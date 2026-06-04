@@ -15,13 +15,19 @@ most-significant bit first.
 
 | Class | Name | Meaning |
 | ----- | ---- | ------- |
-| `00` | Reserved | Invalid in v0.1 |
+| `00` | Toolchain | Base-16T toolchain operations; reserved in Base-16 |
 | `01` | ALU | ALU and jump operations |
 | `10` | Register | Register move and immediate operations |
 | `11` | Memory | Data memory operations |
 
 Reserved fields must be encoded as zero. Portable software must not rely on any
 behavior for invalid encodings.
+
+## Base-16T
+
+Base-16T defines class `00` for toolchain-oriented instructions needed by C and
+C++ compiler targets: immediate arithmetic, register-indirect memory access,
+call/return, register jump, and signed/unsigned comparison branches.
 
 See [../tables/encoding-fields.csv](../tables/encoding-fields.csv) for the
 machine-readable field table.

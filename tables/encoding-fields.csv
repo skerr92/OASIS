@@ -1,5 +1,32 @@
 format,bits,field,meaning
 common,31:30,class,instruction class
+toolchain_imm,31:30,class,00 toolchain class
+toolchain_imm,29:26,opcode,4-bit toolchain opcode
+toolchain_imm,25:20,ra,destination/source register
+toolchain_imm,19:16,reserved,must be zero
+toolchain_imm,15:0,imm16,immediate operand
+toolchain_mem_indirect,31:30,class,00 toolchain class
+toolchain_mem_indirect,29:26,opcode,4-bit toolchain opcode
+toolchain_mem_indirect,25:20,ra,load/store data register
+toolchain_mem_indirect,19:14,rb,base address register
+toolchain_mem_indirect,13:8,off6,signed word offset
+toolchain_mem_indirect,7:0,reserved,must be zero
+toolchain_branch,31:30,class,00 toolchain class
+toolchain_branch,29:26,opcode,4-bit toolchain opcode
+toolchain_branch,25:20,ra,left comparison register
+toolchain_branch,19:14,rb,right comparison register
+toolchain_branch,13:6,target8,absolute 8-bit instruction target
+toolchain_branch,5:0,reserved,must be zero
+toolchain_call,31:30,class,00 toolchain class
+toolchain_call,29:26,opcode,4-bit toolchain opcode
+toolchain_call,25:14,reserved,must be zero
+toolchain_call,13:6,target8,absolute 8-bit instruction target for CALL
+toolchain_call,5:0,reserved,must be zero
+toolchain_jump_reg,31:30,class,00 toolchain class
+toolchain_jump_reg,29:26,opcode,4-bit toolchain opcode
+toolchain_jump_reg,25:20,reserved,must be zero
+toolchain_jump_reg,19:14,rb,target register
+toolchain_jump_reg,13:0,reserved,must be zero
 alu_jump,29:26,opcode,4-bit ALU or jump opcode
 alu_jump,25:20,ra,destination/source register
 alu_jump,19:14,rb_or_imm6,source register or shift/rotate amount

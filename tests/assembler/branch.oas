@@ -1,0 +1,10 @@
+MVI r1, 5
+MVI r2, 5
+JEQ r1, r2, equal
+MVI r3, 0xffff
+equal:
+MVI r3, 0x0001
+JMP done
+MVI r3, 0x0002
+done:
+NOP

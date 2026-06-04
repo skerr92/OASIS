@@ -1,0 +1,13 @@
+#!/usr/bin/env sh
+set -eu
+
+cat >&2 <<'EOF'
+oasis-c++: C/C++ compilation is not implemented yet.
+
+Planned GCC target: oasis16-unknown-elf
+First host target: Darwin/macOS
+
+See toolchain/plan.md and toolchain/gcc14/README.md for the backend, binutils,
+runtime, and ABI work needed before this wrapper can invoke a real compiler.
+EOF
+exit 1

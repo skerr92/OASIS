@@ -1,0 +1,3 @@
+oasis16.o: $(srcdir)/config/oasis16/oasis16.cc
+	$(COMPILE) $<
+	$(POSTCOMPILE)

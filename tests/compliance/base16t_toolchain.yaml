@@ -1,0 +1,28 @@
+name: base16t_toolchain
+profile: oasis-base16t-v0.1-draft
+description: Base-16T stack, call, return, indirect memory, and comparison branch coverage.
+program:
+  - MVI r56, 0x01ff
+  - SBI r56, 1
+  - MVI r4, 0x1234
+  - STR r4, [r56 + 0]
+  - LDR r1, [r56 + 0]
+  - ADI r56, 1
+  - CALL function
+  - JMP done
+  - "function:"
+  - JLT r1, r4, less
+  - JGE r1, r4, ge
+  - "less:"
+  - MVI r2, 0xffff
+  - RET
+  - "ge:"
+  - MVI r2, 0x0001
+  - RET
+  - "done:"
+  - NOP
+expect:
+  registers:
+    r1: 0x1234
+    r2: 0x0001
+    r56: 0x01ff

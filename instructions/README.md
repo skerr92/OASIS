@@ -4,6 +4,17 @@ These pages are generated from `tables/opcode-map.csv`.
 
 | Instruction | Page |
 | ----------- | ---- |
+| `ADI` | [ADI.md](ADI.md) |
+| `SBI` | [SBI.md](SBI.md) |
+| `LDR` | [LDR.md](LDR.md) |
+| `STR` | [STR.md](STR.md) |
+| `CALL` | [CALL.md](CALL.md) |
+| `RET` | [RET.md](RET.md) |
+| `JMR` | [JMR.md](JMR.md) |
+| `JLT` | [JLT.md](JLT.md) |
+| `JGE` | [JGE.md](JGE.md) |
+| `JLTU` | [JLTU.md](JLTU.md) |
+| `JGEU` | [JGEU.md](JGEU.md) |
 | `ADD` | [ADD.md](ADD.md) |
 | `SUB` | [SUB.md](SUB.md) |
 | `AND` | [AND.md](AND.md) |

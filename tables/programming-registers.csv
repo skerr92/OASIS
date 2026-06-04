@@ -1,0 +1,10 @@
+address,name,access,width,description
+0x0000,CONTROL,RW,16,control bits for halt reset instruction-memory read/write and auto-increment
+0x0001,STATUS,RO,16,status bits for halt reset busy and error state
+0x0002,CORE_ID,RO,16,implementation-defined core identifier
+0x0003,OASIS_PROFILE,RO,16,OASIS profile identifier
+0x0004,IMEM_ADDR,RW,16,instruction memory address in low 8 bits
+0x0005,IMEM_WDATA_LO,RW,16,instruction write data bits 15:0
+0x0006,IMEM_WDATA_HI,RW,16,instruction write data bits 31:16
+0x0007,IMEM_RDATA_LO,RO,16,instruction read data bits 15:0
+0x0008,IMEM_RDATA_HI,RO,16,instruction read data bits 31:16

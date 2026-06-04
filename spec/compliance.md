@@ -3,6 +3,11 @@
 Compliance tests define ISA-visible behavior that every compatible OASIS
 implementation must match. They live in `tests/compliance/` as YAML files.
 
+Tests name the profile they target:
+
+- `oasis-base16-v0.1-draft`
+- `oasis-base16t-v0.1-draft`
+
 Each instruction should have at least one basic test and one edge-case test where
 applicable.
 

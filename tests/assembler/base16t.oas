@@ -1,0 +1,20 @@
+MVI r56, 0x01ff
+SBI r56, 1
+STR r4, [r56 + 0]
+LDR r1, [r56 + 0]
+ADI r56, 1
+CALL function
+JMR r1
+function:
+JLT r1, r2, less
+JGE r1, r2, ge
+JLTU r1, r2, less_u
+JGEU r1, r2, ge_u
+less:
+RET
+ge:
+RET
+less_u:
+RET
+ge_u:
+RET

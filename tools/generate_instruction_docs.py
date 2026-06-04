@@ -13,6 +13,43 @@ INSTRUCTION_DIR = ROOT / "instructions"
 
 
 ENCODING_BY_GROUP = {
+    "imm": [
+        ("31:30", "class", "`00` toolchain class"),
+        ("29:26", "opcode", "instruction opcode"),
+        ("25:20", "ra", "destination/source register"),
+        ("19:16", "reserved", "must be zero"),
+        ("15:0", "imm16", "immediate operand"),
+    ],
+    "mem_indirect": [
+        ("31:30", "class", "`00` toolchain class"),
+        ("29:26", "opcode", "instruction opcode"),
+        ("25:20", "ra", "load/store data register"),
+        ("19:14", "rb", "base address register"),
+        ("13:8", "off6", "signed word offset"),
+        ("7:0", "reserved", "must be zero"),
+    ],
+    "call": [
+        ("31:30", "class", "`00` toolchain class"),
+        ("29:26", "opcode", "instruction opcode"),
+        ("25:14", "reserved", "must be zero"),
+        ("13:6", "target8", "absolute target for CALL"),
+        ("5:0", "reserved", "must be zero"),
+    ],
+    "jump_reg": [
+        ("31:30", "class", "`00` toolchain class"),
+        ("29:26", "opcode", "instruction opcode"),
+        ("25:20", "reserved", "must be zero"),
+        ("19:14", "rb", "target register"),
+        ("13:0", "reserved", "must be zero"),
+    ],
+    "branch_ext": [
+        ("31:30", "class", "`00` toolchain class"),
+        ("29:26", "opcode", "instruction opcode"),
+        ("25:20", "ra", "left comparison register"),
+        ("19:14", "rb", "right comparison register"),
+        ("13:6", "target8", "absolute 8-bit instruction target"),
+        ("5:0", "reserved", "must be zero"),
+    ],
     "alu": [
         ("31:30", "class", "`01` ALU/jump class"),
         ("29:26", "opcode", "instruction opcode"),

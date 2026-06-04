@@ -1,0 +1,7 @@
+# Add this case to GCC 14 gcc/config.gcc.
+#
+# oasis16-*-elf*)
+#   tm_file="elfos.h newlib-stdint.h oasis16/oasis16.h"
+#   tmake_file="oasis16/t-oasis16"
+#   extra_objs="oasis16.o"
+#   ;;

@@ -15,3 +15,12 @@ The program counter stores an 8-bit instruction index. Jump targets are absolute
 
 Reset sets `pc = 0`. Register and memory reset values are implementation-defined
 unless a future profile states otherwise.
+
+## Programmability
+
+Instruction memory may be initialized through synthesis, simulation files, ROM,
+flash, SPI, JTAG, or another implementation-defined loader. Portable OASIS
+software is represented as an ordered list of 32-bit instruction words starting
+at instruction index `0x00` unless a loader specifies a different start address.
+
+See [programming.md](programming.md) for the recommended programming model.

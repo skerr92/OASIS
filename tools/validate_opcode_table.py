@@ -32,10 +32,10 @@ def main() -> int:
             if mnemonic != mnemonic.upper():
                 errors.append(f"{mnemonic}: mnemonic must be uppercase")
 
-            if row["class"] not in {"01", "10", "11"}:
+            if row["class"] not in {"00", "01", "10", "11"}:
                 errors.append(f"{mnemonic}: invalid class {row['class']}")
 
-            expected_opcode_width = 4 if row["class"] == "01" else 2
+            expected_opcode_width = 4 if row["class"] in {"00", "01"} else 2
             if len(row["opcode"]) != expected_opcode_width:
                 errors.append(
                     f"{mnemonic}: opcode {row['opcode']} must be "

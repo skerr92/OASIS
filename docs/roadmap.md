@@ -25,7 +25,17 @@
 - Add a conformance badge such as `OASIS Base-16 Compliant`
 - Add guides for building a minimal OASIS core
 
+## Phase 4: C And C++ Toolchain
+
+- Define a Base-16T ABI
+- Define the Base-16T toolchain profile
+- Define a bare-metal runtime
+- Define object and linker expectations
+- Add compiler wrapper behavior
+- Prototype Darwin-hosted GCC 14 and binutils backend ports
+- Compile a simple arithmetic C function into OASIS assembly
+
 ## Deferred
 
-Do not add privilege modes, interrupts, exceptions, byte addressing, or new ALU
-features until Base-16 v0.1 is specified and tested.
+Do not add privilege modes, interrupts, exceptions, byte addressing, new ALU
+features, or full C/C++ support until Base-16 v0.1 is specified and tested.

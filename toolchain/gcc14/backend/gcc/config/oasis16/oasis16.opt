@@ -1,0 +1,5 @@
+; OASIS target options.
+
+mbase16t
+Target Mask(BASE16T)
+Generate code for OASIS Base-16T.

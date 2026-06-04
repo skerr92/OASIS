@@ -7,10 +7,14 @@ tested before new operations are added.
 
 | Group | Instructions |
 | ----- | ------------ |
+| Toolchain | `ADI`, `SBI`, `LDR`, `STR`, `CALL`, `RET`, `JMR`, `JLT`, `JGE`, `JLTU`, `JGEU` |
 | ALU | `ADD`, `SUB`, `AND`, `OOR`, `XOR`, `SHR`, `SHL`, `RTR`, `RTL`, `NOT`, `MLT` |
 | Branch | `JEQ`, `JNE`, `JMP`, `NOP` |
 | Register | `MVV`, `MVI` |
 | Memory | `MVF`, `MVT`, `MSI` |
+
+The toolchain group belongs to the Base-16T profile. Base-16T is Base-16 plus
+the instructions required for freestanding C and C++ compiler support.
 
 See [../instructions/README.md](../instructions/README.md) for the detailed
 per-instruction reference and [../tables/opcode-map.csv](../tables/opcode-map.csv)

@@ -10,7 +10,12 @@ against a pinned OASIS version.
 
 ## Current Profile
 
-OASIS v0.1-draft defines the Base-16 profile:
+OASIS v0.1-draft defines two profiles:
+
+- Base-16: compact ISA foundation
+- Base-16T: Base-16 plus toolchain operations for C/C++ compiler targets
+
+Base-16 provides:
 
 - 16-bit data path
 - 32-bit instructions
@@ -18,6 +23,9 @@ OASIS v0.1-draft defines the Base-16 profile:
 - Word-addressed data memory
 - Basic ALU, move/immediate, load/store, and jump/branch operations
 - No privilege modes, interrupts, exceptions, or status flags
+
+Base-16T adds immediate arithmetic, register-indirect memory access, call/return,
+jump-register, and signed/unsigned comparison branches.
 
 Start with [spec/oasis-v0.1.md](spec/oasis-v0.1.md).
 
@@ -30,7 +38,34 @@ Start with [spec/oasis-v0.1.md](spec/oasis-v0.1.md).
 | `tables/` | Machine-readable opcode and encoding tables |
 | `tests/compliance/` | Shared ISA compliance test definitions |
 | `tools/` | Documentation and table validation tools |
+| `bin/` | User-facing tool wrappers |
+| `toolchain/` | C/C++ toolchain planning and runtime scaffolding |
 | `docs/` | Roadmap and process notes |
+
+## Tools
+
+Assemble OASIS Base-16 programs:
+
+```sh
+bin/oasis-asm examples/base16/add_store.oas -o add_store.mem
+```
+
+Generate programming scripts for SPI/JTAG bridges:
+
+```sh
+bin/oasis-program-image examples/base16/add_store.oas -o add_store.dap16
+```
+
+Run repository checks:
+
+```sh
+make check
+```
+
+C and C++ wrappers exist as explicit placeholders under `bin/`. See
+[toolchain/README.md](toolchain/README.md) and
+[toolchain/plan.md](toolchain/plan.md) for the Darwin-first GCC 14 path needed
+before `oasis-cc` and `oasis-c++` can compile programs.
 
 ## Development Rule
 

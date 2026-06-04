@@ -6,7 +6,7 @@ ISA contract.
 
 Status: Experimental draft
 
-Profile: OASIS Base-16
+Profiles: OASIS Base-16 and OASIS Base-16T
 
 Compatible cores: DungV v0.x targets this draft
 
@@ -40,10 +40,43 @@ but portable software must not rely on that behavior.
 
 | Class | Group |
 | ----- | ----- |
-| `00` | Reserved |
+| `00` | Toolchain operations in Base-16T; reserved in Base-16 |
 | `01` | ALU and jump operations |
 | `10` | Register move operations |
 | `11` | Memory operations |
+
+## Toolchain Operation Encoding
+
+Class `00` is reserved by Base-16 and defined by the Base-16T toolchain profile.
+Base-16T exists to support freestanding C and C++ compiler targets.
+
+| Bits | Field |
+| ---- | ----- |
+| `[31:30]` | `00` class |
+| `[29:26]` | 4-bit opcode |
+| `[25:20]` | register A, when used |
+| `[19:14]` | register B, when used |
+| `[13:8]` | signed 6-bit word offset for `LDR` and `STR` |
+| `[13:6]` | 8-bit target for `CALL` and comparison branches |
+| `[15:0]` | 16-bit immediate for `ADI` and `SBI` |
+| unused bits | reserved |
+
+| Opcode | Mnemonic | Syntax | Operation |
+| ------ | -------- | ------ | --------- |
+| `0001` | `ADI` | `ADI ra, imm16` | `ra = ra + imm16` |
+| `0010` | `SBI` | `SBI ra, imm16` | `ra = ra - imm16` |
+| `0011` | `LDR` | `LDR ra, [rb + off6]` | `ra = memory[rb + sign_extend(off6)]` |
+| `0100` | `STR` | `STR ra, [rb + off6]` | `memory[rb + sign_extend(off6)] = ra` |
+| `0101` | `CALL` | `CALL target8` | `r58 = pc + 1; pc = target8` |
+| `0110` | `RET` | `RET` | `pc = r58[7:0]` |
+| `0111` | `JMR` | `JMR rb` | `pc = rb[7:0]` |
+| `1000` | `JLT` | `JLT ra, rb, target8` | signed branch when `ra < rb` |
+| `1001` | `JGE` | `JGE ra, rb, target8` | signed branch when `ra >= rb` |
+| `1010` | `JLTU` | `JLTU ra, rb, target8` | unsigned branch when `ra < rb` |
+| `1011` | `JGEU` | `JGEU ra, rb, target8` | unsigned branch when `ra >= rb` |
+
+Base-16T keeps the 16-bit data path and 32-bit instruction width. Arithmetic
+still wraps modulo 16 bits.
 
 ## ALU And Jump Encoding
 
@@ -148,7 +181,8 @@ reference pages.
 
 ## Calling Convention
 
-No calling convention is defined in v0.1.
+Base-16 has no calling convention. Base-16T uses the bare-metal ABI draft in
+[../toolchain/abi/base16-baremetal-abi.md](../toolchain/abi/base16-baremetal-abi.md).
 
 ## Extension Roadmap
 
@@ -157,15 +191,15 @@ Future OASIS versions may define:
 - A hardwired zero register or named register aliases
 - Byte addressing and explicit endianness
 - Status flags or compare instructions
-- Load/store through register addresses
-- A subroutine call and return convention
 - Privileged execution modes
 
 ## Topic Pages
 
 - [encoding.md](encoding.md)
+- [base16t.md](base16t.md)
 - [registers.md](registers.md)
 - [memory-model.md](memory-model.md)
+- [programming.md](programming.md)
 - [instruction-set.md](instruction-set.md)
 - [exceptions.md](exceptions.md)
 - [abi.md](abi.md)

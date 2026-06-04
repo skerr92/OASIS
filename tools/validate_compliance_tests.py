@@ -16,6 +16,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 TEST_DIR = ROOT / "tests" / "compliance"
 REQUIRED_KEYS = {"name", "profile", "program", "expect"}
+VALID_PROFILES = {"oasis-base16-v0.1-draft", "oasis-base16t-v0.1-draft"}
 
 
 def top_level_keys(text: str) -> set[str]:
@@ -58,7 +59,7 @@ def main() -> int:
             names[name] = path
 
         profile = scalar_value(text, "profile")
-        if profile != "oasis-base16-v0.1-draft":
+        if profile not in VALID_PROFILES:
             errors.append(f"{path}: unexpected profile {profile}")
 
     if errors:
