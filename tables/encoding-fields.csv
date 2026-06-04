@@ -1,0 +1,19 @@
+format,bits,field,meaning
+common,31:30,class,instruction class
+alu_jump,29:26,opcode,4-bit ALU or jump opcode
+alu_jump,25:20,ra,destination/source register
+alu_jump,19:14,rb_or_imm6,source register or shift/rotate amount
+alu_jump,13:6,target8,8-bit absolute jump target for JEQ/JNE/JMP
+alu_jump,5:0,reserved,must be zero
+register,29:28,opcode,2-bit register opcode
+register,27:22,ra,destination register
+register,21:16,rb,source register for MVV
+register,15:0,imm16,immediate value for MVI
+memory_reg_addr,29:28,opcode,2-bit memory opcode for MVF/MVT
+memory_reg_addr,27:22,ra,register operand
+memory_reg_addr,21:13,addr9,9-bit data-memory word address
+memory_reg_addr,12:0,reserved,must be zero
+memory_immediate,29:28,opcode,MSI opcode
+memory_immediate,27:19,addr9,9-bit data-memory word address
+memory_immediate,18:16,reserved,must be zero
+memory_immediate,15:0,imm16,immediate value

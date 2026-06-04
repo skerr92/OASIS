@@ -1,0 +1,10 @@
+name: add_basic
+profile: oasis-base16-v0.1-draft
+description: Basic register addition.
+program:
+  - MVI r1, 10
+  - MVI r2, 20
+  - ADD r1, r2
+expect:
+  registers:
+    r1: 30

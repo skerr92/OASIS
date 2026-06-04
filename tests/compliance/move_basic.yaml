@@ -1,0 +1,10 @@
+name: move_basic
+profile: oasis-base16-v0.1-draft
+description: Immediate and register move behavior.
+program:
+  - MVI r1, 0x1234
+  - MVV r2, r1
+expect:
+  registers:
+    r1: 0x1234
+    r2: 0x1234

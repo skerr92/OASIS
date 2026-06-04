@@ -1,0 +1,19 @@
+name: alu_edges
+profile: oasis-base16-v0.1-draft
+description: ALU wraparound and rotate edge cases.
+program:
+  - MVI r1, 0xffff
+  - MVI r2, 1
+  - ADD r1, r2
+  - MVI r3, 0x0000
+  - SUB r3, r2
+  - MVI r4, 0x8001
+  - RTR r4, 0
+  - MVI r5, 0x0001
+  - RTR r5, 1
+expect:
+  registers:
+    r1: 0x0000
+    r3: 0xffff
+    r4: 0x8001
+    r5: 0x8000
