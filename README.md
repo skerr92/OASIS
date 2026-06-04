@@ -69,6 +69,11 @@ before `oasis-cc` and `oasis-c++` can compile programs.
 
 ## Development Rule
 
-Do not grow the ISA until OASIS Base-16 v0.1 has complete instruction docs,
-machine-readable opcode tables, and compliance tests that implementation repos
-can run.
+OASIS v0.1 now requires:
+
+- Complete generated instruction docs for every opcode
+- Machine-readable opcode, encoding, register, target, and programming tables
+- Compliance coverage for every mnemonic in the opcode table
+
+Do not grow the ISA beyond Base-16/Base-16T until implementation repositories can
+run and report the shared compliance tests.

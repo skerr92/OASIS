@@ -1,0 +1,12 @@
+; OASIS Base-16T startup for the standalone oasis-asm flow.
+; Keep _start at instruction 0 when this is prepended to a program image.
+
+_start:
+MVI r56, 0x01ff
+CALL main
+
+__oasis_exit:
+JMP __oasis_exit
+
+__oasis_abort:
+JMP __oasis_abort

@@ -1,0 +1,3 @@
+oasis16-*-elf*)
+	tmake_file="${tmake_file} oasis16/t-oasis16"
+	;;

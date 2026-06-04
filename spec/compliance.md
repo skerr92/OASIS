@@ -11,6 +11,9 @@ Tests name the profile they target:
 Each instruction should have at least one basic test and one edge-case test where
 applicable.
 
+`tools/validate_compliance_tests.py` checks that every mnemonic in
+`tables/opcode-map.csv` appears in at least one compliance program.
+
 | Instruction | Required coverage |
 | ----------- | ----------------- |
 | `ADD` | Basic addition and 16-bit wrap |
@@ -59,3 +62,5 @@ The harness should support:
 
 Implementation repositories may translate these YAML tests into their local
 assembler, simulator, emulator, or hardware verification flow.
+
+See [../docs/conformance.md](../docs/conformance.md) for profile claim guidance.

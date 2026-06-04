@@ -1,31 +1,32 @@
 # OASIS Runtime
 
-This directory is reserved for the bare-metal runtime needed by C and C++.
+This directory contains the first Base-16T bare-metal runtime pieces for the
+`oasis16-unknown-elf` toolchain profile.
 
-Open decisions:
+## Files
 
-- Stack pointer register
-- Return address register
-- Function call and return instructions or sequences
-- Argument and return-value registers
-- Callee-saved and caller-saved registers
-- Startup code
-- Linker memory layout
-- C library subset
-- C++ static initialization support
+- `crt0.S` is the ELF/GAS startup file. It defines `_start`, initializes `r56`
+  as the stack pointer, calls `main`, and parks in `__oasis_exit`.
+- `crt0.oas` is the same startup shape for the standalone `oasis-asm` program
+  image flow.
+- `linker/oasis16.ld` defines the draft 256-instruction text memory and
+  512-word data memory layout.
+- `include/oasis.h` exposes the runtime exit and abort hooks.
+- `libgcc/oasis16-libgcc.S` provides the first 16-bit arithmetic helper
+  routines used by GCC lowering.
 
-Until these are defined, C/C++ support should be treated as infrastructure work,
-not a complete toolchain.
+## ABI Assumptions
 
-## First Runtime Milestone
+- `r1` and `r2` carry return values.
+- `r4` through `r11` carry incoming arguments.
+- `r56` is `sp`.
+- `r57` is `fp`.
+- `r58` is `ra`; `CALL` writes it and `RET` consumes it.
+- Stack slots are 16-bit data-memory words and the stack grows downward.
 
-The first useful runtime should support a freestanding C program with:
+## Current Scope
 
-- A reset/start symbol
-- Zeroed `.bss`, once object files and sections exist
-- A fixed stack region
-- A halt/exit loop
-- No syscalls
-- No heap
-
-Target this before C++.
+The runtime is enough to anchor freestanding C experiments once the GCC and
+binutils backends are copied into real source trees. It does not yet provide a C
+library, syscalls, heap allocation, object constructors, destructors, or `.bss`
+zeroing.

@@ -1,0 +1,19 @@
+name: base16_shift_rotate
+profile: oasis-base16-v0.1-draft
+description: Shift and rotate instruction coverage.
+program:
+  - MVI r1, 0x8001
+  - MVV r2, r1
+  - SHR r2, 1
+  - MVV r3, r1
+  - SHL r3, 1
+  - MVV r4, r1
+  - RTR r4, 1
+  - MVV r5, r1
+  - RTL r5, 1
+expect:
+  registers:
+    r2: 0x4000
+    r3: 0x0002
+    r4: 0xc000
+    r5: 0x0003

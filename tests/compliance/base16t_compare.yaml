@@ -1,0 +1,28 @@
+name: base16t_compare
+profile: oasis-base16t-v0.1-draft
+description: Base-16T signed and unsigned comparison branch coverage.
+program:
+  - MVI r1, 0xffff
+  - MVI r2, 0x0001
+  - JLT r1, r2, signed_less
+  - MVI r3, 0xffff
+  - "signed_less:"
+  - MVI r3, 1
+  - JGE r2, r1, signed_ge
+  - MVI r4, 0xffff
+  - "signed_ge:"
+  - MVI r4, 1
+  - JLTU r2, r1, unsigned_less
+  - MVI r5, 0xffff
+  - "unsigned_less:"
+  - MVI r5, 1
+  - JGEU r1, r2, unsigned_ge
+  - MVI r6, 0xffff
+  - "unsigned_ge:"
+  - MVI r6, 1
+expect:
+  registers:
+    r3: 1
+    r4: 1
+    r5: 1
+    r6: 1

@@ -47,6 +47,7 @@ def main() -> int:
         gcc_src = temp / "gcc-14"
         binutils_src = temp / "binutils"
         (gcc_src / "gcc").mkdir(parents=True)
+        (gcc_src / "libgcc").mkdir(parents=True)
         binutils_src.mkdir()
 
         apply = run(
@@ -62,6 +63,8 @@ def main() -> int:
             raise AssertionError(apply.stderr)
         if not (gcc_src / "gcc" / "config" / "oasis16" / "oasis16.md").exists():
             raise AssertionError("GCC backend skeleton was not copied")
+        if not (gcc_src / "libgcc" / "config" / "oasis16" / "lib1funcs.S").exists():
+            raise AssertionError("libgcc backend skeleton was not copied")
         if not (binutils_src / "include" / "opcode" / "oasis16.h").exists():
             raise AssertionError("binutils backend skeleton was not copied")
 

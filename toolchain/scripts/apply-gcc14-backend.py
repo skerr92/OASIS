@@ -11,6 +11,7 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[2]
 GCC_BACKEND = ROOT / "toolchain" / "gcc14" / "backend" / "gcc"
+LIBGCC_BACKEND = ROOT / "toolchain" / "gcc14" / "backend" / "libgcc"
 BINUTILS_BACKEND = ROOT / "toolchain" / "binutils" / "backend"
 
 
@@ -48,12 +49,14 @@ def main(argv: list[str]) -> int:
 
     try:
         gcc_files = copy_tree(GCC_BACKEND, args.gcc_src / "gcc", args.force)
+        libgcc_files = copy_tree(LIBGCC_BACKEND, args.gcc_src / "libgcc", args.force)
         binutils_files = copy_tree(BINUTILS_BACKEND, args.binutils_src, args.force)
     except FileExistsError as exc:
         print(exc, file=sys.stderr)
         return 1
 
     print(f"copied {len(gcc_files)} GCC backend files")
+    print(f"copied {len(libgcc_files)} libgcc backend files")
     print(f"copied {len(binutils_files)} binutils backend files")
     print("Manual configure integration is still required; see backend README files.")
     return 0

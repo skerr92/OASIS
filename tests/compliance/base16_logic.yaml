@@ -1,0 +1,20 @@
+name: base16_logic
+profile: oasis-base16-v0.1-draft
+description: Bitwise logic instruction coverage.
+program:
+  - MVI r1, 0x00ff
+  - MVI r2, 0x0f0f
+  - AND r3, r1
+  - MVV r3, r1
+  - AND r3, r2
+  - MVV r4, r1
+  - OOR r4, r2
+  - MVV r5, r1
+  - XOR r5, r2
+  - NOT r1
+expect:
+  registers:
+    r1: 0xff00
+    r3: 0x000f
+    r4: 0x0fff
+    r5: 0x0ff0

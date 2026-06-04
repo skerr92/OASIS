@@ -1,0 +1,5 @@
+/* Add to bfd/archures.c. */
+extern const bfd_arch_info_type bfd_oasis16_arch;
+
+/* Add bfd_arch_oasis16 to enum bfd_architecture. */
+bfd_arch_oasis16, /* OASIS 16-bit architecture. */

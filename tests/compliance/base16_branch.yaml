@@ -1,0 +1,20 @@
+name: base16_branch
+profile: oasis-base16-v0.1-draft
+description: Base branch instruction coverage.
+program:
+  - MVI r1, 1
+  - MVI r2, 2
+  - JNE r1, r2, different
+  - MVI r3, 0xffff
+  - "different:"
+  - JEQ r1, r1, equal
+  - MVI r3, 0xfffe
+  - "equal:"
+  - MVI r3, 0x0001
+  - JMP done
+  - MVI r3, 0x0002
+  - "done:"
+  - NOP
+expect:
+  registers:
+    r3: 0x0001

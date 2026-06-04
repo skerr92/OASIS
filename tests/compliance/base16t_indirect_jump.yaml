@@ -1,0 +1,12 @@
+name: base16t_indirect_jump
+profile: oasis-base16t-v0.1-draft
+description: Base-16T indirect jump coverage.
+program:
+  - MVI r1, target
+  - JMR r1
+  - MVI r2, 0xffff
+  - "target:"
+  - MVI r2, 1
+expect:
+  registers:
+    r2: 1

@@ -15,6 +15,7 @@ shape:
 - ELF header constants
 - Opcode table structure
 - GAS target placeholder
+- LD emulation parameters and linker script template
 
 Known missing pieces:
 

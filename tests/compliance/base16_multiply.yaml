@@ -1,0 +1,14 @@
+name: base16_multiply
+profile: oasis-base16-v0.1-draft
+description: Multiply instruction coverage including low-16 truncation.
+program:
+  - MVI r1, 0x0100
+  - MVI r2, 0x0100
+  - MLT r1, r2
+  - MVI r3, 7
+  - MVI r4, 6
+  - MLT r3, r4
+expect:
+  registers:
+    r1: 0x0000
+    r3: 42

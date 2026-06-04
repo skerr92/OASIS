@@ -9,12 +9,14 @@ assembler/emulator harness.
 from __future__ import annotations
 
 from pathlib import Path
+import csv
 import re
 import sys
 
 
 ROOT = Path(__file__).resolve().parents[1]
 TEST_DIR = ROOT / "tests" / "compliance"
+OPCODE_TABLE = ROOT / "tables" / "opcode-map.csv"
 REQUIRED_KEYS = {"name", "profile", "program", "expect"}
 VALID_PROFILES = {"oasis-base16-v0.1-draft", "oasis-base16t-v0.1-draft"}
 
@@ -35,10 +37,40 @@ def scalar_value(text: str, key: str) -> str | None:
     return match.group(1).strip() if match else None
 
 
+def opcode_mnemonics() -> set[str]:
+    with OPCODE_TABLE.open(newline="") as table:
+        return {row["mnemonic"].upper() for row in csv.DictReader(table)}
+
+
+def covered_mnemonics(text: str) -> set[str]:
+    covered: set[str] = set()
+    in_program = False
+
+    for line in text.splitlines():
+        stripped = line.strip()
+        if stripped == "program:":
+            in_program = True
+            continue
+        if in_program and re.match(r"^[A-Za-z0-9_-]+:", line):
+            in_program = False
+        if not in_program or not stripped.startswith("- "):
+            continue
+
+        item = stripped[2:].strip().strip('"')
+        if item.endswith(":"):
+            continue
+        parts = item.split(None, 1)
+        if parts:
+            covered.add(parts[0].upper())
+
+    return covered
+
+
 def main() -> int:
     errors: list[str] = []
     names: dict[str, Path] = {}
     files = sorted(TEST_DIR.glob("*.yaml"))
+    all_covered: set[str] = set()
 
     if not files:
         errors.append("no compliance YAML files found")
@@ -62,12 +94,21 @@ def main() -> int:
         if profile not in VALID_PROFILES:
             errors.append(f"{path}: unexpected profile {profile}")
 
+        all_covered.update(covered_mnemonics(text))
+
+    missing_mnemonics = opcode_mnemonics() - all_covered
+    if missing_mnemonics:
+        errors.append(
+            "missing compliance coverage for: "
+            + ", ".join(sorted(missing_mnemonics))
+        )
+
     if errors:
         for error in errors:
             print(error, file=sys.stderr)
         return 1
 
-    print(f"validated {len(files)} compliance tests")
+    print(f"validated {len(files)} compliance tests covering {len(all_covered)} mnemonics")
     return 0
 
 
