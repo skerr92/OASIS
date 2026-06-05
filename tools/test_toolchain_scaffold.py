@@ -117,7 +117,15 @@ def main() -> int:
         write(binutils_src / "bfd" / "config.bfd", "case ${targ} in\n  *)\n    ;;\nesac\n")
         write(binutils_src / "include" / "elf" / "common.h", "#define EM_NONE 0\n")
         write(binutils_src / "bfd" / "archures.c", "const void *bfd_archures_list[] = { 0 };\n")
-        write(binutils_src / "bfd" / "reloc.c", "enum bfd_reloc_code_real { BFD_RELOC_NONE };\n")
+        write(
+            binutils_src / "bfd" / "reloc.c",
+            "SENUM\n"
+            "  bfd_reloc_code_real\n"
+            "ENUM\n"
+            "  BFD_RELOC_NONE\n"
+            "ENDSENUM\n"
+            "  BFD_RELOC_UNUSED\n",
+        )
         write(
             binutils_src / "bfd" / "bfd-in2.h",
             "enum bfd_architecture {\n"
@@ -170,6 +178,14 @@ def main() -> int:
         require_contains((binutils_src / "bfd" / "config.bfd").read_text(), "oasis16_elf32_vec")
         require_contains((binutils_src / "bfd" / "bfd-in2.h").read_text(), "bfd_arch_oasis16")
         require_contains((binutils_src / "bfd" / "bfd-in2.h").read_text(), "BFD_RELOC_OASIS16_CALL8")
+        reloc_c = (binutils_src / "bfd" / "reloc.c").read_text()
+        require_contains(
+            reloc_c,
+            "ENUM\n"
+            "  BFD_RELOC_OASIS16_16\n"
+            "ENUMX\n"
+            "  BFD_RELOC_OASIS16_ADDR9",
+        )
         require_contains((binutils_src / "bfd" / "targets.c").read_text(), "&oasis16_elf32_vec")
         require_contains((binutils_src / "include" / "elf" / "common.h").read_text(), "EM_OASIS16")
         require_contains((binutils_src / "opcodes" / "disassemble.c").read_text(), "print_insn_oasis16")

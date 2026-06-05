@@ -115,7 +115,7 @@ def insert_reloc_docs(path: Path) -> bool:
         "  BFD_RELOC_OASIS16_TARGET8,\n"
         "  BFD_RELOC_OASIS16_CALL8,\n"
     )
-    addition = (
+    bad_enumx_addition = (
         "ENUMX\n"
         "  BFD_RELOC_OASIS16_16\n"
         "ENUMX\n"
@@ -128,7 +128,23 @@ def insert_reloc_docs(path: Path) -> bool:
         "  OASIS Base-16T relocations.\n"
         "\n"
     )
+    addition = (
+        "ENUM\n"
+        "  BFD_RELOC_OASIS16_16\n"
+        "ENUMX\n"
+        "  BFD_RELOC_OASIS16_ADDR9\n"
+        "ENUMX\n"
+        "  BFD_RELOC_OASIS16_TARGET8\n"
+        "ENUMX\n"
+        "  BFD_RELOC_OASIS16_CALL8\n"
+        "ENUMDOC\n"
+        "  OASIS Base-16T relocations.\n"
+        "\n"
+    )
     text = read_text(path).replace(bad_addition, "")
+    if bad_enumx_addition in text:
+        write_text(path, text.replace(bad_enumx_addition, addition, 1))
+        return True
     if "BFD_RELOC_OASIS16_CALL8\nENUMDOC" in text:
         return False
     marker = "ENDSENUM\n  BFD_RELOC_UNUSED"
