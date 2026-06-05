@@ -10,7 +10,7 @@ against a pinned OASIS version.
 
 ## Current Profile
 
-OASIS v0.1-draft defines two profiles:
+OASIS v0.1 defines two profiles:
 
 - Base-16: compact ISA foundation
 - Base-16T: Base-16 plus toolchain operations for C/C++ compiler targets
@@ -28,6 +28,10 @@ Base-16T adds immediate arithmetic, register-indirect memory access, call/return
 jump-register, and signed/unsigned comparison branches.
 
 Start with [spec/oasis-v0.1.md](spec/oasis-v0.1.md).
+
+OASIS v0.1 is the first functional architecture and toolchain baseline. The
+v0.2 work stream is now focused on a more capable core profile, deeper compiler
+lowering, richer runtime support, and stronger release/compliance packaging.
 
 ## Repository Layout
 
@@ -67,13 +71,22 @@ make check
 `oasis16-elf-g++`. See [toolchain/README.md](toolchain/README.md) for build and
 validation commands.
 
+GitHub Actions publishes two downloadable artifacts on `main`, version tags, and
+manual workflow runs:
+
+- `oasis16-toolchain-installer`: a prebuilt OASIS Base-16T GCC/binutils prefix
+  packaged with an `install.sh`
+- `oasis-source-compliance-package`: the OASIS spec, tables, tools, compliance
+  tests, runtime files, and backend sources for implementations that do not want
+  to consume this repository as a submodule
+
 ## Development Rule
 
-OASIS v0.1 now requires:
+OASIS v0.1 requires:
 
 - Complete generated instruction docs for every opcode
 - Machine-readable opcode, encoding, register, target, and programming tables
 - Compliance coverage for every mnemonic in the opcode table
 
-Do not grow the ISA beyond Base-16/Base-16T until implementation repositories can
-run and report the shared compliance tests.
+OASIS v0.2 proposals should keep v0.1 compatibility explicit and include
+matching table, documentation, assembler, compliance, and toolchain updates.

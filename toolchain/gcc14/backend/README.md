@@ -28,7 +28,6 @@ This backend establishes:
 
 Remaining bring-up work:
 
-- Full GCC bootstrap against an upstream GCC 14 source tree
 - Real reload/LRA pressure tuning from compiler test results
 - Stack argument load/store edge cases beyond the first ABI pass
 - C library integration and C++ constructor/destructor support

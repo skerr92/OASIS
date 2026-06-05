@@ -12,7 +12,7 @@ Recommended dependency options:
 
 Implementation README files should report:
 
-- OASIS version or draft profile
+- OASIS version or profile
 - OASIS commit hash
 - Implemented instruction set subset
 - Compliance test status
@@ -20,7 +20,7 @@ Implementation README files should report:
 Example:
 
 ```text
-Targets: OASIS Base-16 v0.1-draft
+Targets: OASIS Base-16 v0.1
 Spec commit: abc1234
 Status: partial implementation, compliance in progress
 ```
@@ -29,9 +29,9 @@ Status: partial implementation, compliance in progress
 
 Use explicit compatibility labels:
 
-- `OASIS v0.1-draft`
+- `OASIS v0.1`
 - `OASIS Base-16 v0.1`
-- `DungV v0.1 implements partial OASIS v0.1-draft`
+- `DungV v0.1 implements partial OASIS v0.1`
 - `DungV v0.2 implements full OASIS Base-16 v0.1`
 
 Instruction status should use:

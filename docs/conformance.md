@@ -34,8 +34,8 @@ Implementation repositories should:
 
 Suggested badge text:
 
-- `OASIS Base-16 v0.1 Draft: Tested`
-- `OASIS Base-16T v0.1 Draft: Tested`
+- `OASIS Base-16 v0.1: Tested`
+- `OASIS Base-16T v0.1: Tested`
 
 Do not claim a profile until every instruction in that profile is implemented
 and covered by passing compliance tests.

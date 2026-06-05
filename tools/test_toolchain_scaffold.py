@@ -58,6 +58,16 @@ def main() -> int:
         raise AssertionError("installed toolchain validation help should succeed")
     require_contains(validate.stdout, "validate-installed-toolchain.sh")
 
+    package_toolchain = run(["toolchain/scripts/package-toolchain-installer.sh", "--help"])
+    if package_toolchain.returncode != 0:
+        raise AssertionError("toolchain packaging help should succeed")
+    require_contains(package_toolchain.stdout, "package-toolchain-installer.sh")
+
+    package_source = run(["toolchain/scripts/package-source-release.sh", "--help"])
+    if package_source.returncode != 0:
+        raise AssertionError("source packaging help should succeed")
+    require_contains(package_source.stdout, "package-source-release.sh")
+
     dry_validate = run(
         [
             "toolchain/scripts/validate-installed-toolchain.sh",

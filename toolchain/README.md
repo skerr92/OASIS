@@ -6,13 +6,15 @@ The first compiler target is a freestanding GCC 14 cross toolchain for
 
 ## Current Status
 
-The Base-16 assembler is implemented in `tools/oasis_asm.py`.
+The Base-16 assembler is implemented in `tools/oasis_asm.py`, and OASIS v0.1
+now has a working initial GCC 14/binutils toolchain path for
+`oasis16-unknown-elf`.
 
-The repository now contains the OASIS backend files, config integration helper,
-build wrappers, runtime files, ELF-to-image conversion, and installed-toolchain
-smoke tests. What remains is the native bring-up loop: apply these files to real
-GCC 14 and binutils source trees, build them, and fix any upstream API or
-machine-description diagnostics that appear.
+The repository contains backend files, config integration helpers, build
+wrappers, runtime files, ELF-to-image conversion, packaging scripts, and
+installed-toolchain smoke tests. GitHub Actions builds the toolchain against
+upstream GCC/binutils source trees on release-producing refs and uploads a
+toolchain installer plus a source/compliance package.
 
 ## Target Triple
 
@@ -57,15 +59,14 @@ tables in `tables/`. Compiler backends, assemblers, emulators, and compliance
 harnesses should prefer generated metadata over hand-copying opcode constants.
 The metadata also includes the recommended programming access-port register map.
 
-## Remaining Bring-Up Work
+## v0.2 Toolchain Work
 
-1. Run the build scripts against real GCC 14 and binutils source trees.
-2. Fix native compile diagnostics in BFD, GAS, LD, opcodes, GCC, and libgcc.
-3. Run `toolchain/scripts/validate-installed-toolchain.sh` on the installed
-   prefix.
-4. Use validation results to tune GCC reload/LRA behavior, stack arguments, and
-   machine-description coverage.
-5. Add C++ only after the freestanding C toolchain is stable.
+1. Expand GCC lowering for wider integer modes and more complex addressing.
+2. Add deeper libgcc/runtime support beyond the initial 16-bit helper set.
+3. Decide the C++ freestanding policy: static initialization, exceptions, RTTI,
+   allocation, and library subset.
+4. Add more compiler-generated compliance and torture-style smoke tests.
+5. Keep release artifacts reproducible across Linux and Darwin hosts.
 
 ## GCC 14 Build Scripts
 
@@ -88,9 +89,9 @@ toolchain/scripts/build-linux-gcc14.sh \
 ```
 
 This stages the backend files, configures binutils, configures GCC stage 1, and
-installs the draft runtime files. Use `--dry-run` first to inspect the exact
-commands. Add `--run-tests` to run the freestanding C smoke suite after
-installation.
+installs the freestanding runtime and libgcc helper archive. Use `--dry-run`
+first to inspect the exact commands. Add `--run-tests` to run the freestanding
+smoke suite after installation.
 
 Backend files:
 
@@ -117,6 +118,22 @@ Installed toolchains can be validated directly:
 
 ```sh
 toolchain/scripts/validate-installed-toolchain.sh --prefix "$PWD/.toolchain/oasis16"
+```
+
+Package a built prefix as a downloadable installer:
+
+```sh
+toolchain/scripts/package-toolchain-installer.sh \
+  --prefix "$PWD/.toolchain/oasis16" \
+  --output oasis16-toolchain.tar.gz
+```
+
+Package the OASIS source, generated metadata, tools, backend files, runtime, and
+compliance tests for non-submodule consumers:
+
+```sh
+make generate
+toolchain/scripts/package-source-release.sh --output oasis-source.tar.gz
 ```
 
 ## LLVM Backend

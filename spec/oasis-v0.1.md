@@ -1,14 +1,14 @@
-# OASIS v0.1 Draft
+# OASIS v0.1
 
 OASIS is a small, readable, implementation-friendly ISA for learning, FPGA soft
 cores, microcontrollers, and custom chip experiments. This document is the v0.1
 ISA contract.
 
-Status: Experimental draft
+Status: Functional v0.1 baseline
 
 Profiles: OASIS Base-16 and OASIS Base-16T
 
-Compatible cores: DungV v0.x targets this draft
+Compatible cores: DungV v0.x targets this baseline
 
 ## Architectural State
 

@@ -5,3 +5,5 @@ toolchain/generated/
 .OASIS
 .build
 .toolchain
+dist/
+*.tar.gz

@@ -1,6 +1,6 @@
 # Roadmap
 
-## Phase 1: Stabilize OASIS Base-16
+## v0.1 Complete: Stabilize OASIS Base-16
 
 - Architectural state is defined.
 - Instruction encoding is defined.
@@ -10,7 +10,7 @@
 - Reserved bits and invalid encodings are documented.
 - Machine-readable opcode tables are published.
 
-## Phase 2: Make The Spec Executable
+## v0.1 Complete: Make The Spec Executable
 
 - YAML compliance tests cover every instruction.
 - A dependency-free assembler is available at `bin/oasis-asm`.
@@ -19,25 +19,40 @@
   through `make check`.
 - A Python reference emulator remains useful future work.
 
-## Phase 3: Support Implementations
+## v0.1 Complete: Support Implementations
 
-- Provide compliance reports
-- Document repo-to-repo dependency options
-- Add a conformance badge such as `OASIS Base-16 Compliant`
-- Add guides for building a minimal OASIS core
+- Compliance tests are packaged with the source release artifact.
+- Repo-to-repo dependency options are documented.
+- Source package artifacts are available for users who do not want submodules.
+- Conformance badges and implementation guides remain useful v0.2 support work.
 
-## Phase 4: C And C++ Toolchain
+## v0.1 Complete: C And C++ Toolchain Baseline
 
 - Base-16T ABI and toolchain profile are defined.
 - Bare-metal runtime files and linker scripts are present.
 - GCC 14 and binutils backend files are present.
 - Darwin, Linux, and generic build wrappers are present.
 - Installed-toolchain validation tests are present.
-- Remaining work is native build validation against upstream GCC 14 and binutils
-  source trees.
+- Native GCC 14/binutils build validation is wired into GitHub Actions for
+  release artifact generation.
+- Downloadable toolchain installer artifacts are produced on `main`, version
+  tags, and manual workflow runs.
+
+## v0.2: Fuller Core And Toolchain
+
+- Decide the next core profile additions: byte addressing, expanded memory
+  model, interrupts/exceptions, status/compare behavior, or wider program
+  counters.
+- Extend compliance tests before accepting each new architectural feature.
+- Grow GCC lowering beyond the first 16-bit freestanding subset, including more
+  robust 32-bit and 64-bit helper paths.
+- Add runtime support for startup variants, static initialization, and a clearer
+  halt/exit/debug convention.
+- Evaluate C++ freestanding support: constructors, destructors, `new`/`delete`,
+  unwind policy, RTTI policy, and a tiny standard-library subset.
+- Add implementation-facing release notes and compliance report templates.
 
 ## Deferred
 
-Defer privilege modes, interrupts, exceptions, byte addressing, new ALU features,
-and hosted C/C++ support until Base-16/Base-16T freestanding C bring-up is
-validated in real toolchain builds.
+Defer hosted libc, threads, operating-system ABIs, dynamic linking, and full
+libstdc++ until the v0.2 freestanding core/toolchain path is stable.

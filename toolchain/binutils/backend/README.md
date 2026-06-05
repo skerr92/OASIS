@@ -20,7 +20,6 @@ for the first `oasis16-unknown-elf` binutils build:
 
 Remaining bring-up work:
 
-- Native build validation inside an upstream binutils source tree
 - Exhaustive relocation relaxation and overflow tests
 
 `toolchain/scripts/apply-gcc14-backend.py --integrate-config` copies these files

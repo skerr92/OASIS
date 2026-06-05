@@ -15,7 +15,7 @@ Options:
   --clean        remove OASIS build directories before configuring
   --dry-run      print commands without executing them
   --force        overwrite staged backend files in source trees
-  --run-tests    run C smoke tests after installing runtime files
+  --run-tests    run freestanding smoke tests after installing runtime files
   -h, --help     show this help
 EOF
 }
@@ -190,7 +190,7 @@ run_in_dir "$GCC_BUILD" "$GCC_SRC/configure" \
   --target="$TARGET" \
   --program-prefix="$TARGET_ALIAS-" \
   --prefix="$PREFIX" \
-  --enable-languages=c \
+  --enable-languages=c,c++ \
   --without-headers \
   --with-system-zlib \
   --with-insnemit-partitions=7 \
@@ -201,7 +201,9 @@ run_in_dir "$GCC_BUILD" "$GCC_SRC/configure" \
   --disable-nls \
   --disable-multilib
 run make -C "$GCC_BUILD" all-gcc -j "$JOBS"
+run make -C "$GCC_BUILD" all-target-libgcc -j "$JOBS"
 run make -C "$GCC_BUILD" install-gcc
+run make -C "$GCC_BUILD" install-target-libgcc
 
 run mkdir -p "$PREFIX/$TARGET/lib"
 run mkdir -p "$PREFIX/$TARGET/include"

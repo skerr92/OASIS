@@ -1,6 +1,8 @@
 # OASIS Toolchain Plan
 
-The toolchain should grow in layers. The assembler is the first completed layer.
+The v0.1 toolchain baseline is in place. The assembler, ELF conversion,
+GCC/binutils backend files, runtime pieces, build scripts, validation scripts,
+and release packaging scripts are now part of the repository.
 
 ## Current State
 
@@ -16,9 +18,9 @@ Available now:
 
 Not available yet:
 
-- Native-built binutils tools
-- Native-built GCC
-- C++ runtime or standard library support
+- Hosted libc support
+- Full C++ runtime or standard library support
+- Complete 32-bit/64-bit libgcc lowering
 
 ## Toolchain Profile
 
@@ -72,7 +74,7 @@ Status: implemented for freestanding C bring-up.
 
 ### 4. Object And Linker Format
 
-Status: implemented as backend files; awaiting native binutils build validation.
+Status: implemented and covered by the release build workflow.
 
 For GCC/binutils, the practical path is ELF:
 
@@ -83,7 +85,7 @@ For GCC/binutils, the practical path is ELF:
 
 ### 5. Binutils Port
 
-Status: implemented as backend files; awaiting native binutils build validation.
+Status: implemented and covered by the release build workflow.
 
 - BFD architecture
 - Opcode table
@@ -96,7 +98,8 @@ are the ELF path for normal GCC workflows.
 
 ### 6. GCC 14 Backend
 
-Status: implemented as backend files; awaiting native GCC build validation.
+Status: implemented for the v0.1 freestanding baseline and covered by the
+release build workflow.
 
 Initial goal:
 
@@ -104,8 +107,8 @@ Initial goal:
 - Target `oasis16-unknown-elf`
 - GCC 14 source tree
 - Base-16T instruction patterns
-- Language: C first
-- C++ only after libgcc/runtime basics are stable
+- Languages: freestanding C plus C++ front-end bring-up
+- C++ runtime features remain v0.2 work
 
 ### 7. Compiler Validation
 
