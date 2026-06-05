@@ -1,3 +1,5 @@
+#define IN_TARGET_CODE 1
+
 #include "config.h"
 #include "system.h"
 #include "coretypes.h"
@@ -5,16 +7,25 @@
 #include "target.h"
 #include "rtl.h"
 #include "tree.h"
+#include "stringpool.h"
+#include "attribs.h"
+#include "df.h"
 #include "memmodel.h"
 #include "tm_p.h"
-#include "target-def.h"
+#include "regs.h"
+#include "emit-rtl.h"
 #include "output.h"
+#include "insn-config.h"
 #include "insn-attr.h"
+#include "recog.h"
 #include "calls.h"
 #include "explow.h"
 #include "expr.h"
 #include "function.h"
-#include "df.h"
+#include "builtins.h"
+
+/* This file should be included last.  */
+#include "target-def.h"
 
 static void
 oasis16_option_override(void)
@@ -25,6 +36,32 @@ static bool oasis16_save_reg_p(unsigned int regno);
 static unsigned int oasis16_saved_reg_count(void);
 
 static unsigned int
+oasis16_hard_regno_nregs(unsigned int regno ATTRIBUTE_UNUSED, machine_mode mode)
+{
+  return (GET_MODE_SIZE(mode) + UNITS_PER_WORD - 1) / UNITS_PER_WORD;
+}
+
+static bool
+oasis16_hard_regno_mode_ok(unsigned int regno ATTRIBUTE_UNUSED,
+                           machine_mode mode ATTRIBUTE_UNUSED)
+{
+  return true;
+}
+
+static bool
+oasis16_modes_tieable_p(machine_mode mode1 ATTRIBUTE_UNUSED,
+                        machine_mode mode2 ATTRIBUTE_UNUSED)
+{
+  return true;
+}
+
+static HOST_WIDE_INT
+oasis16_starting_frame_offset(void)
+{
+  return 0;
+}
+
+static unsigned int
 oasis16_arg_words(machine_mode mode, const_tree type)
 {
   HOST_WIDE_INT size;
@@ -32,7 +69,7 @@ oasis16_arg_words(machine_mode mode, const_tree type)
   if (mode == BLKmode && type != NULL_TREE)
     size = int_size_in_bytes(type);
   else
-    size = GET_MODE_SIZE(mode).to_constant();
+    size = GET_MODE_SIZE(mode);
 
   if (size <= 0)
     size = UNITS_PER_WORD;
@@ -87,7 +124,8 @@ oasis16_return_in_memory(const_tree type, const_tree fntype ATTRIBUTE_UNUSED)
 int
 oasis16_initial_elimination_offset(int from, int to)
 {
-  HOST_WIDE_INT frame_size = get_frame_size() + oasis16_saved_reg_count() * UNITS_PER_WORD;
+  HOST_WIDE_INT frame_size =
+    get_frame_size().to_constant() + oasis16_saved_reg_count() * UNITS_PER_WORD;
 
   if (from == ARG_POINTER_REGNUM && to == STACK_POINTER_REGNUM)
     return frame_size;
@@ -124,7 +162,8 @@ oasis16_offset_address_p(rtx x, bool strict)
 }
 
 bool
-oasis16_legitimate_address_p(machine_mode mode ATTRIBUTE_UNUSED, rtx x, bool strict)
+oasis16_legitimate_address_p(machine_mode mode ATTRIBUTE_UNUSED, rtx x, bool strict,
+                             code_helper)
 {
   return oasis16_offset_address_p(x, strict);
 }
@@ -182,6 +221,22 @@ oasis16_adjust_stack(HOST_WIDE_INT amount)
     emit_insn(gen_addhi3(sp, sp, GEN_INT(-amount)));
 }
 
+static rtx_insn *
+oasis16_emit_recognized(rtx pattern)
+{
+  rtx_insn *insn = emit_insn(pattern);
+  recog_memoized(insn);
+  return insn;
+}
+
+static rtx_insn *
+oasis16_emit_recognized_jump(rtx pattern)
+{
+  rtx_insn *insn = emit_jump_insn(pattern);
+  recog_memoized(insn);
+  return insn;
+}
+
 static rtx
 oasis16_stack_slot(unsigned int word_offset)
 {
@@ -198,36 +253,38 @@ oasis16_stack_slot(unsigned int word_offset)
 void
 oasis16_expand_prologue(void)
 {
-  HOST_WIDE_INT frame_size = get_frame_size();
+  HOST_WIDE_INT frame_size = get_frame_size().to_constant();
   unsigned int slot = 0;
 
   oasis16_adjust_stack(frame_size + oasis16_saved_reg_count() * UNITS_PER_WORD);
 
   for (unsigned int regno = 0; regno < FIRST_PSEUDO_REGISTER; regno++)
     if (oasis16_save_reg_p(regno))
-      emit_move_insn(oasis16_stack_slot(slot++), gen_rtx_REG(HImode, regno));
+      oasis16_emit_recognized(gen_movhi(oasis16_stack_slot(slot++),
+                                        gen_rtx_REG(HImode, regno)));
 
   if (frame_pointer_needed)
-    emit_move_insn(gen_rtx_REG(HImode, FRAME_POINTER_REGNUM),
-                   gen_rtx_REG(HImode, STACK_POINTER_REGNUM));
+    oasis16_emit_recognized(gen_movhi(gen_rtx_REG(HImode, FRAME_POINTER_REGNUM),
+                                      gen_rtx_REG(HImode, STACK_POINTER_REGNUM)));
 }
 
 void
 oasis16_expand_epilogue(void)
 {
-  HOST_WIDE_INT frame_size = get_frame_size();
+  HOST_WIDE_INT frame_size = get_frame_size().to_constant();
   unsigned int slot = 0;
 
   if (frame_pointer_needed)
-    emit_move_insn(gen_rtx_REG(HImode, STACK_POINTER_REGNUM),
-                   gen_rtx_REG(HImode, FRAME_POINTER_REGNUM));
+    oasis16_emit_recognized(gen_movhi(gen_rtx_REG(HImode, STACK_POINTER_REGNUM),
+                                      gen_rtx_REG(HImode, FRAME_POINTER_REGNUM)));
 
   for (unsigned int regno = 0; regno < FIRST_PSEUDO_REGISTER; regno++)
     if (oasis16_save_reg_p(regno))
-      emit_move_insn(gen_rtx_REG(HImode, regno), oasis16_stack_slot(slot++));
+      oasis16_emit_recognized(gen_movhi(gen_rtx_REG(HImode, regno),
+                                        oasis16_stack_slot(slot++)));
 
   oasis16_adjust_stack(-(frame_size + oasis16_saved_reg_count() * UNITS_PER_WORD));
-  emit_jump_insn(gen_returner());
+  oasis16_emit_recognized_jump(gen_returner());
 }
 
 void
@@ -275,11 +332,34 @@ oasis16_print_operand_address(FILE *file, rtx x)
   output_addr_const(file, x);
 }
 
+static void
+oasis16_globalize_label(FILE *file, const char *name)
+{
+  fputs("\t.global\t", file);
+  assemble_name(file, name);
+  fputc('\n', file);
+}
+
 #undef TARGET_OPTION_OVERRIDE
 #define TARGET_OPTION_OVERRIDE oasis16_option_override
 
+#undef TARGET_ASM_GLOBALIZE_LABEL
+#define TARGET_ASM_GLOBALIZE_LABEL oasis16_globalize_label
+
 #undef TARGET_FUNCTION_ARG
 #define TARGET_FUNCTION_ARG oasis16_function_arg
+
+#undef TARGET_HARD_REGNO_NREGS
+#define TARGET_HARD_REGNO_NREGS oasis16_hard_regno_nregs
+
+#undef TARGET_HARD_REGNO_MODE_OK
+#define TARGET_HARD_REGNO_MODE_OK oasis16_hard_regno_mode_ok
+
+#undef TARGET_MODES_TIEABLE_P
+#define TARGET_MODES_TIEABLE_P oasis16_modes_tieable_p
+
+#undef TARGET_STARTING_FRAME_OFFSET
+#define TARGET_STARTING_FRAME_OFFSET oasis16_starting_frame_offset
 
 #undef TARGET_FUNCTION_ARG_ADVANCE
 #define TARGET_FUNCTION_ARG_ADVANCE oasis16_function_arg_advance

@@ -1,13 +1,23 @@
 #!/usr/bin/env sh
 set -eu
 
+TARGET=oasis16-elf-gcc
+
+if [ -n "${OASIS_TOOLCHAIN_PREFIX:-}" ] && [ -x "$OASIS_TOOLCHAIN_PREFIX/bin/$TARGET" ]; then
+  exec "$OASIS_TOOLCHAIN_PREFIX/bin/$TARGET" "$@"
+fi
+
 cat >&2 <<'EOF'
-oasis-cc: C/C++ compilation is not implemented yet.
+oasis-cc: no installed OASIS C compiler found.
 
-Planned GCC target: oasis16-unknown-elf
-First host target: Darwin/macOS
+Build or install the oasis16-unknown-elf toolchain, then set:
 
-See toolchain/plan.md and toolchain/gcc14/README.md for the backend, binutils,
-runtime, and ABI work needed before this wrapper can invoke a real compiler.
+  OASIS_TOOLCHAIN_PREFIX=/path/to/oasis16
+
+Expected compiler:
+
+  $OASIS_TOOLCHAIN_PREFIX/bin/oasis16-elf-gcc
+
+See toolchain/README.md for build scripts and validation.
 EOF
 exit 1

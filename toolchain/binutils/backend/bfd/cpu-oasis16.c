@@ -12,7 +12,7 @@ const bfd_arch_info_type bfd_oasis16_arch =
   "oasis16",
   "oasis16",
   1,
-  TRUE,
+  true,
   bfd_default_compatible,
   bfd_default_scan,
   bfd_arch_default_fill,

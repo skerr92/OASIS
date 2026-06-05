@@ -1,15 +1,45 @@
 #include "as.h"
 #include "safe-ctype.h"
 #include "subsegs.h"
-#include "struc-symbol.h"
 #include "opcode/oasis16.h"
 #include "elf/oasis16.h"
 
-const char comment_chars[] = ";";
-const char line_comment_chars[] = ";";
+const char comment_chars[] = ";#";
+const char line_comment_chars[] = ";#";
 const char line_separator_chars[] = "";
 const char EXP_CHARS[] = "eE";
 const char FLT_CHARS[] = "rRsSfFdDxXpP";
+
+const char md_shortopts[] = "";
+
+const struct option md_longopts[] =
+{
+  { NULL, no_argument, NULL, 0 }
+};
+
+const size_t md_longopts_size = sizeof(md_longopts);
+
+const pseudo_typeS md_pseudo_table[] =
+{
+  { NULL, NULL, 0 }
+};
+
+int
+md_parse_option(int c ATTRIBUTE_UNUSED, const char *arg ATTRIBUTE_UNUSED)
+{
+  return 0;
+}
+
+void
+md_show_usage(FILE *stream ATTRIBUTE_UNUSED)
+{
+}
+
+symbolS *
+md_undefined_symbol(char *name ATTRIBUTE_UNUSED)
+{
+  return NULL;
+}
 
 static char *
 skip_space(char *input)
@@ -54,25 +84,30 @@ parse_register(char *input, unsigned int *regno)
 }
 
 static char *
-parse_absolute(char *input, expressionS *expr)
+parse_absolute(char *input, expressionS *expression_p)
 {
+  char *saved_input_line_pointer = input_line_pointer;
+
   input = skip_space(input);
-  expression(expr);
+  input_line_pointer = input;
+  expression(expression_p);
+  input = input_line_pointer;
+  input_line_pointer = saved_input_line_pointer;
   return skip_space(input);
 }
 
 static int
-expression_is_constant(expressionS *expr, int *value)
+expression_is_constant(expressionS *expression_p, int *value)
 {
-  if (expr->X_op != O_constant)
+  if (expression_p->X_op != O_constant)
     return 0;
 
-  *value = (int) expr->X_add_number;
+  *value = (int) expression_p->X_add_number;
   return 1;
 }
 
 static char *
-parse_addr9(char *input, expressionS *expr)
+parse_addr9(char *input, expressionS *expression_p)
 {
   input = skip_space(input);
   if (*input != '[')
@@ -80,7 +115,7 @@ parse_addr9(char *input, expressionS *expr)
       as_bad(_("expected '['"));
       return input;
     }
-  input = parse_absolute(input + 1, expr);
+  input = parse_absolute(input + 1, expression_p);
   if (*input != ']')
     as_bad(_("expected ']'"));
   else
@@ -293,7 +328,7 @@ md_assemble(char *str)
 const char *
 md_atof(int type, char *litP, int *sizeP)
 {
-  return ieee_md_atof(type, litP, sizeP, FALSE);
+  return ieee_md_atof(type, litP, sizeP, false);
 }
 
 void

@@ -1,0 +1,840 @@
+# OASIS GCC 14 Toolchain Implementation Plan
+
+## Objective
+
+Turn the current OASIS toolchain scaffold into a working prototype GCC 14 cross toolchain hosted on Darwin/macOS for:
+
+```text
+oasis16-unknown-elf
+```
+
+Then generalize the same build flow for Linux hosts.
+
+---
+
+## Current State
+
+### Existing Foundation
+
+- OASIS defines Base-16 and Base-16T.
+- Base-16T is the intended compiler target profile.
+- `oasis-asm`, program image tooling, opcode generation, and metadata generation already exist.
+- GCC backend skeleton exists under:
+
+```text
+toolchain/gcc14/backend/
+```
+
+including:
+
+- register classes
+- target hooks
+- instruction patterns
+- prologue/epilogue generation
+- branch support
+- call support
+- HImode arithmetic support
+
+- Binutils scaffold exists under:
+
+```text
+toolchain/binutils/backend/
+```
+
+but still lacks:
+
+- relocations
+- GAS backend
+- BFD integration
+- linker support
+- disassembler support
+
+- `build-darwin-gcc14.sh` is currently a scaffold that validates arguments and prints stages.
+
+---
+
+# Phase 1 — Finish Binutils First
+
+## Why
+
+GCC can emit assembly, but until GAS, BFD, and LD work, the compiler cannot produce usable binaries.
+
+Binutils is the critical path.
+
+---
+
+## 1. Complete Opcode Definitions
+
+Finish:
+
+```text
+include/opcode/oasis16.h
+```
+
+Define:
+
+- opcode IDs
+- instruction classes
+- operand formats
+- encoding masks
+- decoding masks
+
+---
+
+## 2. Complete Disassembler
+
+Finish:
+
+```text
+opcodes/oasis16-opc.c
+```
+
+Implement:
+
+```text
+ADD
+SUB
+AND
+OR
+XOR
+NOT
+MOV
+MVI
+LDR
+STR
+JMP
+CALL
+RET
+conditional branches
+```
+
+Acceptance:
+
+```bash
+oasis16-elf-objdump -d test.o
+```
+
+produces readable assembly.
+
+---
+
+## 3. Implement GAS Backend
+
+Add:
+
+```text
+gas/config/tc-oasis16.c
+gas/config/tc-oasis16.h
+```
+
+Implement parser support for:
+
+```asm
+ADD r1, r2
+SUB r3, r4
+
+MVI r1, 123
+
+LDR r1, [r2]
+LDR r1, [r2 + 3]
+
+STR r3, [r4]
+STR r3, [r4 - 2]
+
+CALL function
+JMP label
+```
+
+Support labels:
+
+```asm
+start:
+loop:
+done:
+```
+
+Support directives:
+
+```asm
+.text
+.data
+.bss
+.global
+.word
+.byte
+.align
+```
+
+---
+
+## 4. Implement Relocations
+
+Start with only:
+
+### Absolute Relocation
+
+```text
+R_OASIS16_ABS16
+```
+
+### Branch Relocation
+
+```text
+R_OASIS16_PCREL8
+```
+
+### Call Relocation
+
+```text
+R_OASIS16_CALL
+```
+
+Ignore advanced relocation types initially.
+
+---
+
+## 5. Implement BFD Target
+
+Add:
+
+```text
+bfd/cpu-oasis16.c
+bfd/elf32-oasis16.c
+```
+
+Create:
+
+```text
+bfd_arch_oasis16
+```
+
+Define:
+
+```text
+ELF machine type
+```
+
+Use a temporary custom machine number initially.
+
+---
+
+## 6. Implement Linker Target
+
+Add:
+
+```text
+ld/emulparams/oasis16elf.sh
+```
+
+Add:
+
+```text
+ld/scripttempl/oasis16.sc
+```
+
+Default memory map:
+
+```text
+.text
+.rodata
+.data
+.bss
+.stack
+```
+
+Simple linker script:
+
+```ld
+MEMORY
+{
+    RAM (rwx) : ORIGIN = 0x0000, LENGTH = 64K
+}
+
+SECTIONS
+{
+    .text : { *(.text*) }
+    .rodata : { *(.rodata*) }
+    .data : { *(.data*) }
+    .bss : { *(.bss*) }
+}
+```
+
+---
+
+## Phase 1 Acceptance Criteria
+
+All commands succeed:
+
+```bash
+oasis16-elf-as test.s -o test.o
+
+oasis16-elf-objdump -d test.o
+
+oasis16-elf-ld test.o -o test.elf
+```
+
+---
+
+# Phase 2 — Bring GCC 14 Online
+
+---
+
+## 1. Wire Backend Into GCC
+
+Take:
+
+```text
+toolchain/gcc14/backend/gcc/config/oasis16/
+```
+
+and patch GCC 14 source tree.
+
+Update:
+
+```text
+config.gcc
+config.sub
+```
+
+Add target triplet:
+
+```text
+oasis16-unknown-elf
+```
+
+---
+
+## 2. Build Minimal Compiler
+
+Configure:
+
+```bash
+--enable-languages=c
+--without-headers
+--disable-shared
+--disable-threads
+--disable-libssp
+--disable-libstdcxx
+--disable-nls
+```
+
+Only build:
+
+```text
+C compiler
+```
+
+No:
+
+```text
+C++
+Ada
+Fortran
+OpenMP
+```
+
+---
+
+## 3. Restrict Initial Backend Scope
+
+Native mode:
+
+```text
+HImode
+```
+
+Register width:
+
+```text
+16-bit
+```
+
+No support for:
+
+```text
+32-bit arithmetic
+division
+floating point
+long long
+```
+
+yet.
+
+---
+
+## 4. Make GCC and GAS Agree
+
+Ensure:
+
+```text
+operand printers
+constraint definitions
+register names
+immediate formats
+```
+
+exactly match GAS syntax.
+
+Acceptance:
+
+```bash
+oasis16-elf-gcc -S add.c
+```
+
+assembles successfully.
+
+---
+
+## Phase 2 Acceptance Criteria
+
+```bash
+oasis16-elf-gcc -S hello.c -o hello.s
+
+oasis16-elf-as hello.s -o hello.o
+
+oasis16-elf-objdump -d hello.o
+```
+
+works end-to-end.
+
+---
+
+# Phase 3 — Minimal Runtime
+
+---
+
+## Runtime Layout
+
+Create:
+
+```text
+toolchain/runtime/
+```
+
+Contents:
+
+```text
+crt0.oas
+oasis16.ld
+
+include/stdint.h
+include/stddef.h
+
+libgcc-stubs/
+```
+
+---
+
+## crt0 Responsibilities
+
+On reset:
+
+### 1. Initialize Stack
+
+```asm
+MOV SP, STACK_TOP
+```
+
+### 2. Clear BSS
+
+```text
+zero .bss
+```
+
+### 3. Initialize Data
+
+Copy:
+
+```text
+ROM -> RAM
+```
+
+if needed.
+
+### 4. Call Main
+
+```asm
+CALL main
+```
+
+### 5. Halt
+
+```asm
+halt:
+    JMP halt
+```
+
+---
+
+## Linker Script
+
+Provide:
+
+```text
+__stack_top
+__bss_start
+__bss_end
+__data_start
+__data_end
+```
+
+symbols.
+
+---
+
+## Phase 3 Acceptance Criteria
+
+```bash
+oasis16-elf-gcc \
+    -ffreestanding \
+    -nostdlib \
+    crt0.o \
+    main.c \
+    -T oasis16.ld \
+    -o main.elf
+```
+
+links successfully.
+
+---
+
+# Phase 4 — Make build-darwin-gcc14.sh Real
+
+Replace scaffold logic with actual build stages.
+
+---
+
+## Stage 1
+
+Apply backend patches.
+
+```bash
+apply-gcc14-backend.py
+```
+
+---
+
+## Stage 2
+
+Build Binutils:
+
+```bash
+configure
+make
+make install
+```
+
+---
+
+## Stage 3
+
+Build GCC Stage 1:
+
+```bash
+all-gcc
+install-gcc
+```
+
+---
+
+## Stage 4
+
+Build Runtime
+
+Generate:
+
+```text
+crt0.o
+libgcc helpers
+linker scripts
+headers
+```
+
+---
+
+## Stage 5
+
+Run Validation Tests
+
+Compile:
+
+```text
+return_constant.c
+add.c
+call.c
+```
+
+Verify successful:
+
+```text
+assemble
+link
+objdump
+```
+
+---
+
+## Script Options
+
+Support:
+
+```bash
+--jobs
+--clean
+--dry-run
+--prefix
+```
+
+---
+
+# Phase 5 — Compiler Validation Suite
+
+Create:
+
+```text
+toolchain/tests/c/
+```
+
+Files:
+
+```text
+return_constant.c
+add.c
+sub.c
+if_else.c
+while_loop.c
+for_loop.c
+call.c
+pointer_load_store.c
+global_data.c
+array_access.c
+```
+
+---
+
+## CI Validation Flow
+
+For each test:
+
+```text
+C
+ ↓
+GCC
+ ↓
+Assembly
+ ↓
+GAS
+ ↓
+Object
+ ↓
+Linker
+ ↓
+ELF
+ ↓
+Objdump
+```
+
+Validate:
+
+```text
+no compiler crashes
+no linker failures
+valid output
+```
+
+---
+
+# Phase 6 — OASIS ELF Loader Integration
+
+Add:
+
+```text
+oasis-elf2img
+```
+
+Convert:
+
+```text
+ELF
+ ↓
+OASIS Program Image
+```
+
+This allows generated binaries to run directly on:
+
+```text
+DungV
+future simulators
+future FPGA implementations
+```
+
+Acceptance:
+
+```bash
+hello.c
+ ↓
+gcc
+ ↓
+elf
+ ↓
+oasis-elf2img
+ ↓
+simulator
+```
+
+---
+
+# Phase 7 — Linux Host Support
+
+After Darwin succeeds.
+
+---
+
+## Create Common Build Script
+
+Add:
+
+```text
+build-gcc14-common.sh
+```
+
+Shared stages:
+
+```text
+detect host
+apply patches
+build binutils
+build gcc
+build runtime
+run tests
+```
+
+---
+
+## Darwin Wrapper
+
+```text
+build-darwin-gcc14.sh
+```
+
+Contains:
+
+```text
+Homebrew checks
+macOS paths
+Apple clang checks
+```
+
+---
+
+## Linux Wrapper
+
+```text
+build-linux-gcc14.sh
+```
+
+Contains:
+
+```text
+Ubuntu/Debian package checks
+Fedora package checks
+Arch package checks
+```
+
+---
+
+# Deferred Features
+
+These should not block the first prototype.
+
+## Compiler
+
+```text
+C++
+libstdc++
+exceptions
+RTTI
+unwind tables
+```
+
+## ISA
+
+```text
+floating point
+64-bit arithmetic
+SIMD
+```
+
+## Runtime
+
+```text
+malloc
+free
+printf
+hosted libc
+```
+
+## OS
+
+```text
+syscalls
+threads
+processes
+signals
+```
+
+---
+
+# Prototype Success Definition
+
+The prototype is considered successful when the following works on macOS:
+
+```bash
+toolchain/scripts/build-darwin-gcc14.sh \
+    --prefix "$PWD/.toolchain/oasis16" \
+    --gcc-src /path/to/gcc-14 \
+    --binutils-src /path/to/binutils \
+    --jobs 8
+```
+
+and then:
+
+```bash
+.toolchain/oasis16/bin/oasis16-elf-gcc \
+    -ffreestanding \
+    -nostdlib \
+    toolchain/runtime/crt0.o \
+    examples/c/hello_int.c \
+    -T toolchain/runtime/oasis16.ld \
+    -o hello_int.elf
+```
+
+followed by:
+
+```bash
+oasis16-elf-objdump -d hello_int.elf
+```
+
+and:
+
+```bash
+oasis-elf2img hello_int.elf hello.img
+```
+
+producing a runnable OASIS binary image.
+
+---
+
+# Implementation Priority
+
+1. Finish Binutils
+2. Make GAS assemble OASIS instructions
+3. Make LD generate ELF
+4. Make GCC emit valid assembly
+5. Build freestanding runtime
+6. Automate Darwin build
+7. Add Linux host support
+8. Add ELF-to-image conversion
+9. Expand language/runtime support
+
+Binutils is the critical path. GCC should not be expanded until assembly, linking, relocations, and ELF generation are functioning reliably.

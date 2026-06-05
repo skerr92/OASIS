@@ -2,21 +2,22 @@
 
 ## Phase 1: Stabilize OASIS Base-16
 
-- Define architectural state
-- Define exact instruction encoding
-- Define memory behavior
-- Define reset behavior
-- Define all current opcodes
-- Define reserved bits and invalid encodings
-- Publish machine-readable opcode tables
+- Architectural state is defined.
+- Instruction encoding is defined.
+- Memory behavior is defined.
+- Reset behavior is defined.
+- Current opcodes are defined.
+- Reserved bits and invalid encodings are documented.
+- Machine-readable opcode tables are published.
 
 ## Phase 2: Make The Spec Executable
 
-- Add YAML compliance tests for every instruction
-- Add a tiny assembler
-- Add a Python reference emulator
-- Generate instruction docs from opcode tables
-- Validate duplicate opcodes in CI
+- YAML compliance tests cover every instruction.
+- A dependency-free assembler is available at `bin/oasis-asm`.
+- Instruction docs are generated from opcode tables.
+- Opcode, register, instruction-doc, compliance, GCC, and binutils validators run
+  through `make check`.
+- A Python reference emulator remains useful future work.
 
 ## Phase 3: Support Implementations
 
@@ -27,15 +28,16 @@
 
 ## Phase 4: C And C++ Toolchain
 
-- Define a Base-16T ABI
-- Define the Base-16T toolchain profile
-- Define a bare-metal runtime
-- Define object and linker expectations
-- Add compiler wrapper behavior
-- Prototype Darwin-hosted GCC 14 and binutils backend ports
-- Compile a simple arithmetic C function into OASIS assembly
+- Base-16T ABI and toolchain profile are defined.
+- Bare-metal runtime files and linker scripts are present.
+- GCC 14 and binutils backend files are present.
+- Darwin, Linux, and generic build wrappers are present.
+- Installed-toolchain validation tests are present.
+- Remaining work is native build validation against upstream GCC 14 and binutils
+  source trees.
 
 ## Deferred
 
-Do not add privilege modes, interrupts, exceptions, byte addressing, new ALU
-features, or full C/C++ support until Base-16 v0.1 is specified and tested.
+Defer privilege modes, interrupts, exceptions, byte addressing, new ALU features,
+and hosted C/C++ support until Base-16/Base-16T freestanding C bring-up is
+validated in real toolchain builds.

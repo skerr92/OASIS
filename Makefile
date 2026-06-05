@@ -4,6 +4,7 @@ check:
 	python3 tools/validate_instruction_docs.py
 	python3 tools/validate_compliance_tests.py
 	python3 tools/test_assembler.py
+	python3 tools/test_elf2img.py
 	python3 tools/test_toolchain_scaffold.py
 	python3 tools/validate_gcc_backend.py
 	python3 tools/validate_binutils_backend.py

@@ -8,15 +8,16 @@ Available now:
 
 - OASIS Base-16 assembler: `bin/oasis-asm`
 - Program image generator: `bin/oasis-program-image`
+- ELF-to-program-image converter: `bin/oasis-elf2img`
+- Darwin and Linux GCC 14 build wrappers
+- Installed-toolchain C smoke-test runner
 - Machine-readable ISA metadata: `toolchain/generated/oasis-base16t-v0.1-draft.json`
 - Opcode, register, encoding, and programming tables in `tables/`
 
 Not available yet:
 
-- Object file format
-- Linker
-- C runtime
-- GCC backend
+- Native-built binutils tools
+- Native-built GCC
 - C++ runtime or standard library support
 
 ## Toolchain Profile
@@ -59,20 +60,19 @@ Define:
 
 See `toolchain/abi/base16-baremetal-abi.md`.
 
-### 3. Runtime Skeleton
+### 3. Runtime
 
-Status: scaffolded.
-
-Add:
+Status: implemented for freestanding C bring-up.
 
 - Startup sequence
-- Zeroing or copying data sections, once sections exist
 - Exit trap or halt convention
 - Minimal headers for freestanding C
+- Linker script symbols for text, data, BSS, and stack
+- Libgcc helper routines for the first 16-bit arithmetic set
 
 ### 4. Object And Linker Format
 
-Status: not started.
+Status: implemented as backend files; awaiting native binutils build validation.
 
 For GCC/binutils, the practical path is ELF:
 
@@ -83,22 +83,20 @@ For GCC/binutils, the practical path is ELF:
 
 ### 5. Binutils Port
 
-Status: not started.
-
-GCC normally expects target binutils:
+Status: implemented as backend files; awaiting native binutils build validation.
 
 - BFD architecture
 - Opcode table
-- GAS assembler or adapter
+- GAS assembler
 - LD emulation/linker script
-- objdump/readelf support
+- objdump support
 
-The existing OASIS assembler can guide GAS encoding, but GCC still needs object
-and linker support for normal C/C++ workflows.
+The existing OASIS assembler remains useful for flat images, while GAS/BFD/LD
+are the ELF path for normal GCC workflows.
 
 ### 6. GCC 14 Backend
 
-Status: scaffolded.
+Status: implemented as backend files; awaiting native GCC build validation.
 
 Initial goal:
 
@@ -109,7 +107,16 @@ Initial goal:
 - Language: C first
 - C++ only after libgcc/runtime basics are stable
 
-### 7. C++ Support
+### 7. Compiler Validation
+
+Status: implemented.
+
+The C smoke tests in `toolchain/tests/c/` cover return values, arithmetic,
+branches, calls, pointer load/store, globals, and arrays. Run them with
+`toolchain/scripts/validate-installed-toolchain.sh` after installing a toolchain
+prefix.
+
+### 8. C++ Support
 
 Status: future.
 

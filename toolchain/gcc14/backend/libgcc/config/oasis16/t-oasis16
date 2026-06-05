@@ -1,2 +1,11 @@
 LIB1ASMSRC = oasis16/lib1funcs.S
 LIB1ASMFUNCS = _mulhi3 _ashlhi3 _lshrhi3 _udivhi3 _umodhi3 _divhi3 _modhi3
+override LIB2FUNCS_EXCLUDE := %
+override LIB2ADD =
+override LIB2ADD_ST =
+override LIB2ADDEH =
+override LIB2ADDEHSTATIC =
+override LIB2ADDEHSHARED =
+override EXTRA_PARTS =
+override INSTALL_PARTS =
+override enable_gcov = no

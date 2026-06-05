@@ -1,7 +1,9 @@
 # Toolchain Tests
 
-These tests describe the compiler milestones. They are not executable until the
-OASIS GCC/binutils backend exists.
+These tests describe the compiler milestones. The executable smoke-test suite
+lives in `toolchain/tests/c/` and is run by
+`toolchain/scripts/validate-installed-toolchain.sh` once an OASIS GCC/binutils
+prefix exists.
 
 ## First C Smoke Test
 
@@ -41,7 +43,17 @@ oasis16-elf-gcc -ffreestanding -nostdlib examples/c/add.c -o add.elf
 Then:
 
 ```sh
-oasis16-elf-objcopy -O binary add.elf add.bin
+bin/oasis-elf2img add.elf -o add.dap16
 ```
 
-A later tool should convert `add.elf` or `add.bin` into an OASIS program image.
+The converter emits the same `dap16` and `spi16-hex` programming formats as the
+assembly image flow.
+
+## Installed Toolchain Suite
+
+```sh
+toolchain/scripts/validate-installed-toolchain.sh --prefix .toolchain/oasis16
+```
+
+Use `--dry-run` before the toolchain exists to inspect the compile, assemble,
+link, objdump, and ELF-to-image stages.

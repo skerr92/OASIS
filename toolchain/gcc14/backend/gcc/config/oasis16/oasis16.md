@@ -4,7 +4,16 @@
     (R58 58)
   ])
 
+(include "constraints.md")
+(include "predicates.md")
+
 (define_attr "type" "alu,load,store,branch,call" (const_string "alu"))
+
+(define_insn "nop"
+  [(const_int 0)]
+  ""
+  "NOP"
+  [(set_attr "type" "alu")])
 
 (define_expand "prologue"
   [(const_int 0)]
@@ -148,12 +157,16 @@
   "*
    switch (GET_CODE (operands[0]))
      {
-     case EQ: return \"JEQ %1, %2, %3\";
-     case NE: return \"JNE %1, %2, %3\";
-     case LT: return \"JLT %1, %2, %3\";
-     case GE: return \"JGE %1, %2, %3\";
-     case LTU: return \"JLTU %1, %2, %3\";
-     case GEU: return \"JGEU %1, %2, %3\";
-     default: gcc_unreachable ();
-     }"
+	     case EQ: return \"JEQ %1, %2, %3\";
+	     case NE: return \"JNE %1, %2, %3\";
+	     case LT: return \"JLT %1, %2, %3\";
+	     case GE: return \"JGE %1, %2, %3\";
+	     case GT: return \"JLT %2, %1, %3\";
+	     case LE: return \"JGE %2, %1, %3\";
+	     case LTU: return \"JLTU %1, %2, %3\";
+	     case GEU: return \"JGEU %1, %2, %3\";
+	     case GTU: return \"JLTU %2, %1, %3\";
+	     case LEU: return \"JGEU %2, %1, %3\";
+	     default: gcc_unreachable ();
+	     }"
   [(set_attr "type" "branch")])

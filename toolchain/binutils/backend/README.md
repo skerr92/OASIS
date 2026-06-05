@@ -1,4 +1,4 @@
-# OASIS Binutils Backend Skeleton
+# OASIS Binutils Backend
 
 This directory contains files intended to be copied into a binutils source tree.
 
@@ -8,22 +8,20 @@ Target:
 oasis16-unknown-elf
 ```
 
-This is a scaffold, not a complete binutils port. It gives the port a concrete
-shape:
+This backend provides the OASIS source files and integration fragments needed
+for the first `oasis16-unknown-elf` binutils build:
 
-- BFD architecture placeholder
+- BFD architecture definition
 - ELF header constants
-- Opcode table structure
-- GAS target placeholder
+- Opcode table, encoder, decoder, and disassembler entry point
+- GAS parser/encoder for the OASIS assembly syntax
 - LD emulation parameters and linker script template
+- Initial relocation names and BFD howto entries
 
-Known missing pieces:
+Remaining bring-up work:
 
-- Relocation definitions and handling
-- Full GAS parser/encoder
-- BFD ELF backend implementation
-- LD emulation scripts wired into binutils configure
-- objdump disassembler support
+- Native build validation inside an upstream binutils source tree
+- Exhaustive relocation relaxation and overflow tests
 
-The existing `tools/oasis_asm.py` remains the working flat-image assembler while
-this port matures.
+`toolchain/scripts/apply-gcc14-backend.py --integrate-config` copies these files
+and patches common binutils config files when they exist.

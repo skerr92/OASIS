@@ -39,7 +39,7 @@ Start with [spec/oasis-v0.1.md](spec/oasis-v0.1.md).
 | `tests/compliance/` | Shared ISA compliance test definitions |
 | `tools/` | Documentation and table validation tools |
 | `bin/` | User-facing tool wrappers |
-| `toolchain/` | C/C++ toolchain planning and runtime scaffolding |
+| `toolchain/` | GCC/binutils backend files, runtime pieces, and build scripts |
 | `docs/` | Roadmap and process notes |
 
 ## Tools
@@ -62,10 +62,10 @@ Run repository checks:
 make check
 ```
 
-C and C++ wrappers exist as explicit placeholders under `bin/`. See
-[toolchain/README.md](toolchain/README.md) and
-[toolchain/plan.md](toolchain/plan.md) for the Darwin-first GCC 14 path needed
-before `oasis-cc` and `oasis-c++` can compile programs.
+`bin/oasis-cc` and `bin/oasis-c++` forward to an installed OASIS toolchain when
+`OASIS_TOOLCHAIN_PREFIX` points at a prefix containing `oasis16-elf-gcc` or
+`oasis16-elf-g++`. See [toolchain/README.md](toolchain/README.md) for build and
+validation commands.
 
 ## Development Rule
 

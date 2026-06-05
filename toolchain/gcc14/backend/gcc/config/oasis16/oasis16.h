@@ -12,17 +12,22 @@
 #define WORDS_BIG_ENDIAN 0
 
 #define UNITS_PER_WORD 2
-#define BITS_PER_UNIT 8
+#define MOVE_MAX 2
+#define DEFAULT_SIGNED_CHAR 1
 #define INT_TYPE_SIZE 16
 #define SHORT_TYPE_SIZE 16
 #define LONG_TYPE_SIZE 32
 #define LONG_LONG_TYPE_SIZE 64
+#define FLOAT_TYPE_SIZE 32
+#define DOUBLE_TYPE_SIZE 64
+#define LONG_DOUBLE_TYPE_SIZE 64
 #define POINTER_SIZE 16
 #define PARM_BOUNDARY 16
 #define STACK_BOUNDARY 16
 #define FUNCTION_BOUNDARY 16
 #define BIGGEST_ALIGNMENT 16
 #define STRICT_ALIGNMENT 0
+#define TARGET_FLOAT_FORMAT IEEE_FLOAT_FORMAT
 
 #define FIRST_PSEUDO_REGISTER 64
 
@@ -61,11 +66,6 @@
     0, 56, 57, 58, 59, 60, 61, 62, 63 \
   }
 
-#define HARD_REGNO_NREGS(REGNO, MODE) \
-  ((GET_MODE_SIZE(MODE).to_constant() + UNITS_PER_WORD - 1) / UNITS_PER_WORD)
-#define HARD_REGNO_MODE_OK(REGNO, MODE) 1
-#define MODES_TIEABLE_P(MODE1, MODE2) 1
-
 enum reg_class {
   NO_REGS,
   GENERAL_REGS,
@@ -78,7 +78,7 @@ enum reg_class {
 #define REG_CLASS_CONTENTS \
   { \
     { 0, 0 }, \
-    { 0xffffffff, 0x00ffffff }, \
+    { 0xffffffff, 0xffffffff }, \
     { 0xffffffff, 0xffffffff } \
   }
 
@@ -89,6 +89,7 @@ enum reg_class {
 #define CLASS_MAX_NREGS(CLASS, MODE) 1
 #define REGNO_OK_FOR_BASE_P(REGNO) \
   ((REGNO) < FIRST_PSEUDO_REGISTER || (unsigned) reg_renumber[(REGNO)] < FIRST_PSEUDO_REGISTER)
+#define REGNO_OK_FOR_INDEX_P(REGNO) 0
 
 #define STACK_POINTER_REGNUM OASIS16_STACK_POINTER_REGNUM
 #define FRAME_POINTER_REGNUM OASIS16_FRAME_POINTER_REGNUM
@@ -103,11 +104,13 @@ enum reg_class {
 
 #define CUMULATIVE_ARGS unsigned int
 #define INIT_CUMULATIVE_ARGS(CUM, FNTYPE, LIBNAME, FNDECL, N_NAMED_ARGS) ((CUM) = 0)
+#define FIRST_PARM_OFFSET(FNDECL) 0
 
 #define Pmode HImode
+#define FUNCTION_MODE Pmode
+#define CASE_VECTOR_MODE HImode
 #define STACK_GROWS_DOWNWARD 1
 #define FRAME_GROWS_DOWNWARD 1
-#define STARTING_FRAME_OFFSET 0
 
 #define ELIMINABLE_REGS \
   { { ARG_POINTER_REGNUM, STACK_POINTER_REGNUM }, \
@@ -118,7 +121,10 @@ enum reg_class {
   ((OFFSET) = oasis16_initial_elimination_offset((FROM), (TO)))
 
 #define RETURN_ADDR_RTX(COUNT, FRAME) oasis16_return_addr_rtx((COUNT), (FRAME))
+#define INCOMING_RETURN_ADDR_RTX gen_rtx_REG(Pmode, RETURN_ADDRESS_REGNUM)
+#define DWARF_FRAME_RETURN_COLUMN DWARF_FRAME_REGNUM(RETURN_ADDRESS_REGNUM)
 #define EPILOGUE_USES(REGNO) ((REGNO) == RETURN_ADDRESS_REGNUM)
+#define FUNCTION_PROFILER(STREAM, LABELNO) do { } while (0)
 
 #define REGISTER_NAMES \
   { \
@@ -143,6 +149,14 @@ enum reg_class {
 #define ASM_APP_ON ";APP\n"
 #define ASM_APP_OFF ";NO_APP\n"
 #define ASM_COMMENT_START ";"
+#define TEXT_SECTION_ASM_OP "\t.text"
+#define DATA_SECTION_ASM_OP "\t.data"
+#define BSS_SECTION_ASM_OP "\t.bss"
+#define ASM_OUTPUT_ALIGN(STREAM, LOG) \
+  do { \
+    if ((LOG) != 0) \
+      fprintf((STREAM), "\t.balign %d\n", 1 << (LOG)); \
+  } while (0)
 
 #define HAS_INIT_SECTION 1
 #define TRAMPOLINE_SIZE 0

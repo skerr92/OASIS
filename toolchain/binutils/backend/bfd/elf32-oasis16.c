@@ -1,25 +1,26 @@
 #include "sysdep.h"
 #include "bfd.h"
 #include "libbfd.h"
+#include "libiberty.h"
 #include "elf-bfd.h"
 #include "elf/oasis16.h"
 
 static reloc_howto_type oasis16_elf_howto_table[] =
 {
-  HOWTO(R_OASIS16_NONE, 0, 0, 0, FALSE, 0, complain_overflow_dont,
-        bfd_elf_generic_reloc, "R_OASIS16_NONE", FALSE, 0, 0, FALSE),
+  HOWTO(R_OASIS16_NONE, 0, 0, 0, false, 0, complain_overflow_dont,
+        bfd_elf_generic_reloc, "R_OASIS16_NONE", false, 0, 0, false),
 
-  HOWTO(R_OASIS16_16, 0, 1, 16, FALSE, 0, complain_overflow_unsigned,
-        bfd_elf_generic_reloc, "R_OASIS16_16", FALSE, 0, 0xffff, FALSE),
+  HOWTO(R_OASIS16_16, 0, 1, 16, false, 0, complain_overflow_unsigned,
+        bfd_elf_generic_reloc, "R_OASIS16_16", false, 0, 0xffff, false),
 
-  HOWTO(R_OASIS16_ADDR9, 13, 2, 9, FALSE, 0, complain_overflow_unsigned,
-        bfd_elf_generic_reloc, "R_OASIS16_ADDR9", FALSE, 0, 0x003fe000, FALSE),
+  HOWTO(R_OASIS16_ADDR9, 13, 2, 9, false, 0, complain_overflow_unsigned,
+        bfd_elf_generic_reloc, "R_OASIS16_ADDR9", false, 0, 0x003fe000, false),
 
-  HOWTO(R_OASIS16_TARGET8, 6, 2, 8, FALSE, 0, complain_overflow_unsigned,
-        bfd_elf_generic_reloc, "R_OASIS16_TARGET8", FALSE, 0, 0x00003fc0, FALSE),
+  HOWTO(R_OASIS16_TARGET8, 6, 2, 8, false, 0, complain_overflow_unsigned,
+        bfd_elf_generic_reloc, "R_OASIS16_TARGET8", false, 0, 0x00003fc0, false),
 
-  HOWTO(R_OASIS16_CALL8, 6, 2, 8, FALSE, 0, complain_overflow_unsigned,
-        bfd_elf_generic_reloc, "R_OASIS16_CALL8", FALSE, 0, 0x00003fc0, FALSE),
+  HOWTO(R_OASIS16_CALL8, 6, 2, 8, false, 0, complain_overflow_unsigned,
+        bfd_elf_generic_reloc, "R_OASIS16_CALL8", false, 0, 0x00003fc0, false),
 };
 
 static reloc_howto_type *
@@ -56,7 +57,7 @@ oasis16_reloc_name_lookup(bfd *abfd ATTRIBUTE_UNUSED, const char *r_name)
   return NULL;
 }
 
-static void
+static bool
 oasis16_info_to_howto_rela(bfd *abfd ATTRIBUTE_UNUSED,
                            arelent *cache_ptr,
                            Elf_Internal_Rela *dst)
@@ -64,7 +65,12 @@ oasis16_info_to_howto_rela(bfd *abfd ATTRIBUTE_UNUSED,
   unsigned int r_type = ELF32_R_TYPE(dst->r_info);
 
   if (r_type < ARRAY_SIZE(oasis16_elf_howto_table))
-    cache_ptr->howto = &oasis16_elf_howto_table[r_type];
+    {
+      cache_ptr->howto = &oasis16_elf_howto_table[r_type];
+      return true;
+    }
+
+  return false;
 }
 
 #define ELF_ARCH bfd_arch_oasis16

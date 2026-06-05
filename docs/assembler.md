@@ -67,4 +67,22 @@ Formats:
 | `dap16` | Transport-neutral 16-bit register write script. |
 | `spi16-hex` | SPI write frames encoded as hexadecimal text. |
 
+## ELF Images
+
+`bin/oasis-elf2img` converts linked or relocatable `elf32-oasis16` files into the
+same programming image formats. It extracts the first executable `PT_LOAD`
+segment when present, otherwise it falls back to `.text`.
+
+```sh
+bin/oasis-elf2img hello.elf -o hello.dap16
+bin/oasis-elf2img hello.elf --format spi16-hex -o hello.spi16
+```
+
+Diagnostic formats are also available:
+
+| Format | Description |
+| ------ | ----------- |
+| `hex` | One 8-digit hexadecimal instruction per line. |
+| `binstr` | One 32-bit binary instruction per line. |
+
 See [programming-cores.md](programming-cores.md) for programming flows.

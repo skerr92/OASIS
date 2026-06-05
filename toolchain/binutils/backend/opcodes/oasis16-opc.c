@@ -1,6 +1,16 @@
 #include "sysdep.h"
 #include "opcode/oasis16.h"
 
+static int
+oasis16_sign_extend(unsigned int value, unsigned int bits)
+{
+  unsigned int sign = 1u << (bits - 1);
+  unsigned int mask = (1u << bits) - 1u;
+
+  value &= mask;
+  return (int) ((value ^ sign) - sign);
+}
+
 const struct oasis16_opcode oasis16_opcodes[] =
 {
   { "ADI", 0, 0x1, OASIS16_OPERANDS_RA_IMM16, "ra,imm16" },
@@ -39,7 +49,7 @@ const struct oasis16_opcode oasis16_opcodes[] =
 const unsigned int oasis16_num_opcodes =
   sizeof(oasis16_opcodes) / sizeof(oasis16_opcodes[0]);
 
-bfd_boolean
+bool
 oasis16_signed_range(int value, int bits)
 {
   int min = -(1 << (bits - 1));
@@ -47,7 +57,7 @@ oasis16_signed_range(int value, int bits)
   return value >= min && value <= max;
 }
 
-bfd_boolean
+bool
 oasis16_unsigned_range(unsigned int value, int bits)
 {
   return value < (1u << bits);
@@ -65,12 +75,18 @@ oasis16_lookup_opcode(const char *name)
   return NULL;
 }
 
-bfd_boolean
+bool
 oasis16_encode_instruction(const struct oasis16_opcode *opcode,
                            const struct oasis16_insn *operands,
                            unsigned int *word)
 {
-  unsigned int encoded = (opcode->insn_class << 30) | (opcode->opcode << 26);
+  unsigned int encoded = opcode->insn_class << OASIS16_CLASS_SHIFT;
+
+  if (opcode->insn_class == OASIS16_CLASS_REG
+      || opcode->insn_class == OASIS16_CLASS_MEM)
+    encoded |= opcode->opcode << OASIS16_REG_OPCODE_SHIFT;
+  else
+    encoded |= opcode->opcode << OASIS16_ALU_OPCODE_SHIFT;
 
   switch (opcode->operands)
     {
@@ -79,14 +95,14 @@ oasis16_encode_instruction(const struct oasis16_opcode *opcode,
 
     case OASIS16_OPERANDS_RA:
       if (!oasis16_unsigned_range(operands->ra, 6))
-        return FALSE;
+        return false;
       encoded |= operands->ra << 20;
       break;
 
     case OASIS16_OPERANDS_RA_RB:
       if (!oasis16_unsigned_range(operands->ra, 6)
           || !oasis16_unsigned_range(operands->rb, 6))
-        return FALSE;
+        return false;
       if (opcode->insn_class == OASIS16_CLASS_REG)
         encoded |= (operands->ra << 22) | (operands->rb << 16);
       else
@@ -96,14 +112,14 @@ oasis16_encode_instruction(const struct oasis16_opcode *opcode,
     case OASIS16_OPERANDS_RA_IMM6:
       if (!oasis16_unsigned_range(operands->ra, 6)
           || !oasis16_unsigned_range((unsigned int) operands->immediate, 6))
-        return FALSE;
+        return false;
       encoded |= (operands->ra << 20) | ((unsigned int) operands->immediate << 14);
       break;
 
     case OASIS16_OPERANDS_RA_IMM16:
       if (!oasis16_unsigned_range(operands->ra, 6)
           || !oasis16_unsigned_range((unsigned int) operands->immediate, 16))
-        return FALSE;
+        return false;
       if (opcode->insn_class == OASIS16_CLASS_REG)
         encoded |= (operands->ra << 22) | ((unsigned int) operands->immediate & 0xffff);
       else
@@ -114,34 +130,34 @@ oasis16_encode_instruction(const struct oasis16_opcode *opcode,
       if (!oasis16_unsigned_range(operands->ra, 6)
           || !oasis16_unsigned_range(operands->rb, 6)
           || !oasis16_unsigned_range((unsigned int) operands->target, 8))
-        return FALSE;
+        return false;
       encoded |= (operands->ra << 20) | (operands->rb << 14)
                  | (((unsigned int) operands->target & 0xff) << 6);
       break;
 
     case OASIS16_OPERANDS_TARGET8:
       if (!oasis16_unsigned_range((unsigned int) operands->target, 8))
-        return FALSE;
+        return false;
       encoded |= ((unsigned int) operands->target & 0xff) << 6;
       break;
 
     case OASIS16_OPERANDS_RB:
       if (!oasis16_unsigned_range(operands->rb, 6))
-        return FALSE;
+        return false;
       encoded |= operands->rb << 14;
       break;
 
     case OASIS16_OPERANDS_RA_ADDR9:
       if (!oasis16_unsigned_range(operands->ra, 6)
           || !oasis16_unsigned_range(operands->address, 9))
-        return FALSE;
+        return false;
       encoded |= (operands->ra << 22) | (operands->address << 13);
       break;
 
     case OASIS16_OPERANDS_ADDR9_IMM16:
       if (!oasis16_unsigned_range(operands->address, 9)
           || !oasis16_unsigned_range((unsigned int) operands->immediate, 16))
-        return FALSE;
+        return false;
       encoded |= (operands->address << 19)
                  | ((unsigned int) operands->immediate & 0xffff);
       break;
@@ -150,12 +166,182 @@ oasis16_encode_instruction(const struct oasis16_opcode *opcode,
       if (!oasis16_unsigned_range(operands->ra, 6)
           || !oasis16_unsigned_range(operands->rb, 6)
           || !oasis16_signed_range(operands->offset, 6))
-        return FALSE;
+        return false;
       encoded |= (operands->ra << 20) | (operands->rb << 14)
                  | (((unsigned int) operands->offset & 0x3f) << 8);
       break;
     }
 
   *word = encoded;
-  return TRUE;
+  return true;
+}
+
+bool
+oasis16_decode_instruction(unsigned int word,
+                           const struct oasis16_opcode **opcode,
+                           struct oasis16_insn *operands)
+{
+  unsigned int insn_class = (word >> OASIS16_CLASS_SHIFT) & OASIS16_CLASS_MASK;
+  unsigned int opcode_bits;
+  unsigned int i;
+
+  if (insn_class == OASIS16_CLASS_REG || insn_class == OASIS16_CLASS_MEM)
+    opcode_bits = (word >> OASIS16_REG_OPCODE_SHIFT) & OASIS16_OPCODE2_MASK;
+  else
+    opcode_bits = (word >> OASIS16_ALU_OPCODE_SHIFT) & OASIS16_OPCODE4_MASK;
+
+  for (i = 0; i < oasis16_num_opcodes; i++)
+    if (oasis16_opcodes[i].insn_class == insn_class
+        && oasis16_opcodes[i].opcode == opcode_bits)
+      {
+        const struct oasis16_opcode *op = &oasis16_opcodes[i];
+
+        memset(operands, 0, sizeof(*operands));
+        *opcode = op;
+
+        switch (op->operands)
+          {
+          case OASIS16_OPERANDS_NONE:
+            break;
+
+          case OASIS16_OPERANDS_RA:
+            operands->ra = (word >> OASIS16_RA_ALU_SHIFT) & OASIS16_REG_MASK;
+            break;
+
+          case OASIS16_OPERANDS_RA_RB:
+            if (op->insn_class == OASIS16_CLASS_REG)
+              {
+                operands->ra = (word >> OASIS16_RA_REG_SHIFT) & OASIS16_REG_MASK;
+                operands->rb = (word >> OASIS16_RB_REG_SHIFT) & OASIS16_REG_MASK;
+              }
+            else
+              {
+                operands->ra = (word >> OASIS16_RA_ALU_SHIFT) & OASIS16_REG_MASK;
+                operands->rb = (word >> OASIS16_RB_ALU_SHIFT) & OASIS16_REG_MASK;
+              }
+            break;
+
+          case OASIS16_OPERANDS_RA_IMM6:
+            operands->ra = (word >> OASIS16_RA_ALU_SHIFT) & OASIS16_REG_MASK;
+            operands->immediate = (word >> OASIS16_RB_ALU_SHIFT) & OASIS16_IMM6_MASK;
+            break;
+
+          case OASIS16_OPERANDS_RA_IMM16:
+            if (op->insn_class == OASIS16_CLASS_REG)
+              operands->ra = (word >> OASIS16_RA_REG_SHIFT) & OASIS16_REG_MASK;
+            else
+              operands->ra = (word >> OASIS16_RA_TOOL_SHIFT) & OASIS16_REG_MASK;
+            operands->immediate = word & OASIS16_IMM16_MASK;
+            break;
+
+          case OASIS16_OPERANDS_RA_RB_TARGET8:
+            operands->ra = (word >> OASIS16_RA_ALU_SHIFT) & OASIS16_REG_MASK;
+            operands->rb = (word >> OASIS16_RB_ALU_SHIFT) & OASIS16_REG_MASK;
+            operands->target = (word >> OASIS16_TARGET8_SHIFT) & OASIS16_TARGET8_MASK;
+            break;
+
+          case OASIS16_OPERANDS_TARGET8:
+            operands->target = (word >> OASIS16_TARGET8_SHIFT) & OASIS16_TARGET8_MASK;
+            break;
+
+          case OASIS16_OPERANDS_RB:
+            operands->rb = (word >> OASIS16_RB_TOOL_SHIFT) & OASIS16_REG_MASK;
+            break;
+
+          case OASIS16_OPERANDS_RA_ADDR9:
+            operands->ra = (word >> OASIS16_RA_MEM_SHIFT) & OASIS16_REG_MASK;
+            operands->address = (word >> OASIS16_ADDR9_SHIFT) & OASIS16_ADDR9_MASK;
+            break;
+
+          case OASIS16_OPERANDS_ADDR9_IMM16:
+            operands->address = (word >> OASIS16_MSI_ADDR9_SHIFT) & OASIS16_ADDR9_MASK;
+            operands->immediate = word & OASIS16_IMM16_MASK;
+            break;
+
+          case OASIS16_OPERANDS_RA_MEM_RB_OFF6:
+            operands->ra = (word >> OASIS16_RA_TOOL_SHIFT) & OASIS16_REG_MASK;
+            operands->rb = (word >> OASIS16_RB_TOOL_SHIFT) & OASIS16_REG_MASK;
+            operands->offset = oasis16_sign_extend((word >> OASIS16_OFF6_SHIFT)
+                                                   & OASIS16_IMM6_MASK, 6);
+            break;
+          }
+
+        return true;
+      }
+
+  *opcode = NULL;
+  memset(operands, 0, sizeof(*operands));
+  return false;
+}
+
+void
+oasis16_print_instruction(const struct oasis16_opcode *opcode,
+                          const struct oasis16_insn *operands,
+                          fprintf_ftype fprintf_func,
+                          void *stream)
+{
+  fprintf_func(stream, "%s", opcode->name);
+
+  switch (opcode->operands)
+    {
+    case OASIS16_OPERANDS_NONE:
+      break;
+    case OASIS16_OPERANDS_RA:
+      fprintf_func(stream, " r%u", operands->ra);
+      break;
+    case OASIS16_OPERANDS_RA_RB:
+      fprintf_func(stream, " r%u, r%u", operands->ra, operands->rb);
+      break;
+    case OASIS16_OPERANDS_RA_IMM6:
+    case OASIS16_OPERANDS_RA_IMM16:
+      fprintf_func(stream, " r%u, %d", operands->ra, operands->immediate);
+      break;
+    case OASIS16_OPERANDS_RA_RB_TARGET8:
+      fprintf_func(stream, " r%u, r%u, 0x%02x",
+                   operands->ra, operands->rb, operands->target & 0xff);
+      break;
+    case OASIS16_OPERANDS_TARGET8:
+      fprintf_func(stream, " 0x%02x", operands->target & 0xff);
+      break;
+    case OASIS16_OPERANDS_RB:
+      fprintf_func(stream, " r%u", operands->rb);
+      break;
+    case OASIS16_OPERANDS_RA_ADDR9:
+      fprintf_func(stream, " r%u, [0x%03x]", operands->ra, operands->address);
+      break;
+    case OASIS16_OPERANDS_ADDR9_IMM16:
+      fprintf_func(stream, " [0x%03x], %d", operands->address, operands->immediate);
+      break;
+    case OASIS16_OPERANDS_RA_MEM_RB_OFF6:
+      fprintf_func(stream, " r%u, [r%u %c %u]",
+                   operands->ra, operands->rb,
+                   operands->offset < 0 ? '-' : '+',
+                   operands->offset < 0 ? -operands->offset : operands->offset);
+      break;
+    }
+}
+
+int
+print_insn_oasis16(bfd_vma memaddr, struct disassemble_info *info)
+{
+  bfd_byte buffer[OASIS16_INSN_SIZE];
+  const struct oasis16_opcode *opcode;
+  struct oasis16_insn operands;
+  unsigned int word;
+  int status;
+
+  status = info->read_memory_func(memaddr, buffer, OASIS16_INSN_SIZE, info);
+  if (status != 0)
+    {
+      info->memory_error_func(status, memaddr, info);
+      return -1;
+    }
+
+  word = bfd_getl32(buffer);
+  if (!oasis16_decode_instruction(word, &opcode, &operands))
+    info->fprintf_func(info->stream, ".word 0x%08x", word);
+  else
+    oasis16_print_instruction(opcode, &operands, info->fprintf_func, info->stream);
+
+  return OASIS16_INSN_SIZE;
 }

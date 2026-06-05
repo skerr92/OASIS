@@ -1,15 +1,18 @@
 # OASIS Toolchain
 
 This directory captures the path toward compiling C and C++ for OASIS cores.
-The first compiler target is a Darwin-hosted GCC 14 cross toolchain.
+The first compiler target is a freestanding GCC 14 cross toolchain for
+`oasis16-unknown-elf`.
 
 ## Current Status
 
 The Base-16 assembler is implemented in `tools/oasis_asm.py`.
 
-C and C++ compilation is not implemented yet. OASIS v0.1 still needs ABI,
-runtime, object, linker, binutils, and GCC backend work before a complete C/C++
-target is useful.
+The repository now contains the OASIS backend files, config integration helper,
+build wrappers, runtime files, ELF-to-image conversion, and installed-toolchain
+smoke tests. What remains is the native bring-up loop: apply these files to real
+GCC 14 and binutils source trees, build them, and fix any upstream API or
+machine-description diagnostics that appear.
 
 ## Target Triple
 
@@ -38,6 +41,7 @@ oasis16-elf-gcc
 oasis16-elf-g++
 oasis16-elf-as
 oasis16-elf-ld
+oasis-elf2img
 ```
 
 ## Generated Metadata
@@ -53,18 +57,19 @@ tables in `tables/`. Compiler backends, assemblers, emulators, and compliance
 harnesses should prefer generated metadata over hand-copying opcode constants.
 The metadata also includes the recommended programming access-port register map.
 
-## Recommended Path
+## Remaining Bring-Up Work
 
-1. Freeze the Base-16 ISA and compliance tests.
-2. Define the ABI in `spec/abi.md`.
-3. Define a minimal runtime in `toolchain/runtime/`.
-4. Add a tiny assembler-driven code generator for simple C subsets, or start an LLVM backend.
-5. Add linker script/object format decisions.
-6. Add compiler tests that compare generated assembly against the OASIS emulator.
+1. Run the build scripts against real GCC 14 and binutils source trees.
+2. Fix native compile diagnostics in BFD, GAS, LD, opcodes, GCC, and libgcc.
+3. Run `toolchain/scripts/validate-installed-toolchain.sh` on the installed
+   prefix.
+4. Use validation results to tune GCC reload/LRA behavior, stack arguments, and
+   machine-description coverage.
+5. Add C++ only after the freestanding C toolchain is stable.
 
-## Darwin GCC 14 Start
+## GCC 14 Build Scripts
 
-The Darwin-hosted scaffold is:
+Darwin/macOS:
 
 ```sh
 toolchain/scripts/build-darwin-gcc14.sh \
@@ -73,10 +78,21 @@ toolchain/scripts/build-darwin-gcc14.sh \
   --binutils-src /path/to/binutils
 ```
 
-This validates inputs and prints the build sequence. It does not build a
-compiler yet because the OASIS GCC/binutils backend skeletons are not complete.
+Linux:
 
-Backend skeleton files:
+```sh
+toolchain/scripts/build-linux-gcc14.sh \
+  --prefix "$PWD/.toolchain/oasis16" \
+  --gcc-src /path/to/gcc-14 \
+  --binutils-src /path/to/binutils
+```
+
+This stages the backend files, configures binutils, configures GCC stage 1, and
+installs the draft runtime files. Use `--dry-run` first to inspect the exact
+commands. Add `--run-tests` to run the freestanding C smoke suite after
+installation.
+
+Backend files:
 
 - `toolchain/gcc14/backend/`
 - `toolchain/binutils/backend/`
@@ -86,11 +102,24 @@ Stage them into source trees with:
 ```sh
 toolchain/scripts/apply-gcc14-backend.py \
   --gcc-src /path/to/gcc-14 \
-  --binutils-src /path/to/binutils
+  --binutils-src /path/to/binutils \
+  --integrate-config
 ```
 
-## LLVM Backend Scaffold
+Once an ELF exists, convert it to a core programming image with:
 
-`toolchain/llvm/` is reserved for notes and future TableGen/backend files. A real
-LLVM backend will need instruction definitions, register classes, calling
-convention lowering, instruction selection, and MC layer support.
+```sh
+bin/oasis-elf2img hello.elf -o hello.dap16
+bin/oasis-elf2img hello.elf --format spi16-hex -o hello.spi16
+```
+
+Installed toolchains can be validated directly:
+
+```sh
+toolchain/scripts/validate-installed-toolchain.sh --prefix "$PWD/.toolchain/oasis16"
+```
+
+## LLVM Backend
+
+`toolchain/llvm/` is reserved for a future LLVM backend. The active compiler
+bring-up path is GCC/binutils first.

@@ -26,7 +26,6 @@ This directory contains the first Base-16T bare-metal runtime pieces for the
 
 ## Current Scope
 
-The runtime is enough to anchor freestanding C experiments once the GCC and
-binutils backends are copied into real source trees. It does not yet provide a C
-library, syscalls, heap allocation, object constructors, destructors, or `.bss`
-zeroing.
+The runtime anchors freestanding C experiments once GCC and binutils build
+successfully. It does not provide a hosted C library, syscalls, heap allocation,
+object constructors, or destructors.

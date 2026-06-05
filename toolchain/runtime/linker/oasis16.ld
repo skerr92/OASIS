@@ -12,6 +12,7 @@ SECTIONS
   .text 0x0000 :
   {
     KEEP(*(.text.startup))
+    *(.text.start)
     *(.text .text.*)
   } > imem
 

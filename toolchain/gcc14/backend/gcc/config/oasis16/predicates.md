@@ -12,4 +12,4 @@
 
 (define_predicate "oasis16_memory_operand"
   (and (match_code "mem")
-       (match_test "oasis16_legitimate_address_p(mode, XEXP(op, 0), false)")))
+       (match_test "oasis16_legitimate_address_p(mode, XEXP(op, 0), false, ERROR_MARK)")))

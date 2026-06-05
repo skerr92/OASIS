@@ -1,11 +1,10 @@
 # LLVM Backend Notes
 
-This is a placeholder for an eventual LLVM backend targeting
-`oasis16-unknown-none`.
+This directory records the eventual LLVM backend path for `oasis16-unknown-none`.
 
-The immediate compiler priority is a Darwin-hosted GCC 14/binutils path. LLVM
-remains useful later, especially once the ABI and generated toolchain metadata
-are stable.
+The active compiler priority is GCC 14/binutils. LLVM remains useful later,
+especially now that the ABI and generated toolchain metadata are stable enough to
+feed another backend.
 
 Minimum backend components:
 

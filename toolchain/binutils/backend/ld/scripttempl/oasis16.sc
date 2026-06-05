@@ -13,6 +13,7 @@ SECTIONS
 {
   .text 0x0000 :
   {
+    KEEP(*(.text.startup))
     *(.text.start)
     *(.text .text.*)
   } > imem
@@ -43,5 +44,7 @@ SECTIONS
     . = ORIGIN(dmem) + LENGTH(dmem);
     __stack_end = .;
   } > dmem
+
+  PROVIDE(__stack_top = ORIGIN(dmem) + LENGTH(dmem) - 1);
 }
 EOF

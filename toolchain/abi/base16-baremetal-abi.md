@@ -1,6 +1,6 @@
 # OASIS Base-16T Bare-Metal ABI Draft
 
-Status: draft for toolchain discussion.
+Status: draft ABI used by the current GCC/binutils bring-up.
 
 This ABI records the decisions needed to make C and C++ compilation possible for
 the Base-16T toolchain profile.
@@ -22,9 +22,9 @@ the Base-16T toolchain profile.
 | `r4` - `r11` | Function arguments | Caller-saved |
 | `r12` - `r31` | Temporaries | Caller-saved |
 | `r32` - `r55` | Saved registers | Callee-saved |
-| `r56` | Proposed stack pointer `sp` | Callee-saved |
-| `r57` | Proposed frame pointer `fp` | Callee-saved |
-| `r58` | Proposed return address `ra` | Caller-saved |
+| `r56` | Stack pointer `sp` | Callee-saved |
+| `r57` | Frame pointer `fp` | Callee-saved |
+| `r58` | Return address `ra` | Caller-saved |
 | `r59` - `r63` | Reserved for toolchain, debug, or platform | Reserved |
 
 ## Calling Convention
@@ -53,7 +53,7 @@ Base-16T defines the instructions required by this ABI:
 
 The first GCC backend should target Base-16T, not Base-16.
 
-## Memory Map Draft
+## Memory Map
 
 | Region | Addressing | Purpose |
 | ------ | ---------- | ------- |
@@ -61,7 +61,9 @@ The first GCC backend should target Base-16T, not Base-16.
 | Data memory low words | 9-bit word index | Globals, static data, MMIO |
 | Data memory high words | 9-bit word index | Stack |
 
-The exact split is platform-defined until the linker script is formalized.
+The default linker script uses a 256-instruction text memory and 512-word data
+memory. Implementations may override the memory map while keeping ABI register
+roles stable.
 
 ## Function Example
 

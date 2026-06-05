@@ -39,13 +39,36 @@ def main() -> int:
     for token in ["md_assemble", "oasis16_encode_instruction", "tc_gen_reloc"]:
         if token not in gas:
             errors.append(f"GAS backend missing {token}")
+    if not (BINUTILS / "gas" / "config" / "tc-oasis16.h").exists():
+        errors.append("GAS backend missing tc-oasis16.h")
+
+    opcode_header = (BINUTILS / "include" / "opcode" / "oasis16.h").read_text()
+    for token in [
+        "OASIS16_INSN_SIZE",
+        "oasis16_decode_instruction",
+        "oasis16_print_instruction",
+        "print_insn_oasis16",
+    ]:
+        if token not in opcode_header:
+            errors.append(f"opcode header missing {token}")
+
+    for token in [
+        "oasis16_decode_instruction",
+        "oasis16_print_instruction",
+        "print_insn_oasis16",
+    ]:
+        if token not in opcode_c:
+            errors.append(f"opcodes backend missing {token}")
 
     elf_header = (BINUTILS / "include" / "elf" / "oasis16.h").read_text()
     for reloc in [
         "R_OASIS16_16",
+        "R_OASIS16_ABS16",
         "R_OASIS16_ADDR9",
         "R_OASIS16_TARGET8",
+        "R_OASIS16_PCREL8",
         "R_OASIS16_CALL8",
+        "R_OASIS16_CALL",
     ]:
         if reloc not in elf_header:
             errors.append(f"ELF header missing {reloc}")
@@ -75,7 +98,7 @@ def main() -> int:
             print(error, file=sys.stderr)
         return 1
 
-    print(f"validated binutils backend skeleton for {len(isa_mnemonics)} mnemonics")
+    print(f"validated binutils backend for {len(isa_mnemonics)} mnemonics")
     return 0
 
 

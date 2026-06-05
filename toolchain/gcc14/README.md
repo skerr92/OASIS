@@ -36,9 +36,7 @@ Recommended mapping:
 - ISA/runtime environment: `oasis16-unknown-none`
 - GCC/binutils object target: `oasis16-unknown-elf`
 
-## Required GCC Work
-
-A GCC backend needs:
+## GCC Backend Coverage
 
 - `gcc/config/oasis16/` target files
 - Register classes for `r0` through `r63`
@@ -49,19 +47,18 @@ A GCC backend needs:
 - Libgcc support routines
 - Driver and target config entries
 
-Initial skeleton files live under `toolchain/gcc14/backend/`.
+Backend files live under `toolchain/gcc14/backend/`.
 
-## Required Binutils Work
+## Binutils Coverage
 
-GCC expects target binutils for normal operation:
+GCC expects target binutils for normal operation. Backend files live under
+`toolchain/binutils/backend/` and cover:
 
 - BFD architecture definition
 - Opcode definitions
 - GAS assembler support or an adapter around `oasis-asm`
 - LD emulation and linker script
 - objdump support
-
-Initial skeleton files live under `toolchain/binutils/backend/`.
 
 ## First Darwin Build Shape
 

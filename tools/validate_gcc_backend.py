@@ -103,7 +103,7 @@ def main() -> int:
             print(error, file=sys.stderr)
         return 1
 
-    print("validated GCC backend, ABI hooks, and runtime skeleton")
+    print("validated GCC backend, ABI hooks, and runtime files")
     return 0
 
 
