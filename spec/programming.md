@@ -36,6 +36,9 @@ bridges can both expose this same 16-bit register map.
 | `0x0006` | `IMEM_WDATA_HI` | RW | Instruction write data bits `[31:16]` |
 | `0x0007` | `IMEM_RDATA_LO` | RO | Instruction read data bits `[15:0]` |
 | `0x0008` | `IMEM_RDATA_HI` | RO | Instruction read data bits `[31:16]` |
+| `0x0009` | `CORE_PC` | RO | Current program counter in the low bits |
+| `0x000a` | `GPR_ADDR` | RW | General-purpose register selector in bits `[5:0]` |
+| `0x000b` | `GPR_RDATA` | RO | Selected general-purpose register value |
 
 `CONTROL` bits:
 
@@ -55,6 +58,41 @@ bridges can both expose this same 16-bit register map.
 | `1` | `RESETTING` | Core reset is asserted |
 | `2` | `BUSY` | Programming access is in progress |
 | `3` | `ERROR` | Last programming access failed |
+
+## Debug Observation
+
+The programming access port should expose enough state for loaders, simulators,
+and compliance harnesses to identify whether a bare-metal program is still
+running or has parked in the runtime exit path.
+
+`CORE_PC` reports the currently fetched instruction index in the low
+program-counter bits. Wider program counters may use additional low-order bits
+in future profiles; unused high bits read as zero for Base-16.
+
+`GPR_ADDR` selects one of the 64 general-purpose registers. `GPR_RDATA` reports
+the selected 16-bit value. Register readback is intended for halted debug and
+compliance flows. Implementations that allow live readback must document whether
+the value is sampled before or after an instruction commits.
+
+The access port is still not part of the CPU-visible data-memory map. Runtime
+software does not write these registers directly; the implementation updates
+them from internal core state.
+
+## Bare-Metal Exit Convention
+
+The Base-16T runtime starts at `_start`, initializes `sp`, calls `main`, and then
+parks in `__oasis_exit`. A debugger, simulator, or compliance harness may treat
+`pc == __oasis_exit` as normal program completion. The return value from `main`
+remains in `r1` and is the program exit code.
+
+Runtime abort paths park in `__oasis_abort`. A debugger, simulator, or
+compliance harness may treat `pc == __oasis_abort` as abnormal termination. The
+value in `r1` is implementation-defined unless the failing helper documents a
+specific diagnostic value.
+
+This convention deliberately avoids assigning a new halt or trap instruction in
+v0.2. Cores may still add implementation-specific debug halt behavior, but
+portable software should use the runtime symbols above.
 
 ## Programming Sequence
 

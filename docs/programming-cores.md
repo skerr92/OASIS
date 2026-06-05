@@ -10,6 +10,7 @@ A programmable Base-16 core should provide:
 - A writable instruction memory path
 - A way to halt or reset the core during programming
 - Optional instruction-memory readback
+- Program-counter and register readback for debug/compliance observation
 - A transport bridge, commonly SPI or JTAG
 
 The recommended transport-neutral register map is defined in
@@ -46,3 +47,10 @@ SPI is compact and easy to drive from a microcontroller.
 
 JTAG is preferred for FPGA development because it naturally supports debug,
 readback, and board bring-up.
+
+## Runtime Completion
+
+The Base-16T runtime parks completed programs at `__oasis_exit` and abnormal
+runtime failures at `__oasis_abort`. Debuggers and compliance harnesses should
+use `CORE_PC` to detect those symbols and `GPR_ADDR`/`GPR_RDATA` to read `r1`
+as the exit code after normal completion.

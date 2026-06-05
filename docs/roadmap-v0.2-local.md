@@ -37,6 +37,8 @@ the public roadmap and release notes.
   for larger data-memory addresses.
 - Completed: draft class `00` instruction-expansion guidance before assigning any new
   peripheral opcodes.
+- Completed: define the first runtime/debug exit convention around `_start`,
+  `__oasis_exit`, `__oasis_abort`, `CORE_PC`, and register readback.
 - Leave the archived v0.1 spec untouched and document v0.2 behavior in current
   tables/spec files.
 

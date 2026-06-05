@@ -54,7 +54,7 @@ Run:
 make generate
 ```
 
-This creates `toolchain/generated/oasis-base16t-v0.1-draft.json` from the source
+This creates `toolchain/generated/oasis-base16t-v0.2-draft.json` from the source
 tables in `tables/`. Compiler backends, assemblers, emulators, and compliance
 harnesses should prefer generated metadata over hand-copying opcode constants.
 The metadata also includes the recommended programming access-port register map.
