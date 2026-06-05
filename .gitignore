@@ -2,3 +2,6 @@ examples/base16/*.mem
 examples/base16/*.dap16
 examples/base16/*.spi16
 toolchain/generated/
+.OASIS
+.build
+.toolchain

@@ -62,6 +62,19 @@ def insert_before_marker(path: Path, token: str, marker: str, addition: str) -> 
     return True
 
 
+def insert_before_first_marker(
+    path: Path, token: str, markers: tuple[str, ...], addition: str
+) -> bool:
+    text = read_text(path)
+    if token in text:
+        return False
+    for marker in markers:
+        if marker in text:
+            write_text(path, text.replace(marker, addition + marker, 1))
+            return True
+    raise IntegrationError(f"{path} missing markers {markers!r}")
+
+
 def replace_once(path: Path, token: str, old: str, new: str) -> bool:
     text = read_text(path)
     if token in text:
@@ -87,9 +100,10 @@ def insert_archures_extern(path: Path) -> bool:
     if token in text:
         text = text.replace(token, "")
     marker = "static const bfd_arch_info_type * const bfd_archures_list[]"
-    if marker not in text:
-        raise IntegrationError(f"{path} missing marker {marker!r}")
-    write_text(path, text.replace(marker, token + "\n" + marker, 1))
+    if marker in text:
+        write_text(path, text.replace(marker, token + "\n" + marker, 1))
+    else:
+        write_text(path, token + "\n" + text)
     return True
 
 
@@ -119,12 +133,14 @@ def insert_reloc_docs(path: Path) -> bool:
         return False
     marker = "ENDSENUM\n  BFD_RELOC_UNUSED"
     if marker not in text:
-        raise IntegrationError(f"{path} missing marker {marker!r}")
+        return False
     write_text(path, text.replace(marker, addition + marker, 1))
     return True
 
 
 def insert_opcodes_arch(path: Path) -> bool:
+    if "bfd_or1k_arch)" not in read_text(path):
+        return False
     return insert_before_marker(
         path,
         "bfd_oasis16_arch)",
@@ -153,9 +169,15 @@ def insert_bfd_config_target(path: Path) -> bool:
     if addition in text:
         text = text.replace(addition, "")
     marker = "  or1k-*-elf | or1k-*-linux* | or1k-*-rtems*)"
-    if marker not in text:
+    fallback = "  *)\n"
+    if marker in text:
+        write_text(path, text.replace(marker, addition + marker, 1))
+    elif fallback in text:
+        write_text(path, text.replace(fallback, addition + fallback, 1))
+    elif "esac\n" in text:
+        write_text(path, text.replace("esac\n", addition + "esac\n", 1))
+    else:
         raise IntegrationError(f"{path} missing marker {marker!r}")
-    write_text(path, text.replace(marker, addition + marker, 1))
     return True
 
 
@@ -229,10 +251,12 @@ def integrate_libgcc_config_host(path: Path) -> bool:
     if target_block in text[text.find(target_marker) if target_marker in text else 0:]:
         return changed
 
-    if target_marker not in text:
+    if target_marker in text:
+        write_text(path, text.replace(target_marker, target_block + target_marker, 1))
+    elif "esac\n" in text:
+        write_text(path, text.replace("esac\n", target_block + "esac\n", 1))
+    else:
         raise IntegrationError(f"{path} missing marker {target_marker!r}")
-
-    write_text(path, text.replace(target_marker, target_block + target_marker, 1))
     return True
 
 
@@ -300,18 +324,23 @@ def integrate_gcc_config_gcc(path: Path) -> bool:
             changed = True
 
     cpu_marker = "m32c*-*-*)\n"
-    if cpu_marker not in text:
-        raise RuntimeError(f"{path}: marker not found: {cpu_marker.strip()}")
-    if cpu_replacement not in text:
+    if cpu_marker in text and cpu_replacement not in text:
         text = text.replace(cpu_marker, cpu_replacement + cpu_marker, 1)
         changed = True
 
     target_marker = "xstormy16-*-elf)\n"
-    if target_marker not in text:
-        raise RuntimeError(f"{path}: marker not found: {target_marker.strip()}")
-    if target_replacement not in text:
+    if target_marker in text and target_replacement not in text:
         text = text.replace(target_marker, target_replacement + target_marker, 1)
         changed = True
+    elif target_marker not in text:
+        fallback = target_replacement if cpu_marker not in text else cpu_replacement
+        if fallback not in text and "esac\n" in text:
+            text = text.replace("esac\n", fallback + "esac\n", 1)
+            changed = True
+        elif fallback not in text:
+            raise RuntimeError(
+                f"{path}: marker not found: {target_marker.strip()} or esac"
+            )
 
     if changed:
         path.write_text(text)
@@ -399,10 +428,10 @@ def integrate_binutils(binutils_src: Path) -> list[str]:
         changes.append("bfd/targets.c:extern")
     if patch_if_exists(
         targets_c,
-        lambda path: insert_before_marker(
+        lambda path: insert_before_first_marker(
             path,
             "&oasis16_elf32_vec",
-            "\tNULL /* end of list marker */",
+            ("\tNULL /* end of list marker */", "  NULL\n"),
             "  &oasis16_elf32_vec,\n",
         ),
     ):
@@ -468,10 +497,10 @@ def integrate_binutils(binutils_src: Path) -> list[str]:
     disassemble_c = binutils_src / "opcodes" / "disassemble.c"
     if patch_if_exists(
         disassemble_c,
-        lambda path: insert_before_marker(
+        lambda path: insert_before_first_marker(
             path,
             "print_insn_oasis16",
-            "disassembler_ftype\n",
+            ("disassembler_ftype\n", "switch ("),
             (
                 "extern int print_insn_oasis16 (bfd_vma, disassemble_info *);\n"
             ),
@@ -514,10 +543,10 @@ def integrate_binutils(binutils_src: Path) -> list[str]:
     gas_configure = binutils_src / "gas" / "configure.tgt"
     if patch_if_exists(
         gas_configure,
-        lambda path: insert_before_marker(
+        lambda path: insert_before_first_marker(
             path,
             "oasis16-*-elf*",
-            "  *-*-elf | *-*-rtems* | *-*-sysv4*)",
+            ("  *-*-elf | *-*-rtems* | *-*-sysv4*)", "  *)\n", "esac\n"),
             "  oasis16-*-elf*) fmt=elf ;;\n",
         ),
     ):
@@ -526,10 +555,14 @@ def integrate_binutils(binutils_src: Path) -> list[str]:
     ld_configure = binutils_src / "ld" / "configure.tgt"
     if patch_if_exists(
         ld_configure,
-        lambda path: insert_before_marker(
+        lambda path: insert_before_first_marker(
             path,
             "oasis16-*-elf*",
-            "or1k-*-elf | or1knd-*-elf | or1k-*-rtems* | or1knd-*-rtems*)",
+            (
+                "or1k-*-elf | or1knd-*-elf | or1k-*-rtems* | or1knd-*-rtems*)",
+                "  *)\n",
+                "esac\n",
+            ),
             "oasis16-*-elf*) targ_emul=oasis16elf ;;\n",
         ),
     ):
