@@ -4,7 +4,7 @@ ENTRY(_start)
 MEMORY
 {
   imem (rx)  : ORIGIN = 0x0000, LENGTH = 0x0100
-  dmem (rw)  : ORIGIN = 0x0000, LENGTH = 0x0200
+  dmem (rw)  : ORIGIN = 0x0100, LENGTH = 0x0200
 }
 
 SECTIONS
