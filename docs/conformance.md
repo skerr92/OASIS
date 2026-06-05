@@ -28,7 +28,9 @@ Implementation repositories should:
 2. Assemble each compliance program.
 3. Run it on the implementation or simulator.
 4. Compare expected register, memory, and program-counter state.
-5. Report profile coverage.
+5. For tests with `expect.exit`, observe `CORE_PC`, select the exit-code
+   register through `GPR_ADDR`, and compare `GPR_RDATA` with the expected code.
+6. Report profile coverage.
 
 ## Badges
 

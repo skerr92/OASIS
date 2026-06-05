@@ -7,6 +7,8 @@ Tests name the profile they target:
 
 - `oasis-base16-v0.1-draft`
 - `oasis-base16t-v0.1-draft`
+- `oasis-base16-v0.2-draft`
+- `oasis-base16t-v0.2-draft`
 
 Each instruction should have at least one basic test and one edge-case test where
 applicable.
@@ -51,6 +53,30 @@ expect:
     r1: 30
 ```
 
+v0.2 tests may also describe runtime completion through the recommended
+programming access port:
+
+```yaml
+expect:
+  registers:
+    r1: 0x002a
+  pc: __oasis_exit
+  exit:
+    kind: normal
+    symbol: __oasis_exit
+    code_register: r1
+    code: 0x002a
+    observe:
+      pc: CORE_PC
+      register_selector: GPR_ADDR
+      register_data: GPR_RDATA
+```
+
+`expect.exit` is a harness-facing contract. A simulator or debugger should
+observe `symbol` through `CORE_PC`, select `code_register` through `GPR_ADDR`,
+and compare `GPR_RDATA` with `code`. `kind: normal` uses `__oasis_exit`;
+`kind: abort` uses `__oasis_abort`.
+
 ## Harness Requirements
 
 The harness should support:
@@ -58,6 +84,7 @@ The harness should support:
 - Loading an instruction memory image
 - Running a program for a bounded number of instructions or cycles
 - Reading selected registers, memory locations, and `pc`
+- Detecting `expect.exit` by using `CORE_PC`, `GPR_ADDR`, and `GPR_RDATA`
 - Reporting failures in a machine-readable format
 
 Implementation repositories may translate these YAML tests into their local

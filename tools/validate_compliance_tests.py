@@ -42,6 +42,56 @@ def scalar_value(text: str, key: str) -> str | None:
     return match.group(1).strip() if match else None
 
 
+def indented_block(text: str, header: str, indent: int) -> list[str]:
+    lines = text.splitlines()
+    start = None
+    prefix = " " * indent
+    header_line = f"{prefix}{header}:"
+
+    for index, line in enumerate(lines):
+        if line == header_line:
+            start = index + 1
+            break
+
+    if start is None:
+        return []
+
+    block: list[str] = []
+    for line in lines[start:]:
+        if not line.strip():
+            block.append(line)
+            continue
+        current_indent = len(line) - len(line.lstrip(" "))
+        if current_indent <= indent:
+            break
+        block.append(line)
+
+    return block
+
+
+def mapping_keys(block: list[str], indent: int) -> set[str]:
+    keys: set[str] = set()
+    prefix = " " * indent
+    for line in block:
+        if not line.startswith(prefix) or line.startswith(prefix + " "):
+            continue
+        match = re.match(rf"^ {{{indent}}}([A-Za-z0-9_-]+):", line)
+        if match:
+            keys.add(match.group(1))
+    return keys
+
+
+def mapping_value(block: list[str], key: str, indent: int) -> str | None:
+    prefix = " " * indent
+    for line in block:
+        if not line.startswith(prefix) or line.startswith(prefix + " "):
+            continue
+        match = re.match(rf"^ {{{indent}}}{key}:\s*(.+)$", line)
+        if match:
+            return match.group(1).strip()
+    return None
+
+
 def opcode_mnemonics() -> set[str]:
     with OPCODE_TABLE.open(newline="") as table:
         return {row["mnemonic"].upper() for row in csv.DictReader(table)}
@@ -69,6 +119,62 @@ def covered_mnemonics(text: str) -> set[str]:
             covered.add(parts[0].upper())
 
     return covered
+
+
+def validate_exit_expectation(path: Path, text: str, errors: list[str]) -> None:
+    exit_block = indented_block(text, "exit", 2)
+    if not exit_block:
+        return
+
+    required = {"kind", "symbol", "code_register", "code", "observe"}
+    keys = mapping_keys(exit_block, 4)
+    missing = required - keys
+    if missing:
+        errors.append(
+            f"{path}: expect.exit missing keys: {', '.join(sorted(missing))}"
+        )
+
+    kind = mapping_value(exit_block, "kind", 4)
+    if kind not in {"normal", "abort"}:
+        errors.append(f"{path}: expect.exit.kind must be normal or abort")
+
+    symbol = mapping_value(exit_block, "symbol", 4)
+    if symbol not in {"__oasis_exit", "__oasis_abort"}:
+        errors.append(f"{path}: expect.exit.symbol must be __oasis_exit or __oasis_abort")
+    elif kind == "normal" and symbol != "__oasis_exit":
+        errors.append(f"{path}: expect.exit.kind normal must use __oasis_exit")
+    elif kind == "abort" and symbol != "__oasis_abort":
+        errors.append(f"{path}: expect.exit.kind abort must use __oasis_abort")
+
+    code_register = mapping_value(exit_block, "code_register", 4)
+    if not code_register or not re.match(r"^r([0-9]|[1-5][0-9]|6[0-3])$", code_register):
+        errors.append(f"{path}: expect.exit.code_register must be r0 through r63")
+
+    code = mapping_value(exit_block, "code", 4)
+    if code and not re.match(r"^(0x[0-9a-fA-F]+|[0-9]+)$", code):
+        errors.append(f"{path}: expect.exit.code must be an integer literal")
+    elif code and int(code, 0) > 0xffff:
+        errors.append(f"{path}: expect.exit.code must fit in 16 bits")
+
+    observe_block = indented_block("\n".join(exit_block), "observe", 4)
+    observe_required = {"pc", "register_selector", "register_data"}
+    observe_keys = mapping_keys(observe_block, 6)
+    observe_missing = observe_required - observe_keys
+    if observe_missing:
+        errors.append(
+            f"{path}: expect.exit.observe missing keys: "
+            + ", ".join(sorted(observe_missing))
+        )
+
+    expected_observe = {
+        "pc": "CORE_PC",
+        "register_selector": "GPR_ADDR",
+        "register_data": "GPR_RDATA",
+    }
+    for key, expected in expected_observe.items():
+        value = mapping_value(observe_block, key, 6)
+        if value and value != expected:
+            errors.append(f"{path}: expect.exit.observe.{key} must be {expected}")
 
 
 def main() -> int:
@@ -99,6 +205,7 @@ def main() -> int:
         if profile not in VALID_PROFILES:
             errors.append(f"{path}: unexpected profile {profile}")
 
+        validate_exit_expectation(path, text, errors)
         all_covered.update(covered_mnemonics(text))
 
     missing_mnemonics = opcode_mnemonics() - all_covered

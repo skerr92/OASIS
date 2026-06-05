@@ -39,6 +39,8 @@ the public roadmap and release notes.
   peripheral opcodes.
 - Completed: define the first runtime/debug exit convention around `_start`,
   `__oasis_exit`, `__oasis_abort`, `CORE_PC`, and register readback.
+- Completed: extend compliance YAML validation and add a Base-16T runtime-exit
+  fixture for the debug observation convention.
 - Leave the archived v0.1 spec untouched and document v0.2 behavior in current
   tables/spec files.
 

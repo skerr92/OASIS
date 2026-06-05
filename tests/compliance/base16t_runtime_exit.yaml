@@ -1,0 +1,28 @@
+name: base16t_runtime_exit
+profile: oasis-base16t-v0.2-draft
+description: Base-16T startup calls main, preserves r1 as the exit code, and parks at __oasis_exit.
+program:
+  - "_start:"
+  - MVI r56, 0x0fff
+  - CALL main
+  - "__oasis_exit:"
+  - JMP __oasis_exit
+  - "__oasis_abort:"
+  - JMP __oasis_abort
+  - "main:"
+  - MVI r1, 0x002a
+  - RET
+expect:
+  registers:
+    r1: 0x002a
+    r56: 0x0fff
+  pc: __oasis_exit
+  exit:
+    kind: normal
+    symbol: __oasis_exit
+    code_register: r1
+    code: 0x002a
+    observe:
+      pc: CORE_PC
+      register_selector: GPR_ADDR
+      register_data: GPR_RDATA
