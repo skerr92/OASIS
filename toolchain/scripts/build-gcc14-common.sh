@@ -208,11 +208,17 @@ run make -C "$GCC_BUILD" install-target-libgcc
 run mkdir -p "$PREFIX/$TARGET/lib"
 run mkdir -p "$PREFIX/$TARGET/include"
 run mkdir -p "$PREFIX/bin"
+run mkdir -p "$PREFIX/tools"
 run cp "$ROOT/toolchain/runtime/crt0.S" "$PREFIX/$TARGET/lib/crt0.S"
 run cp "$ROOT/toolchain/runtime/crt0.oas" "$PREFIX/$TARGET/lib/crt0.oas"
 run cp "$ROOT/toolchain/runtime/linker/oasis16.ld" "$PREFIX/$TARGET/lib/oasis16.ld"
 run cp "$ROOT/toolchain/runtime/include/oasis.h" "$PREFIX/$TARGET/include/oasis.h"
 run cp "$ROOT/bin/oasis-elf2img" "$PREFIX/bin/oasis-elf2img"
+run cp "$ROOT/bin/oasis-program-image" "$PREFIX/bin/oasis-program-image"
+run cp "$ROOT/bin/oasis-asm" "$PREFIX/bin/oasis-asm"
+run cp "$ROOT/tools/oasis_elf2img.py" "$PREFIX/tools/oasis_elf2img.py"
+run cp "$ROOT/tools/oasis_program_image.py" "$PREFIX/tools/oasis_program_image.py"
+run cp "$ROOT/tools/oasis_asm.py" "$PREFIX/tools/oasis_asm.py"
 
 if [ "$RUN_TESTS" -eq 1 ]; then
   run "$ROOT/toolchain/scripts/validate-installed-toolchain.sh" --prefix "$PREFIX"

@@ -68,6 +68,22 @@ def main() -> int:
         raise AssertionError("source packaging help should succeed")
     require_contains(package_source.stdout, "package-source-release.sh")
 
+    build_common = (ROOT / "toolchain" / "scripts" / "build-gcc14-common.sh").read_text()
+    for installed_tool in [
+        "$ROOT/bin/oasis-elf2img",
+        "$ROOT/bin/oasis-program-image",
+        "$ROOT/bin/oasis-asm",
+        "$ROOT/tools/oasis_elf2img.py",
+        "$ROOT/tools/oasis_program_image.py",
+        "$ROOT/tools/oasis_asm.py",
+    ]:
+        require_contains(build_common, installed_tool)
+
+    validate_script = (ROOT / "toolchain" / "scripts" / "validate-installed-toolchain.sh").read_text()
+    require_contains(validate_script, "$PREFIX/tools/oasis_elf2img.py")
+    require_contains(validate_script, "$PREFIX/tools/oasis_program_image.py")
+    require_contains(validate_script, "$PREFIX/tools/oasis_asm.py")
+
     dry_validate = run(
         [
             "toolchain/scripts/validate-installed-toolchain.sh",

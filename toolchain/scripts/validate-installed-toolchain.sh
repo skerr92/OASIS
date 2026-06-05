@@ -87,6 +87,17 @@ if [ "$DRY_RUN" -eq 0 ]; then
       exit 1
     fi
   done
+
+  for helper in \
+    "$PREFIX/tools/oasis_elf2img.py" \
+    "$PREFIX/tools/oasis_program_image.py" \
+    "$PREFIX/tools/oasis_asm.py"
+  do
+    if [ ! -r "$helper" ]; then
+      echo "error: missing installed helper: $helper" >&2
+      exit 1
+    fi
+  done
 fi
 
 run mkdir -p "$OUT_DIR"
