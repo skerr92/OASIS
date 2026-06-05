@@ -10,7 +10,7 @@ This directory contains the first Base-16T bare-metal runtime pieces for the
 - `crt0.oas` is the same startup shape for the standalone `oasis-asm` program
   image flow.
 - `linker/oasis16.ld` defines the v0.1 256-instruction text memory and
-  512-word data memory layout.
+  4096-word data memory layout.
 - `include/oasis.h` exposes the runtime exit and abort hooks.
 - `libgcc/oasis16-libgcc.S` provides the first 16-bit arithmetic helper
   routines used by GCC lowering.

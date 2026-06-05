@@ -9,7 +9,7 @@ the Base-16T toolchain profile.
 
 | Purpose | Name |
 | ------- | ---- |
-| ISA profile | `oasis-base16t-v0.1-draft` |
+| ISA profile | `oasis-base16t-v0.2-draft` |
 | Generic bare-metal target | `oasis16-unknown-elf` |
 | GCC/binutils target alias | `oasis16-elf` |
 
@@ -58,10 +58,10 @@ The first GCC backend should target Base-16T, not Base-16.
 | Region | Addressing | Purpose |
 | ------ | ---------- | ------- |
 | Instruction memory | 8-bit instruction index | Program text |
-| Data memory low words | 9-bit word index | Globals, static data, MMIO |
-| Data memory high words | 9-bit word index | Stack |
+| Data memory low words | 12-bit word index | Globals, static data, MMIO |
+| Data memory high words | 12-bit word index | Stack |
 
-The default linker script uses a 256-instruction text memory and 512-word data
+The default linker script uses a 256-instruction text memory and 4096-word data
 memory. Implementations may override the memory map while keeping ABI register
 roles stable.
 

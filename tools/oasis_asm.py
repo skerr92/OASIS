@@ -18,7 +18,7 @@ import sys
 
 XLEN = 16
 REG_COUNT = 64
-DATA_ADDR_MAX = 0x1FF
+DATA_ADDR_MAX = 0xFFF
 PC_MAX = 0xFF
 IMM16_MAX = 0xFFFF
 IMM6_MAX = 0x3F
@@ -316,13 +316,13 @@ def encode_memory(
         expect_count(operands, 2, mnemonic, line)
         ra = parse_register(operands[0], line)
         addr = parse_mem_addr(operands[1], labels, line)
-        return (CLASS_MEM << 30) | (opcode << 28) | (ra << 22) | (addr << 13)
+        return (CLASS_MEM << 30) | (opcode << 28) | (ra << 22) | (addr << 10)
 
     if mnemonic == "MSI":
         expect_count(operands, 2, mnemonic, line)
         addr = parse_mem_addr(operands[0], labels, line)
         imm16 = require_range(parse_int(operands[1], labels, line), 0, IMM16_MAX, "imm16", line)
-        return (CLASS_MEM << 30) | (opcode << 28) | (addr << 19) | imm16
+        return (CLASS_MEM << 30) | (opcode << 28) | (addr << 16) | imm16
 
     raise AssemblerError(f"{line.path}:{line.line_no}: unsupported memory op {mnemonic}")
 

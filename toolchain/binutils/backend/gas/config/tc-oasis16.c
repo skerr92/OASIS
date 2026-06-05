@@ -107,7 +107,7 @@ expression_is_constant(expressionS *expression_p, int *value)
 }
 
 static char *
-parse_addr9(char *input, expressionS *expression_p)
+parse_addr12(char *input, expressionS *expression_p)
 {
   input = skip_space(input);
   if (*input != '[')
@@ -162,13 +162,14 @@ reloc_for_operand(const struct oasis16_opcode *opcode)
   switch (opcode->operands)
     {
     case OASIS16_OPERANDS_RA_IMM16:
-    case OASIS16_OPERANDS_ADDR9_IMM16:
       return BFD_RELOC_OASIS16_16;
+    case OASIS16_OPERANDS_ADDR12_IMM16:
+      return BFD_RELOC_OASIS16_MSI_ADDR12;
     case OASIS16_OPERANDS_TARGET8:
     case OASIS16_OPERANDS_RA_RB_TARGET8:
       return BFD_RELOC_OASIS16_CALL8;
-    case OASIS16_OPERANDS_RA_ADDR9:
-      return BFD_RELOC_OASIS16_ADDR9;
+    case OASIS16_OPERANDS_RA_ADDR12:
+      return BFD_RELOC_OASIS16_ADDR12;
     default:
       return BFD_RELOC_NONE;
     }
@@ -281,18 +282,18 @@ md_assemble(char *str)
       input = parse_register(input, &operands.rb);
       break;
 
-    case OASIS16_OPERANDS_RA_ADDR9:
+    case OASIS16_OPERANDS_RA_ADDR12:
       input = parse_register(input, &operands.ra);
       input = skip_comma(input);
-      input = parse_addr9(input, &reloc_expr);
+      input = parse_addr12(input, &reloc_expr);
       if (expression_is_constant(&reloc_expr, &value))
         operands.address = (unsigned int) value;
       else
         reloc_ptr = &reloc_expr;
       break;
 
-    case OASIS16_OPERANDS_ADDR9_IMM16:
-      input = parse_addr9(input, &reloc_expr);
+    case OASIS16_OPERANDS_ADDR12_IMM16:
+      input = parse_addr12(input, &reloc_expr);
       if (expression_is_constant(&reloc_expr, &value))
         operands.address = (unsigned int) value;
       else
@@ -343,8 +344,11 @@ md_apply_fix(fixS *fixP, valueT *valP, segT seg ATTRIBUTE_UNUSED)
     case BFD_RELOC_OASIS16_16:
       instruction |= value & 0xffff;
       break;
-    case BFD_RELOC_OASIS16_ADDR9:
-      instruction |= (value & 0x1ff) << 13;
+    case BFD_RELOC_OASIS16_ADDR12:
+      instruction |= (value & 0xfff) << 10;
+      break;
+    case BFD_RELOC_OASIS16_MSI_ADDR12:
+      instruction |= (value & 0xfff) << 16;
       break;
     case BFD_RELOC_OASIS16_CALL8:
       instruction |= (value & 0xff) << 6;

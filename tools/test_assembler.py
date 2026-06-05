@@ -96,7 +96,16 @@ def main() -> int:
         "hex",
     )
     assert_error("MVI r64, 1\n", "register 64 out of range")
-    assert_error("MVT r1, [0x200]\n", "memory address 512 out of range")
+    with tempfile.NamedTemporaryFile("w", suffix=".oas", delete=False) as temp:
+        temp.write("MVF r1, [0xfff]\nMVT r1, [0xfff]\nMSI [0xfff], 0x1234\n")
+        high_addr_path = Path(temp.name)
+
+    try:
+        run_asm(high_addr_path, "hex")
+    finally:
+        high_addr_path.unlink()
+
+    assert_error("MVT r1, [0x1000]\n", "memory address 4096 out of range")
     assert_error("LDR r1, [r56 + 32]\n", "off6 32 out of range")
     assert_program_image(
         ROOT / "examples" / "base16" / "add_store.oas",
