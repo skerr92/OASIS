@@ -10,6 +10,8 @@ The suite is intentionally small and layered:
 - `call.c` exercises the `CALL`/`RET` ABI.
 - `pointer_load_store.c`, `global_data.c`, and `array_access.c` exercise stack,
   pointer, and data-section flows.
+- `large_global_data.c` keeps a global object above the old 512-word v0.1 data
+  range so linker and ELF-image flows continue covering the v0.2 memory map.
 
 Run after installing a toolchain prefix:
 

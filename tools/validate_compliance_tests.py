@@ -18,7 +18,12 @@ ROOT = Path(__file__).resolve().parents[1]
 TEST_DIR = ROOT / "tests" / "compliance"
 OPCODE_TABLE = ROOT / "tables" / "opcode-map.csv"
 REQUIRED_KEYS = {"name", "profile", "program", "expect"}
-VALID_PROFILES = {"oasis-base16-v0.1-draft", "oasis-base16t-v0.1-draft"}
+VALID_PROFILES = {
+    "oasis-base16-v0.1-draft",
+    "oasis-base16t-v0.1-draft",
+    "oasis-base16-v0.2-draft",
+    "oasis-base16t-v0.2-draft",
+}
 
 
 def top_level_keys(text: str) -> set[str]:

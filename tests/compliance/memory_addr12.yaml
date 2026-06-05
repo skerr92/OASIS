@@ -1,0 +1,13 @@
+name: memory_addr12
+profile: oasis-base16-v0.2-draft
+description: Absolute data-memory operations reach the top 12-bit word address.
+program:
+  - MSI [0xfff], 0x55aa
+  - MVF r1, [0xfff]
+  - MVT r1, [0xffe]
+expect:
+  registers:
+    r1: 0x55aa
+  memory:
+    0xfff: 0x55aa
+    0xffe: 0x55aa

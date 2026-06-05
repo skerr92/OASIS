@@ -30,10 +30,12 @@ the public roadmap and release notes.
 
 ## Current Sprint
 
-- Update memory encodings from `addr9` to `addr12`.
-- Update assembler, generated docs, binutils opcode tables, GAS parsing, BFD
+- Completed: update memory encodings from `addr9` to `addr12`.
+- Completed: update assembler, generated docs, binutils opcode tables, GAS parsing, BFD
   relocations, and validation tests.
-- Draft class `00` instruction-expansion guidance before assigning any new
+- In progress: add targeted assembler, compliance, and toolchain smoke coverage
+  for larger data-memory addresses.
+- Completed: draft class `00` instruction-expansion guidance before assigning any new
   peripheral opcodes.
 - Leave the archived v0.1 spec untouched and document v0.2 behavior in current
   tables/spec files.
