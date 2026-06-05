@@ -32,15 +32,16 @@
   })
 
 (define_insn "movhi"
-  [(set (match_operand:HI 0 "nonimmediate_operand" "=r,r,r,m")
-        (match_operand:HI 1 "general_operand" "r,I,m,r"))]
+  [(set (match_operand:HI 0 "nonimmediate_operand" "=r,r,r,r,m")
+        (match_operand:HI 1 "general_operand" "r,I,S,m,r"))]
   ""
   "@
    MVV %0, %1
    MVI %0, %1
+   MVI %0, %1
    LDR %0, %1
    STR %1, %0"
-  [(set_attr "type" "alu,alu,load,store")])
+  [(set_attr "type" "alu,alu,alu,load,store")])
 
 (define_insn "addhi3"
   [(set (match_operand:HI 0 "register_operand" "=r,r")

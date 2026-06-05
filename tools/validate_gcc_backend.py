@@ -69,6 +69,7 @@ def main() -> int:
         'match_operand:HI 0 "oasis16_call_address_operand" "S"',
         'match_operand:HI 1 "oasis16_call_address_operand" "S"',
         "(clobber (reg:HI R58))",
+        '"r,I,S,m,r"',
         'match_operator 0 "comparison_operator"',
         "LDR %0, %1",
         "STR %1, %0",
