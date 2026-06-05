@@ -24,6 +24,8 @@ def main() -> int:
     oasis_cc = (GCC / "oasis16.cc").read_text()
     oasis_h = (GCC / "oasis16.h").read_text()
     oasis_md = (GCC / "oasis16.md").read_text()
+    constraints = (GCC / "constraints.md").read_text()
+    predicates = (GCC / "predicates.md").read_text()
     protos = (GCC / "oasis16-protos.h").read_text()
 
     for token in [
@@ -56,14 +58,36 @@ def main() -> int:
     for token in [
         '(define_expand "prologue"',
         '(define_expand "epilogue"',
-        '(define_insn "call"',
-        '(define_insn "call_value"',
+        '(define_expand "call"',
+        '(define_insn "*call"',
+        '(define_insn "*call_no_clobber"',
+        '(define_expand "call_value"',
+        '(define_insn "*call_value"',
+        '(define_insn "*call_value_no_clobber"',
+        '(parallel [(call',
+        '(parallel [(set',
+        'match_operand:HI 0 "oasis16_call_address_operand" "S"',
+        'match_operand:HI 1 "oasis16_call_address_operand" "S"',
         "(clobber (reg:HI R58))",
         'match_operator 0 "comparison_operator"',
         "LDR %0, %1",
         "STR %1, %0",
     ]:
         require(oasis_md, token, errors, "oasis16.md")
+
+    for token in [
+        'define_constraint "S"',
+        "symbol_ref",
+        "label_ref",
+    ]:
+        require(constraints, token, errors, "constraints.md")
+
+    for token in [
+        'define_predicate "oasis16_call_operand"',
+        'define_predicate "oasis16_call_address_operand"',
+        "SYMBOL_REF_P(XEXP(op, 0))",
+    ]:
+        require(predicates, token, errors, "predicates.md")
 
     for token in [
         "oasis16_initial_elimination_offset",

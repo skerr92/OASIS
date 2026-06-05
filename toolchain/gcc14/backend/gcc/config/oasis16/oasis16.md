@@ -128,19 +128,49 @@
   "JMR %0"
   [(set_attr "type" "branch")])
 
-(define_insn "call"
-  [(call (match_operand:HI 0 "immediate_operand" "i")
+(define_expand "call"
+  [(parallel [(call (match_operand:HI 0 "oasis16_call_operand" "")
+                    (match_operand 1 "" ""))
+              (clobber (reg:HI R58))])]
+  ""
+  "")
+
+(define_insn "*call"
+  [(call (mem:HI (match_operand:HI 0 "oasis16_call_address_operand" "S"))
          (match_operand 1 "" ""))
    (clobber (reg:HI R58))]
   ""
   "CALL %0"
   [(set_attr "type" "call")])
 
-(define_insn "call_value"
+(define_insn "*call_no_clobber"
+  [(call (mem:HI (match_operand:HI 0 "oasis16_call_address_operand" "S"))
+         (match_operand 1 "" ""))]
+  ""
+  "CALL %0"
+  [(set_attr "type" "call")])
+
+(define_expand "call_value"
+  [(parallel [(set (match_operand 0 "register_operand" "")
+                   (call (match_operand:HI 1 "oasis16_call_operand" "")
+                         (match_operand 2 "" "")))
+              (clobber (reg:HI R58))])]
+  ""
+  "")
+
+(define_insn "*call_value"
   [(set (match_operand 0 "register_operand" "=r")
-        (call (match_operand:HI 1 "immediate_operand" "i")
+        (call (mem:HI (match_operand:HI 1 "oasis16_call_address_operand" "S"))
               (match_operand 2 "" "")))
    (clobber (reg:HI R58))]
+  ""
+  "CALL %1"
+  [(set_attr "type" "call")])
+
+(define_insn "*call_value_no_clobber"
+  [(set (match_operand 0 "register_operand" "=r")
+        (call (mem:HI (match_operand:HI 1 "oasis16_call_address_operand" "S"))
+              (match_operand 2 "" "")))]
   ""
   "CALL %1"
   [(set_attr "type" "call")])

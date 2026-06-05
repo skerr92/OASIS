@@ -12,3 +12,8 @@
   "A signed 6-bit offset."
   (and (match_code "const_int")
        (match_test "IN_RANGE (ival, -32, 31)")))
+
+(define_constraint "S"
+  "A symbolic direct-call target."
+  (ior (match_code "symbol_ref")
+       (match_code "label_ref")))
