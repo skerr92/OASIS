@@ -1,8 +1,8 @@
 name,value,purpose
-isa_profile,oasis-base16t-v0.1-draft,compiler-capable ISA profile
-base_profile,oasis-base16-v0.1-draft,base ISA profile extended by Base-16T
+isa_profile,oasis-base16t-v0.2-draft,compiler-capable ISA profile
+base_profile,oasis-base16-v0.2-draft,base ISA profile extended by Base-16T
 isa_environment,oasis16-unknown-none,bare-metal ISA/runtime environment descriptor
 gcc_target,oasis16-unknown-elf,GCC and binutils target triple
 tool_alias,oasis16-elf,short prefix for installed cross tools
 first_host,Darwin,first supported host platform
-gcc_major,14,planned GCC major version
+gcc_major,14,GCC major version used by the current toolchain build

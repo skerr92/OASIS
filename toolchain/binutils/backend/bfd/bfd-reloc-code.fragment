@@ -1,6 +1,7 @@
 /* Add these to bfd/reloc.c and include/bfdlink.h generated relocation lists as
    appropriate for the binutils version being ported. */
 BFD_RELOC_OASIS16_16
-BFD_RELOC_OASIS16_ADDR9
+BFD_RELOC_OASIS16_ADDR12
+BFD_RELOC_OASIS16_MSI_ADDR12
 BFD_RELOC_OASIS16_TARGET8
 BFD_RELOC_OASIS16_CALL8

@@ -33,6 +33,15 @@ OASIS v0.1 is the first functional architecture and toolchain baseline. The
 v0.2 work stream is now focused on a more capable core profile, deeper compiler
 lowering, richer runtime support, and stronger release/compliance packaging.
 
+OASIS v0.2-draft also starts the OASIS-32 planning scaffold. OASIS-32 is
+experimental architecture groundwork for future 32-bit profiles and does not
+modify OASIS v0.1 Base-16/Base-16T compatibility.
+
+OASIS-16 v0.2 release planning is tracked in
+[docs/oasis16-v0.2-release-plan.md](docs/oasis16-v0.2-release-plan.md).
+Draft release notes are tracked in
+[docs/oasis16-v0.2-release-notes.md](docs/oasis16-v0.2-release-notes.md).
+
 ## Repository Layout
 
 | Path | Purpose |
@@ -45,6 +54,10 @@ lowering, richer runtime support, and stronger release/compliance packaging.
 | `bin/` | User-facing tool wrappers |
 | `toolchain/` | GCC/binutils backend files, runtime pieces, and build scripts |
 | `docs/` | Roadmap and process notes |
+
+OASIS-32 draft planning starts at
+[spec/oasis-v0.2-draft.md](spec/oasis-v0.2-draft.md) and
+[docs/roadmap-32.md](docs/roadmap-32.md).
 
 ## Tools
 

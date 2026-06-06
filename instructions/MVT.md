@@ -7,7 +7,7 @@ Stores ra into data memory.
 ## Syntax
 
 ```asm
-MVT ra, [addr9]
+MVT ra, [addr12]
 ```
 
 ## Encoding
@@ -20,14 +20,15 @@ Opcode: `10`
 | ---- | ----- | ------- |
 | `31:30` | `class` | `11` memory class |
 | `29:28` | `opcode` | instruction opcode |
-| `27:22` | `ra/addr9` | register for MVF/MVT or address high field for MSI |
-| `21:13` | `addr9` | data-memory word address for MVF/MVT |
+| `27:22` | `ra` | register for MVF/MVT |
+| `21:10` | `addr12` | data-memory word address for MVF/MVT |
+| `27:16` | `addr12` | data-memory word address for MSI |
 | `15:0` | `imm16` | immediate value for MSI |
 
 ## Operation
 
 ```text
-memory[addr9] = ra
+memory[addr12] = ra
 ```
 
 ## Effects
@@ -39,7 +40,7 @@ memory[addr9] = ra
 
 ## Edge Cases
 
-- Address is a 9-bit word index
+- Address is a 12-bit word index
 - reserved bits must be zero.
 
 ## Example

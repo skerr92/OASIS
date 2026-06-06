@@ -12,6 +12,14 @@ Usage:
 
 Options:
   --jobs N       parallel make jobs, default: host CPU count when detectable
+  --with-gmp DIR
+                 GMP install prefix for GCC configure
+  --with-mpfr DIR
+                 MPFR install prefix for GCC configure
+  --with-mpc DIR
+                 MPC install prefix for GCC configure
+  --with-isl DIR
+                 ISL install prefix for GCC configure
   --clean        remove OASIS build directories before configuring
   --dry-run      print commands without executing them
   --force        overwrite staged backend files in source trees
@@ -25,6 +33,10 @@ PREFIX=
 GCC_SRC=
 BINUTILS_SRC=
 JOBS=
+GMP_PREFIX=
+MPFR_PREFIX=
+MPC_PREFIX=
+ISL_PREFIX=
 CLEAN=0
 DRY_RUN=0
 FORCE=0
@@ -100,6 +112,38 @@ while [ "$#" -gt 0 ]; do
       JOBS=$2
       shift 2
       ;;
+    --with-gmp)
+      GMP_PREFIX=$2
+      shift 2
+      ;;
+    --with-gmp=*)
+      GMP_PREFIX=${1#*=}
+      shift
+      ;;
+    --with-mpfr)
+      MPFR_PREFIX=$2
+      shift 2
+      ;;
+    --with-mpfr=*)
+      MPFR_PREFIX=${1#*=}
+      shift
+      ;;
+    --with-mpc)
+      MPC_PREFIX=$2
+      shift 2
+      ;;
+    --with-mpc=*)
+      MPC_PREFIX=${1#*=}
+      shift
+      ;;
+    --with-isl)
+      ISL_PREFIX=$2
+      shift 2
+      ;;
+    --with-isl=*)
+      ISL_PREFIX=${1#*=}
+      shift
+      ;;
     --clean)
       CLEAN=1
       shift
@@ -153,6 +197,18 @@ echo "binutils-src: $BINUTILS_SRC"
 echo "jobs:         $JOBS"
 echo "dry-run:      $DRY_RUN"
 echo "run-tests:    $RUN_TESTS"
+if [ -n "$GMP_PREFIX" ]; then
+  echo "gmp-prefix:   $GMP_PREFIX"
+fi
+if [ -n "$MPFR_PREFIX" ]; then
+  echo "mpfr-prefix:  $MPFR_PREFIX"
+fi
+if [ -n "$MPC_PREFIX" ]; then
+  echo "mpc-prefix:   $MPC_PREFIX"
+fi
+if [ -n "$ISL_PREFIX" ]; then
+  echo "isl-prefix:   $ISL_PREFIX"
+fi
 echo
 
 if [ "$CLEAN" -eq 1 ]; then
@@ -186,7 +242,7 @@ run_in_dir "$BINUTILS_BUILD" "$BINUTILS_SRC/configure" \
 run make -C "$BINUTILS_BUILD" -j "$JOBS"
 run make -C "$BINUTILS_BUILD" install
 
-run_in_dir "$GCC_BUILD" "$GCC_SRC/configure" \
+set -- "$GCC_SRC/configure" \
   --target="$TARGET" \
   --program-prefix="$TARGET_ALIAS-" \
   --prefix="$PREFIX" \
@@ -200,6 +256,19 @@ run_in_dir "$GCC_BUILD" "$GCC_SRC/configure" \
   --disable-libstdcxx \
   --disable-nls \
   --disable-multilib
+if [ -n "$GMP_PREFIX" ]; then
+  set -- "$@" "--with-gmp=$GMP_PREFIX"
+fi
+if [ -n "$MPFR_PREFIX" ]; then
+  set -- "$@" "--with-mpfr=$MPFR_PREFIX"
+fi
+if [ -n "$MPC_PREFIX" ]; then
+  set -- "$@" "--with-mpc=$MPC_PREFIX"
+fi
+if [ -n "$ISL_PREFIX" ]; then
+  set -- "$@" "--with-isl=$ISL_PREFIX"
+fi
+run_in_dir "$GCC_BUILD" "$@"
 run make -C "$GCC_BUILD" all-gcc -j "$JOBS"
 run make -C "$GCC_BUILD" all-target-libgcc -j "$JOBS"
 run make -C "$GCC_BUILD" install-gcc
@@ -211,6 +280,8 @@ run mkdir -p "$PREFIX/bin"
 run mkdir -p "$PREFIX/tools"
 run cp "$ROOT/toolchain/runtime/crt0.S" "$PREFIX/$TARGET/lib/crt0.S"
 run cp "$ROOT/toolchain/runtime/crt0.oas" "$PREFIX/$TARGET/lib/crt0.oas"
+run cp "$ROOT/toolchain/runtime/cxxabi.c" "$PREFIX/$TARGET/lib/cxxabi.c"
+run cp "$ROOT/toolchain/runtime/cxxnew.cpp" "$PREFIX/$TARGET/lib/cxxnew.cpp"
 run cp "$ROOT/toolchain/runtime/linker/oasis16.ld" "$PREFIX/$TARGET/lib/oasis16.ld"
 run cp "$ROOT/toolchain/runtime/include/oasis.h" "$PREFIX/$TARGET/include/oasis.h"
 run cp "$ROOT/bin/oasis-elf2img" "$PREFIX/bin/oasis-elf2img"

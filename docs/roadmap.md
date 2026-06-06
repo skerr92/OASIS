@@ -17,7 +17,8 @@
 - Instruction docs are generated from opcode tables.
 - Opcode, register, instruction-doc, compliance, GCC, and binutils validators run
   through `make check`.
-- A Python reference emulator remains useful future work.
+- OASIS-32 draft table validation is wired into `make check` without changing
+  Base-16/Base-16T semantics.
 
 ## v0.1 Complete: Support Implementations
 
@@ -40,17 +41,24 @@
 
 ## v0.2: Fuller Core And Toolchain
 
-- Decide the next core profile additions: byte addressing, expanded memory
-  model, interrupts/exceptions, status/compare behavior, or wider program
-  counters.
-- Extend compliance tests before accepting each new architectural feature.
-- Grow GCC lowering beyond the first 16-bit freestanding subset, including more
-  robust 32-bit and 64-bit helper paths.
-- Add runtime support for startup variants, static initialization, and a clearer
-  halt/exit/debug convention.
-- Evaluate C++ freestanding support: constructors, destructors, `new`/`delete`,
-  unwind policy, RTTI policy, and a tiny standard-library subset.
-- Add implementation-facing release notes and compliance report templates.
+OASIS v0.2 is the first formal OASIS-16 release target. It should promote the
+working Base-16/Base-16T architecture from experimental bring-up to a stable
+versioned contract.
+
+The active release checklist lives in
+[oasis16-v0.2-release-plan.md](oasis16-v0.2-release-plan.md).
+
+- Finalize Base-16/Base-16T v0.2 profile names and release notes.
+- Keep `addr12` data-memory addressing as the v0.2 Base-16 memory baseline.
+- Keep Base-16T class `00` compiler-facing opcodes stable.
+- Extend compliance tests before accepting any additional architectural feature.
+- Expand installed-toolchain smoke coverage for larger data-memory addresses,
+  ABI stack frames, C++ runtime hooks, and runtime/linker symbols.
+- Formalize the freestanding C/C++ ABI surface: data model, stack frames,
+  init-array hooks, guard helpers, heapless `new`/`delete`, and exception/RTTI
+  defaults.
+- Publish implementation-facing conformance and external-memory-control notes.
+- Keep OASIS-32 in draft planning only until OASIS-16 v0.2 is released.
 
 ## Deferred
 

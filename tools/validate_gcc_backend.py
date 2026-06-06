@@ -100,6 +100,8 @@ def main() -> int:
     required_files = [
         RUNTIME / "crt0.S",
         RUNTIME / "crt0.oas",
+        RUNTIME / "cxxabi.c",
+        RUNTIME / "cxxnew.cpp",
         RUNTIME / "include" / "oasis.h",
         RUNTIME / "linker" / "oasis16.ld",
         RUNTIME / "libgcc" / "oasis16-libgcc.S",
@@ -110,6 +112,15 @@ def main() -> int:
     for path in required_files:
         if not path.exists():
             errors.append(f"missing runtime/libgcc file: {path}")
+
+    runtime_h = (RUNTIME / "include" / "oasis.h").read_text()
+    for token in [
+        "__oasis_init_array_start",
+        "__oasis_extmem_start",
+        "__cxa_guard_acquire",
+        "__cxa_pure_virtual",
+    ]:
+        require(runtime_h, token, errors, "oasis.h")
 
     libgcc = (RUNTIME / "libgcc" / "oasis16-libgcc.S").read_text()
     for symbol in [

@@ -8,6 +8,7 @@ check:
 	python3 tools/test_toolchain_scaffold.py
 	python3 tools/validate_gcc_backend.py
 	python3 tools/validate_binutils_backend.py
+	python3 tools/validate_oasis32_tables.py
 
 generate:
 	python3 tools/generate_instruction_docs.py

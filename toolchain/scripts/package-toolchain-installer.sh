@@ -84,7 +84,7 @@ cat > "$STAGE/$NAME/README.md" <<'EOF'
 # OASIS Base-16T Toolchain
 
 This archive contains a prebuilt `oasis16-unknown-elf` GCC/binutils toolchain
-for OASIS Base-16T v0.1.
+for OASIS Base-16T v0.2.
 
 Install into a prefix with:
 

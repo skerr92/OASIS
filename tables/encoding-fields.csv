@@ -38,9 +38,8 @@ register,21:16,rb,source register for MVV
 register,15:0,imm16,immediate value for MVI
 memory_reg_addr,29:28,opcode,2-bit memory opcode for MVF/MVT
 memory_reg_addr,27:22,ra,register operand
-memory_reg_addr,21:13,addr9,9-bit data-memory word address
-memory_reg_addr,12:0,reserved,must be zero
+memory_reg_addr,21:10,addr12,12-bit data-memory word address
+memory_reg_addr,9:0,reserved,must be zero
 memory_immediate,29:28,opcode,MSI opcode
-memory_immediate,27:19,addr9,9-bit data-memory word address
-memory_immediate,18:16,reserved,must be zero
+memory_immediate,27:16,addr12,12-bit data-memory word address
 memory_immediate,15:0,imm16,immediate value

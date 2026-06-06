@@ -1,6 +1,6 @@
 # OASIS Toolchain Validation Tests
 
-This directory contains freestanding C smoke tests for the first
+This directory contains freestanding C and C++ smoke tests for the first
 `oasis16-unknown-elf` GCC/binutils toolchain.
 
 The suite is intentionally small and layered:
@@ -10,6 +10,11 @@ The suite is intentionally small and layered:
 - `call.c` exercises the `CALL`/`RET` ABI.
 - `pointer_load_store.c`, `global_data.c`, and `array_access.c` exercise stack,
   pointer, and data-section flows.
+- `large_global_data.c` keeps a global object above the old 512-word v0.1 data
+  range so linker and ELF-image flows continue covering the v0.2 memory map.
+- `cxx/guard_static.cpp` exercises explicit C++ guard helper references.
+- `cxx/heapless_new.cpp` exercises the weak heapless `operator new` runtime
+  hook. It is a link smoke test, not a hosted heap guarantee.
 
 Run after installing a toolchain prefix:
 

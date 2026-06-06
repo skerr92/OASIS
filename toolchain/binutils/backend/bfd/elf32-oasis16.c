@@ -13,14 +13,17 @@ static reloc_howto_type oasis16_elf_howto_table[] =
   HOWTO(R_OASIS16_16, 0, 1, 16, false, 0, complain_overflow_unsigned,
         bfd_elf_generic_reloc, "R_OASIS16_16", false, 0, 0xffff, false),
 
-  HOWTO(R_OASIS16_ADDR9, 13, 2, 9, false, 0, complain_overflow_unsigned,
-        bfd_elf_generic_reloc, "R_OASIS16_ADDR9", false, 0, 0x003fe000, false),
+  HOWTO(R_OASIS16_ADDR12, 10, 2, 12, false, 0, complain_overflow_unsigned,
+        bfd_elf_generic_reloc, "R_OASIS16_ADDR12", false, 0, 0x003ffc00, false),
 
   HOWTO(R_OASIS16_TARGET8, 6, 2, 8, false, 0, complain_overflow_unsigned,
         bfd_elf_generic_reloc, "R_OASIS16_TARGET8", false, 0, 0x00003fc0, false),
 
   HOWTO(R_OASIS16_CALL8, 6, 2, 8, false, 0, complain_overflow_unsigned,
         bfd_elf_generic_reloc, "R_OASIS16_CALL8", false, 0, 0x00003fc0, false),
+
+  HOWTO(R_OASIS16_MSI_ADDR12, 16, 2, 12, false, 0, complain_overflow_unsigned,
+        bfd_elf_generic_reloc, "R_OASIS16_MSI_ADDR12", false, 0, 0x0fff0000, false),
 };
 
 static reloc_howto_type *
@@ -33,8 +36,10 @@ oasis16_reloc_type_lookup(bfd *abfd ATTRIBUTE_UNUSED, bfd_reloc_code_real_type c
     case BFD_RELOC_16:
     case BFD_RELOC_OASIS16_16:
       return &oasis16_elf_howto_table[R_OASIS16_16];
-    case BFD_RELOC_OASIS16_ADDR9:
-      return &oasis16_elf_howto_table[R_OASIS16_ADDR9];
+    case BFD_RELOC_OASIS16_ADDR12:
+      return &oasis16_elf_howto_table[R_OASIS16_ADDR12];
+    case BFD_RELOC_OASIS16_MSI_ADDR12:
+      return &oasis16_elf_howto_table[R_OASIS16_MSI_ADDR12];
     case BFD_RELOC_OASIS16_TARGET8:
       return &oasis16_elf_howto_table[R_OASIS16_TARGET8];
     case BFD_RELOC_OASIS16_CALL8:
