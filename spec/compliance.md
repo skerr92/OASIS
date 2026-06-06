@@ -77,6 +77,17 @@ observe `symbol` through `CORE_PC`, select `code_register` through `GPR_ADDR`,
 and compare `GPR_RDATA` with `code`. `kind: normal` uses `__oasis_exit`;
 `kind: abort` uses `__oasis_abort`.
 
+Base-16T v0.2 compliance may also include ABI-oriented fixtures. These tests
+are still ISA-visible programs, but they target toolchain conventions such as
+stack growth, nested-call return-address saves, callee-saved register restore,
+and runtime exit/debug observation.
+
+Runtime/linker symbol fixtures may include `expect.symbols`. Symbol
+expectations are checked by compliance tooling for shape and by the installed
+toolchain validation flow for actual ELF/linker availability. Valid symbol
+kinds are `runtime` for startup symbols and `linker` for symbols exported by the
+default linker script.
+
 ## Harness Requirements
 
 The harness should support:
@@ -85,6 +96,8 @@ The harness should support:
 - Running a program for a bounded number of instructions or cycles
 - Reading selected registers, memory locations, and `pc`
 - Detecting `expect.exit` by using `CORE_PC`, `GPR_ADDR`, and `GPR_RDATA`
+- Reporting `expect.symbols` coverage when the implementation uses linked ELF
+  images or an equivalent runtime symbol map
 - Reporting failures in a machine-readable format
 
 Implementation repositories may translate these YAML tests into their local

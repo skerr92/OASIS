@@ -57,16 +57,26 @@ def main() -> int:
     if validate.returncode != 0:
         raise AssertionError("installed toolchain validation help should succeed")
     require_contains(validate.stdout, "validate-installed-toolchain.sh")
+    require_contains(validate.stdout, "--cxx-tests")
 
     package_toolchain = run(["toolchain/scripts/package-toolchain-installer.sh", "--help"])
     if package_toolchain.returncode != 0:
         raise AssertionError("toolchain packaging help should succeed")
     require_contains(package_toolchain.stdout, "package-toolchain-installer.sh")
+    require_contains(
+        (ROOT / "toolchain" / "scripts" / "package-toolchain-installer.sh").read_text(),
+        "Base-16T v0.2",
+    )
 
     package_source = run(["toolchain/scripts/package-source-release.sh", "--help"])
     if package_source.returncode != 0:
         raise AssertionError("source packaging help should succeed")
     require_contains(package_source.stdout, "package-source-release.sh")
+    require_contains(package_source.stdout, "default: oasis-v0.2")
+    require_contains(
+        (ROOT / "toolchain" / "scripts" / "package-source-release.sh").read_text(),
+        "OASIS v0.2 Source Package",
+    )
 
     build_common = (ROOT / "toolchain" / "scripts" / "build-gcc14-common.sh").read_text()
     for installed_tool in [
@@ -95,7 +105,10 @@ def main() -> int:
     if dry_validate.returncode != 0:
         raise AssertionError(dry_validate.stderr)
     require_contains(dry_validate.stdout, "oasis16-elf-gcc")
+    require_contains(dry_validate.stdout, "oasis16-elf-g++")
     require_contains(dry_validate.stdout, "oasis-elf2img")
+    require_contains(dry_validate.stdout, "cxxabi.c")
+    require_contains(dry_validate.stdout, "cxxnew.cpp")
 
     with tempfile.TemporaryDirectory() as temp_dir:
         temp = Path(temp_dir)

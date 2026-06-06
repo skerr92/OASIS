@@ -77,6 +77,11 @@ profile explicitly requires these instructions.
 - UART/SPI/I2C: status, data, control, clock/divider setup.
 - Debug/control: halt, exit code, trace control, implementation ID.
 
+See [external-memory-control.md](external-memory-control.md) for the current
+external memory controller contract. That document keeps external memory
+portable through memory-mapped control blocks and linker symbols before any
+dedicated instruction extension is assigned.
+
 ## Extension Profile Rules
 
 - Every extension needs a short profile name, such as `oasis16-periph-v0.2`.

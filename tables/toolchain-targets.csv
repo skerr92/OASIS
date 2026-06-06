@@ -5,4 +5,4 @@ isa_environment,oasis16-unknown-none,bare-metal ISA/runtime environment descript
 gcc_target,oasis16-unknown-elf,GCC and binutils target triple
 tool_alias,oasis16-elf,short prefix for installed cross tools
 first_host,Darwin,first supported host platform
-gcc_major,14,planned GCC major version
+gcc_major,14,GCC major version used by the current toolchain build

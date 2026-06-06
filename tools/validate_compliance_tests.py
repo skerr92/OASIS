@@ -177,6 +177,44 @@ def validate_exit_expectation(path: Path, text: str, errors: list[str]) -> None:
             errors.append(f"{path}: expect.exit.observe.{key} must be {expected}")
 
 
+def validate_symbol_expectation(path: Path, text: str, errors: list[str]) -> None:
+    symbol_block = indented_block(text, "symbols", 2)
+    if not symbol_block:
+        return
+
+    allowed_symbols = {
+        "_start": "runtime",
+        "__oasis_exit": "runtime",
+        "__oasis_abort": "runtime",
+        "__oasis_init_array_start": "linker",
+        "__oasis_init_array_end": "linker",
+        "__oasis_fini_array_start": "linker",
+        "__oasis_fini_array_end": "linker",
+        "__oasis_heap_start": "linker",
+        "__oasis_heap_end": "linker",
+        "__oasis_extmem_start": "linker",
+        "__oasis_extmem_end": "linker",
+        "__oasis_stack_top": "linker",
+    }
+
+    keys = mapping_keys(symbol_block, 4)
+    unknown = keys - set(allowed_symbols)
+    if unknown:
+        errors.append(
+            f"{path}: expect.symbols has unknown symbols: "
+            + ", ".join(sorted(unknown))
+        )
+
+    for symbol, expected_kind in allowed_symbols.items():
+        value = mapping_value(symbol_block, symbol, 4)
+        if value is None:
+            continue
+        if value != expected_kind:
+            errors.append(
+                f"{path}: expect.symbols.{symbol} must be {expected_kind}"
+            )
+
+
 def main() -> int:
     errors: list[str] = []
     names: dict[str, Path] = {}
@@ -206,6 +244,7 @@ def main() -> int:
             errors.append(f"{path}: unexpected profile {profile}")
 
         validate_exit_expectation(path, text, errors)
+        validate_symbol_expectation(path, text, errors)
         all_covered.update(covered_mnemonics(text))
 
     missing_mnemonics = opcode_mnemonics() - all_covered

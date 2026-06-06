@@ -1,0 +1,41 @@
+name: base16t_runtime_symbols
+profile: oasis-base16t-v0.2-draft
+description: Base-16T runtime and linker symbols required by the v0.2 ABI.
+program:
+  - "_start:"
+  - MVI r56, 0x0fff
+  - CALL main
+  - "__oasis_exit:"
+  - JMP __oasis_exit
+  - "__oasis_abort:"
+  - JMP __oasis_abort
+  - "main:"
+  - MVI r1, 0x0000
+  - RET
+expect:
+  registers:
+    r1: 0x0000
+    r56: 0x0fff
+  pc: __oasis_exit
+  symbols:
+    _start: runtime
+    __oasis_exit: runtime
+    __oasis_abort: runtime
+    __oasis_init_array_start: linker
+    __oasis_init_array_end: linker
+    __oasis_fini_array_start: linker
+    __oasis_fini_array_end: linker
+    __oasis_heap_start: linker
+    __oasis_heap_end: linker
+    __oasis_extmem_start: linker
+    __oasis_extmem_end: linker
+    __oasis_stack_top: linker
+  exit:
+    kind: normal
+    symbol: __oasis_exit
+    code_register: r1
+    code: 0x0000
+    observe:
+      pc: CORE_PC
+      register_selector: GPR_ADDR
+      register_data: GPR_RDATA

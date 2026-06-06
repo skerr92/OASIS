@@ -30,4 +30,18 @@ Base-16T now defines the ISA mechanisms needed by this list: stack-capable
 register-indirect memory access, add/sub immediate, call, return, jump-register,
 and signed/unsigned comparison branches.
 
+The v0.2 ABI work also defines:
+
+- a freestanding 16-bit C data model
+- stack-frame conventions for leaf and non-leaf functions
+- the first C++ ABI/runtime hook expectations
+- linker symbols for optional external memory, heap, and stack placement
+
+For v0.2, init/fini array range symbols are required for toolchain
+compatibility, but automatic constructor/destructor execution is an optional
+platform runtime behavior rather than a required default-startup behavior.
+
+See [../docs/external-memory-control.md](../docs/external-memory-control.md) for
+the implementation-facing external memory control note.
+
 See [base16t.md](base16t.md).

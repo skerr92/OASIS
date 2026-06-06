@@ -37,6 +37,11 @@ OASIS v0.2-draft also starts the OASIS-32 planning scaffold. OASIS-32 is
 experimental architecture groundwork for future 32-bit profiles and does not
 modify OASIS v0.1 Base-16/Base-16T compatibility.
 
+OASIS-16 v0.2 release planning is tracked in
+[docs/oasis16-v0.2-release-plan.md](docs/oasis16-v0.2-release-plan.md).
+Draft release notes are tracked in
+[docs/oasis16-v0.2-release-notes.md](docs/oasis16-v0.2-release-notes.md).
+
 ## Repository Layout
 
 | Path | Purpose |

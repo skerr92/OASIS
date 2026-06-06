@@ -35,10 +35,10 @@ CALL function
 RET
 ```
 
-## Future Tooling
+## Tooling
 
-The next useful tool is a small assembler that emits OASIS 32-bit instruction
-words for implementation test harnesses.
+The dependency-free assembler lives at `tools/oasis_asm.py` and is wrapped by
+`bin/oasis-asm`. It emits OASIS 32-bit instruction words for examples,
+compliance fixtures, and implementation test harnesses.
 
-That assembler now lives at `tools/oasis_asm.py`; see
-[../docs/assembler.md](../docs/assembler.md).
+See [../docs/assembler.md](../docs/assembler.md).

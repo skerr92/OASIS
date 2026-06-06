@@ -73,6 +73,8 @@ Base-16T is the intended target for:
 
 The ABI draft lives in
 [../toolchain/abi/base16-baremetal-abi.md](../toolchain/abi/base16-baremetal-abi.md).
+That ABI now defines the freestanding C data model, stack-frame expectations,
+minimal C++ runtime hooks, and external-memory linker hooks for v0.2 planning.
 
 ## Implementation Requirement
 

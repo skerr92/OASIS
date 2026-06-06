@@ -27,13 +27,15 @@ the public roadmap and release notes.
 - Clear debug/halt/exit convention for bare-metal programs.
 - Interrupt or exception entry/return convention.
 - More complete freestanding C++ runtime hooks.
+- External memory controller contract for implementations with larger memory
+  maps or off-chip RAM.
 
 ## Current Sprint
 
 - Completed: update memory encodings from `addr9` to `addr12`.
 - Completed: update assembler, generated docs, binutils opcode tables, GAS parsing, BFD
   relocations, and validation tests.
-- In progress: add targeted assembler, compliance, and toolchain smoke coverage
+- Completed: add targeted assembler, compliance, and toolchain smoke coverage
   for larger data-memory addresses.
 - Completed: draft class `00` instruction-expansion guidance before assigning any new
   peripheral opcodes.
@@ -41,6 +43,23 @@ the public roadmap and release notes.
   `__oasis_exit`, `__oasis_abort`, `CORE_PC`, and register readback.
 - Completed: extend compliance YAML validation and add a Base-16T runtime-exit
   fixture for the debug observation convention.
+- Completed: document Base-16T C data model, stack frames, initial C++ ABI
+  hooks, and external-memory linker/runtime expectations.
+- Completed: add installed-toolchain C++ smoke fixtures for explicit guard
+  helper references and heapless `operator new` linking.
+- Completed: add an ABI-oriented compliance fixture for nested calls,
+  return-address save/restore, and callee-saved register preservation.
+- Completed: add runtime/linker symbol compliance metadata and validation rules.
+- Completed: add an external memory control design note that keeps MMIO as the
+  portable baseline and leaves class `00` opcode `1101` as unassigned
+  exploration space.
+- Completed: draft OASIS-16 v0.2 release notes and document the local Darwin
+  arm64 release build requirement.
+- Completed: set v0.2 constructor-startup policy: init/fini range symbols are
+  required, but automatic constructor/destructor execution is optional platform
+  runtime behavior.
+- Next: close the remaining release mechanics around final artifact names and
+  checksums.
 - Leave the archived v0.1 spec untouched and document v0.2 behavior in current
   tables/spec files.
 

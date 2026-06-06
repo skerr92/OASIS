@@ -12,9 +12,14 @@ now has a working initial GCC 14/binutils toolchain path for
 
 The repository contains backend files, config integration helpers, build
 wrappers, runtime files, ELF-to-image conversion, packaging scripts, and
-installed-toolchain smoke tests. GitHub Actions builds the toolchain against
-upstream GCC/binutils source trees on release-producing refs and uploads a
-toolchain installer plus a source/compliance package.
+installed-toolchain smoke tests. GitHub Actions builds the Linux toolchain
+against upstream GCC/binutils source trees on release-producing refs and uploads
+a Linux toolchain installer plus a source/compliance package.
+
+Darwin arm64 toolchain artifacts are built locally on Apple Silicon hardware for
+each release. The current toolchain build is not treated as reliable on
+GitHub-hosted macOS runners, so Darwin archives should be attached manually to
+the release after local validation.
 
 ## Target Triple
 
@@ -54,7 +59,7 @@ Run:
 make generate
 ```
 
-This creates `toolchain/generated/oasis-base16t-v0.1-draft.json` from the source
+This creates `toolchain/generated/oasis-base16t-v0.2-draft.json` from the source
 tables in `tables/`. Compiler backends, assemblers, emulators, and compliance
 harnesses should prefer generated metadata over hand-copying opcode constants.
 The metadata also includes the recommended programming access-port register map.
@@ -67,6 +72,12 @@ The metadata also includes the recommended programming access-port register map.
    allocation, and library subset.
 4. Add more compiler-generated compliance and torture-style smoke tests.
 5. Keep release artifacts reproducible across Linux and Darwin hosts.
+
+The Base-16T ABI now records the first freestanding C and C++ runtime contract:
+the C data model, stack-frame rules, init/fini range symbols, local static guard
+hooks, heap policy, and external-memory linker symbols. See
+[toolchain/abi/base16-baremetal-abi.md](abi/base16-baremetal-abi.md) and
+[docs/external-memory-control.md](../docs/external-memory-control.md).
 
 OASIS-32 toolchain work is draft planning only for now. The future Base-32T
 target is documented in [spec/oasis32/abi.md](../spec/oasis32/abi.md) and
@@ -118,6 +129,27 @@ toolchain/scripts/build-darwin-gcc14.sh \
   --gcc-src /path/to/gcc-14 \
   --binutils-src /path/to/binutils
 ```
+
+The Darwin wrapper auto-detects Homebrew prefixes for `gmp`, `mpfr`, `libmpc`,
+and `isl` and passes them to GCC configure. If those dependencies are installed
+somewhere else, pass them explicitly:
+
+```sh
+toolchain/scripts/build-darwin-gcc14.sh \
+  --prefix "$PWD/.toolchain/oasis16" \
+  --gcc-src /path/to/gcc-14 \
+  --binutils-src /path/to/binutils \
+  --with-gmp /path/to/gmp \
+  --with-mpfr /path/to/mpfr \
+  --with-mpc /path/to/mpc \
+  --with-isl /path/to/isl
+```
+
+For release Darwin arm64 artifacts, run the Darwin build locally on Apple
+Silicon with `--run-tests`, then package the prefix with
+`toolchain/scripts/package-toolchain-installer.sh`. Do not rely on
+GitHub-hosted macOS runners for the Darwin release archive until the build is
+proven reliable there.
 
 Linux:
 

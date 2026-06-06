@@ -36,6 +36,65 @@ the Base-16T toolchain profile.
 - `RET` returns to `r58[7:0]`.
 - Stack grows down.
 - Stack alignment is 2 bytes.
+- Stack slots are 16-bit data-memory words.
+- Callers allocate outgoing stack arguments before `CALL` and release them after
+  return.
+- Callees that need nested calls must save `r58` before issuing another `CALL`.
+- Callees must preserve `r32` through `r57` if they modify them.
+- `r59` through `r63` must not be used by portable application code.
+
+## C Data Model
+
+The Base-16T C data model is intentionally small and freestanding:
+
+| C type | Size | Alignment | Notes |
+| ------ | ---- | --------- | ----- |
+| `char` | 16 bits | 1 word | Stored in one data-memory word |
+| `short` | 16 bits | 1 word | Same representation as `int` |
+| `int` | 16 bits | 1 word | Natural scalar type |
+| `long` | 16 bits | 1 word | Initial GCC target model |
+| `long long` | 64 bits | 1 word | Compiler/libgcc helper backed |
+| pointer | 16 bits | 1 word | Data-memory word address unless qualified by a profile |
+
+Base-16T data memory is word-addressed, so byte addressing is not
+architecturally visible. `char` is therefore a 16-bit storage unit in the first
+ABI. A future byte-addressed profile may define a different C data model.
+
+## Stack Frame Shape
+
+A conventional non-leaf frame should use this high-level layout:
+
+```text
+higher addresses
+  incoming stack arguments
+  caller frame
+  saved return address, when needed
+  saved frame pointer, when used
+  saved callee-saved registers
+  local variables and spills
+lower addresses
+```
+
+Recommended prologue for a function that needs a frame:
+
+```asm
+SBI r56, frame_words
+STR r58, [r56 + ra_slot]
+STR r57, [r56 + fp_slot]
+MVV r57, r56
+```
+
+Recommended epilogue:
+
+```asm
+LDR r58, [r56 + ra_slot]
+LDR r57, [r56 + fp_slot]
+ADI r56, frame_words
+RET
+```
+
+Leaf functions may omit the frame pointer and return-address save when they do
+not need stack locals, spills, alloca-like storage, or nested calls.
 
 ## Required ISA Mechanisms
 
@@ -53,6 +112,60 @@ Base-16T defines the instructions required by this ABI:
 
 The first GCC backend should target Base-16T, not Base-16.
 
+## C++ Freestanding ABI
+
+Base-16T C++ support is freestanding and intentionally minimal. The v0.2
+baseline documents the symbols and helper hooks needed for early compile/link
+support; hosted C++ and full constructor/destructor startup policy remain
+outside the required baseline.
+
+| Feature | ABI expectation |
+| ------- | --------------- |
+| Name mangling | Use the Itanium C++ ABI mangling where practical |
+| `this` pointer | Passed as the first argument in `r4` |
+| Return values | Same as C: `r1` and `r2` |
+| Constructors | Normal functions using the C calling convention |
+| Destructors | Normal functions using the C calling convention |
+| Static constructors | Init-array range symbols are provided; startup invocation is platform/runtime policy |
+| Static destructors | Fini-array range symbols are provided; invocation is optional platform/runtime policy |
+| `new`/`delete` | Weak runtime hooks or unavailable unless a heap provider is linked |
+| Exceptions | Disabled in the first ABI; compile with no exception unwinding |
+| RTTI | Optional; disabled by default in the first ABI |
+| Guard variables | Helper hooks are provided for function-local statics |
+
+The first C++ toolchain should assume these defaults:
+
+```text
+-fno-exceptions
+-fno-rtti
+freestanding runtime
+no hosted standard library
+```
+
+Required runtime symbols for C++ bring-up:
+
+| Symbol | Purpose |
+| ------ | ------- |
+| `__oasis_init_array_start` | first static constructor entry |
+| `__oasis_init_array_end` | one past the last static constructor entry |
+| `__oasis_fini_array_start` | first static destructor entry, optional |
+| `__oasis_fini_array_end` | one past the last static destructor entry, optional |
+| `__cxa_pure_virtual` | abort hook for pure virtual calls |
+| `__cxa_guard_acquire` | local static guard acquire |
+| `__cxa_guard_release` | local static guard release |
+| `__cxa_guard_abort` | local static guard abort |
+| `operator new` / `operator delete` | weak allocation hooks when heap support exists |
+
+The default OASIS startup object does not currently walk `.init_array` or
+`.fini_array`. Implementations that need global constructor/destructor execution
+must provide a platform startup layer that iterates the exported ranges before
+and after `main`, respectively.
+
+If an implementation does not provide a heap, `operator new` should fail by
+parking in `__oasis_abort` or by returning according to the selected C++ runtime
+policy. The default OASIS runtime remains heapless until an implementation
+advertises a memory provider.
+
 ## Memory Map
 
 | Region | Addressing | Purpose |
@@ -64,6 +177,27 @@ The first GCC backend should target Base-16T, not Base-16.
 The default linker script uses a 256-instruction text memory and 4096-word data
 memory. Implementations may override the memory map while keeping ABI register
 roles stable.
+
+## External Memory And MMIO ABI Hooks
+
+Base-16T keeps the architectural data-memory address type at 16 bits. A core or
+SoC may attach external memory behind part of the 16-bit word-address space, but
+portable software must discover or be linked for that memory map explicitly.
+
+Expected linker symbols for implementations with external memory:
+
+| Symbol | Purpose |
+| ------ | ------- |
+| `__oasis_extmem_start` | first external data-memory word |
+| `__oasis_extmem_end` | one past the last external data-memory word |
+| `__oasis_heap_start` | first heap word, if heap is available |
+| `__oasis_heap_end` | one past the last heap word |
+| `__oasis_stack_top` | initial stack pointer value |
+
+An external-memory implementation may use memory-mapped control registers or an
+optional extension instruction profile. The C/C++ ABI should interact with it
+through the linker map, runtime startup, and implementation headers rather than
+assuming dedicated opcodes.
 
 ## Function Example
 

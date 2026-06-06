@@ -60,9 +60,9 @@ GCC expects target binutils for normal operation. Backend files live under
 - LD emulation and linker script
 - objdump support
 
-## First Darwin Build Shape
+## Darwin Build Shape
 
-The first useful build should be:
+Build the current freestanding GCC/binutils toolchain with:
 
 ```sh
 toolchain/scripts/build-darwin-gcc14.sh \
@@ -71,11 +71,13 @@ toolchain/scripts/build-darwin-gcc14.sh \
   --binutils-src /path/to/binutils
 ```
 
-Expected first language:
+Supported language front ends:
 
 ```text
-C only, freestanding, no hosted libc, targeting Base-16T
+C and C++, freestanding, no hosted libc, targeting Base-16T
 ```
 
-C++ should wait until the ABI, runtime, libgcc, and object/linker work are
-stable.
+The C++ front end is available for freestanding experiments. The runtime now
+documents and installs initial init-array, guard-variable, pure-virtual, and
+heapless allocation hooks. Exceptions, RTTI, hosted libstdc++, threads, and OS
+syscalls remain outside the OASIS-16 v0.2 baseline.

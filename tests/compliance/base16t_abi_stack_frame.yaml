@@ -1,0 +1,30 @@
+name: base16t_abi_stack_frame
+profile: oasis-base16t-v0.2-draft
+description: Base-16T non-leaf frame saves r58 and restores a callee-saved register.
+program:
+  - MVI r56, 0x0fff
+  - MVI r32, 0x2222
+  - MVI r4, 0x0007
+  - CALL outer
+  - JMP done
+  - "outer:"
+  - SBI r56, 2
+  - STR r58, [r56 + 0]
+  - STR r32, [r56 + 1]
+  - MVI r32, 0xabcd
+  - CALL inner
+  - LDR r32, [r56 + 1]
+  - LDR r58, [r56 + 0]
+  - ADI r56, 2
+  - RET
+  - "inner:"
+  - MVI r1, 1
+  - ADD r1, r4
+  - RET
+  - "done:"
+  - NOP
+expect:
+  registers:
+    r1: 0x0008
+    r32: 0x2222
+    r56: 0x0fff

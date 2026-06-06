@@ -12,14 +12,14 @@ Available now:
 - Program image generator: `bin/oasis-program-image`
 - ELF-to-program-image converter: `bin/oasis-elf2img`
 - Darwin and Linux GCC 14 build wrappers
-- Installed-toolchain C smoke-test runner
-- Machine-readable ISA metadata: `toolchain/generated/oasis-base16t-v0.1-draft.json`
+- Installed-toolchain C/C++ smoke-test runner
+- Machine-readable ISA metadata: `toolchain/generated/oasis-base16t-v0.2-draft.json`
 - Opcode, register, encoding, and programming tables in `tables/`
 
 Not available yet:
 
 - Hosted libc support
-- Full C++ runtime or standard library support
+- Hosted or full standard-library C++ support
 - Complete 32-bit/64-bit libgcc lowering
 
 ## Toolchain Profile
@@ -47,9 +47,9 @@ Status: implemented.
 
 ### 2. ABI Draft
 
-Status: Base-16T draft defined.
+Status: Base-16T v0.2 baseline defined.
 
-Define:
+Defined:
 
 - Stack pointer
 - Return address handling
@@ -59,18 +59,23 @@ Define:
 - Stack alignment
 - Program entry point
 - Memory map
+- C data model
+- C++ freestanding hooks
+- External-memory linker symbols
 
 See `toolchain/abi/base16-baremetal-abi.md`.
 
 ### 3. Runtime
 
-Status: implemented for freestanding C bring-up.
+Status: implemented for freestanding C and initial C++ bring-up.
 
 - Startup sequence
 - Exit trap or halt convention
 - Minimal headers for freestanding C
-- Linker script symbols for text, data, BSS, and stack
+- Linker script symbols for text, data, BSS, init arrays, heap, external memory,
+  and stack
 - Libgcc helper routines for the first 16-bit arithmetic set
+- C++ guard-variable, pure-virtual, and heapless allocation stubs
 
 ### 4. Object And Linker Format
 
@@ -102,13 +107,14 @@ Status: implemented for the v0.1 freestanding baseline and covered by the
 release build workflow.
 
 Initial goal:
+Implemented baseline:
 
 - Darwin-hosted cross compiler
 - Target `oasis16-unknown-elf`
 - GCC 14 source tree
 - Base-16T instruction patterns
 - Languages: freestanding C plus C++ front-end bring-up
-- C++ runtime features remain v0.2 work
+- Initial C++ runtime hooks installed with the toolchain prefix
 
 ### 7. Compiler Validation
 
@@ -121,15 +127,23 @@ prefix.
 
 ### 8. C++ Support
 
-Status: future.
+Status: initial freestanding hooks implemented; full hosted C++ deferred.
 
-C++ requires more runtime work:
+C++ baseline support now includes:
 
-- Constructors/destructors
-- Static initialization
-- Personality/unwind decision
-- Minimal `new`/`delete`
-- libstdc++ support or an intentionally tiny freestanding subset
+- init-array and fini-array linker symbols
+- local static guard helper declarations and stubs
+- pure virtual abort hook
+- heapless weak `new`/`delete` stubs
+- documented `-fno-exceptions` and `-fno-rtti` default policy
+
+Remaining work:
+
+- constructor invocation in startup
+- destructor/fini policy
+- exception personality/unwind decision
+- heap provider policy
+- hosted libstdc++ support or an intentionally tiny freestanding subset
 
 ## Recommended First Compiler Target
 

@@ -3,11 +3,34 @@ name: Check
 on:
   workflow_dispatch:
   pull_request:
+    paths:
+      - ".github/workflows/check.yml"
+      - "Makefile"
+      - "docs/**"
+      - "instructions/**"
+      - "spec/**"
+      - "tables/**"
+      - "tests/**"
+      - "tools/**"
+      - "toolchain/**"
+      - "bin/**"
   push:
     branches:
       - main
+      - "v0.*"
     tags:
       - "v*"
+    paths:
+      - ".github/workflows/check.yml"
+      - "Makefile"
+      - "docs/**"
+      - "instructions/**"
+      - "spec/**"
+      - "tables/**"
+      - "tests/**"
+      - "tools/**"
+      - "toolchain/**"
+      - "bin/**"
 
 env:
   GCC_VERSION: "14.3.0"
@@ -21,7 +44,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.x"
-      - run: make check
+      - name: Validate spec, tables, docs, and tooling
+        run: make check
 
   toolchain-artifacts:
     name: Build Toolchain Artifacts

@@ -7,7 +7,7 @@ Usage:
   package-source-release.sh --output OUT.tar.gz [options]
 
 Options:
-  --name NAME     top-level directory name in the archive, default: oasis-v0.1
+  --name NAME     top-level directory name in the archive, default: oasis-v0.2
   -h, --help      show this help
 
 Creates a source package containing the OASIS ISA specification, tables,
@@ -18,7 +18,7 @@ EOF
 
 ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/../.." && pwd)
 OUT=
-NAME=oasis-v0.1
+NAME=oasis-v0.2
 
 while [ "$#" -gt 0 ]; do
   case "$1" in
@@ -71,9 +71,9 @@ tar -C "$ROOT" \
   -cf - . | tar -C "$STAGE/$NAME" -xf -
 
 cat > "$STAGE/$NAME/PACKAGE.md" <<'EOF'
-# OASIS v0.1 Source Package
+# OASIS v0.2 Source Package
 
-This archive contains the OASIS v0.1 ISA source of truth, compliance tests,
+This archive contains the OASIS v0.2 ISA source of truth, compliance tests,
 assembler, GCC/binutils backend files, runtime files, and build scripts.
 
 Run the repository checks with:

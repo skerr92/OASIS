@@ -24,3 +24,13 @@ software is represented as an ordered list of 32-bit instruction words starting
 at instruction index `0x00` unless a loader specifies a different start address.
 
 See [programming.md](programming.md) for the recommended programming model.
+
+## External Memory
+
+Base-16T implementations may attach external memory behind data-memory windows
+or memory-mapped control blocks. External memory is not required by Base-16T,
+and portable software must not assume it exists unless the platform linker map
+or conformance statement advertises it.
+
+The v0.2 external memory control expectations are documented in
+[../docs/external-memory-control.md](../docs/external-memory-control.md).
