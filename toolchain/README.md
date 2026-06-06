@@ -70,6 +70,40 @@ The metadata also includes the recommended programming access-port register map.
 
 ## GCC 14 Build Scripts
 
+## Fetching Upstream Source Trees
+
+The OASIS backend files are staged into normal upstream GCC and binutils source
+trees. The CI build currently uses GCC `14.3.0` and binutils `2.46.0`.
+
+Fetch and unpack both source archives into a local build area:
+
+```sh
+mkdir -p .build/sources
+
+curl --fail --location --show-error \
+  https://ftp.gnu.org/gnu/gcc/gcc-14.3.0/gcc-14.3.0.tar.xz \
+  -o .build/sources/gcc-14.3.0.tar.xz
+
+curl --fail --location --show-error \
+  https://ftp.gnu.org/gnu/binutils/binutils-2.46.0.tar.xz \
+  -o .build/sources/binutils-2.46.0.tar.xz
+
+tar -C .build/sources -xf .build/sources/gcc-14.3.0.tar.xz
+tar -C .build/sources -xf .build/sources/binutils-2.46.0.tar.xz
+```
+
+The build scripts can then use:
+
+```sh
+--gcc-src "$PWD/.build/sources/gcc-14.3.0" \
+--binutils-src "$PWD/.build/sources/binutils-2.46.0"
+```
+
+For release or CI work, keep the exact versions pinned so generated artifacts
+remain reproducible. For bring-up against a newer binutils release, start by
+running `toolchain/scripts/apply-gcc14-backend.py --integrate-config` against
+the new source tree and expect small config or documentation patch differences.
+
 Darwin/macOS:
 
 ```sh
@@ -78,6 +112,15 @@ toolchain/scripts/build-darwin-gcc14.sh \
   --gcc-src /path/to/gcc-14 \
   --binutils-src /path/to/binutils
 ```
+
+On Darwin, GCC/binutils configure scripts often miss Homebrew's keg-only
+dependencies even when they are installed. The Darwin wrapper detects Homebrew
+and prepends include, library, pkg-config, and tool paths for `gmp`, `mpfr`,
+`libmpc`, `isl`, `texinfo`, `flex`, and `bison` before running the common build
+script. It also passes explicit GCC configure prefixes for GMP, MPFR, MPC, and
+ISL. If you use MacPorts or custom-built dependencies, set `CPPFLAGS`,
+`LDFLAGS`, `PKG_CONFIG_PATH`, `PATH`, and the `OASIS_*_PREFIX` variables before
+invoking the wrapper.
 
 Linux:
 

@@ -194,6 +194,10 @@ run_in_dir "$GCC_BUILD" "$GCC_SRC/configure" \
   --without-headers \
   --with-system-zlib \
   --with-insnemit-partitions=7 \
+  ${OASIS_GMP_PREFIX:+--with-gmp=$OASIS_GMP_PREFIX} \
+  ${OASIS_MPFR_PREFIX:+--with-mpfr=$OASIS_MPFR_PREFIX} \
+  ${OASIS_MPC_PREFIX:+--with-mpc=$OASIS_MPC_PREFIX} \
+  ${OASIS_ISL_PREFIX:+--with-isl=$OASIS_ISL_PREFIX} \
   --disable-shared \
   --disable-threads \
   --disable-libssp \
