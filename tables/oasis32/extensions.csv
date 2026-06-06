@@ -1,0 +1,18 @@
+extension,class,name,status,description
+OASIS-32I,0x0,SYSTEM,draft,nop halt trap and system special operations
+OASIS-32I,0x1,ALU,draft,base register-register integer ALU operations
+OASIS-32I,0x2,ALUI,draft,base integer ALU immediate operations
+OASIS-32I,0x3,SHIFT,draft,shift rotate and bit manipulation operations
+OASIS-32I,0x4,LOAD,draft,byte halfword and word loads
+OASIS-32I,0x5,STORE,draft,byte halfword and word stores
+OASIS-32I,0x6,BRANCH,draft,conditional PC-relative branches
+OASIS-32I,0x7,JUMP,draft,jumps calls returns and indirect control flow
+OASIS-32I,0x8,COMPARE,draft,compare and set operations
+OASIS-32I,0x9,MOVE,draft,move and constant construction operations
+OASIS-32T,0x7,TOOLCHAIN,draft,compiler-oriented calls returns and indirect control flow
+OASIS-32M,0xA,MULDIV,draft,multiply divide and remainder operations
+OASIS-32A,0xB,ATOMIC,reserved,atomics and memory ordering
+OASIS-32C,0xC,CUSTOM,reserved,custom and vendor extension namespace
+OASIS-32V,0xD,VECTOR,reserved,vector and SIMD operations
+OASIS-32P,0xE,PRIVILEGED,reserved,privileged and system operations
+OASIS-32X,0xF,EXTENDED,reserved,escape and future extended encodings

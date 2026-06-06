@@ -1,0 +1,58 @@
+mnemonic,class,op,format,extension,status,description
+NOP,0x0,0x0,S,OASIS-32I,draft,no operation
+HALT,0x0,0x1,S,OASIS-32I,draft,halt or enter implementation-defined stopped state
+TRAP,0x0,0x2,S,OASIS-32P,reserved,software trap for privileged profiles
+ADD,0x1,0x0,R,OASIS-32I,draft,rd = ra + rb
+SUB,0x1,0x1,R,OASIS-32I,draft,rd = ra - rb
+AND,0x1,0x2,R,OASIS-32I,draft,rd = ra & rb
+OR,0x1,0x3,R,OASIS-32I,draft,rd = ra | rb
+XOR,0x1,0x4,R,OASIS-32I,draft,rd = ra ^ rb
+NOT,0x1,0x5,R,OASIS-32I,draft,rd = ~ra
+NEG,0x1,0x6,R,OASIS-32I,draft,rd = -ra
+ADDI,0x2,0x0,I,OASIS-32I,draft,rd = ra + sign_extend imm32
+SUBI,0x2,0x1,I,OASIS-32I,draft,rd = ra - sign_extend imm32
+ANDI,0x2,0x2,I,OASIS-32I,draft,rd = ra & imm32
+ORI,0x2,0x3,I,OASIS-32I,draft,rd = ra | imm32
+XORI,0x2,0x4,I,OASIS-32I,draft,rd = ra ^ imm32
+SHL,0x3,0x0,R,OASIS-32I,draft,rd = ra << rb[4:0]
+SHR,0x3,0x1,R,OASIS-32I,draft,rd = logical ra >> rb[4:0]
+SAR,0x3,0x2,R,OASIS-32I,draft,rd = arithmetic ra >> rb[4:0]
+ROTL,0x3,0x3,R,OASIS-32I,draft,rd = rotate-left ra by rb[4:0]
+ROTR,0x3,0x4,R,OASIS-32I,draft,rd = rotate-right ra by rb[4:0]
+SHLI,0x3,0x8,I,OASIS-32I,draft,rd = ra << imm5
+SHRI,0x3,0x9,I,OASIS-32I,draft,rd = logical ra >> imm5
+SARI,0x3,0xA,I,OASIS-32I,draft,rd = arithmetic ra >> imm5
+LDB,0x4,0x0,M,OASIS-32I,draft,load byte zero-extended
+LDBS,0x4,0x1,M,OASIS-32I,draft,load byte sign-extended
+LDH,0x4,0x2,M,OASIS-32I,draft,load halfword zero-extended
+LDHS,0x4,0x3,M,OASIS-32I,draft,load halfword sign-extended
+LDW,0x4,0x4,M,OASIS-32I,draft,load 32-bit word
+STB,0x5,0x0,M,OASIS-32I,draft,store byte
+STH,0x5,0x1,M,OASIS-32I,draft,store halfword
+STW,0x5,0x2,M,OASIS-32I,draft,store 32-bit word
+BEQ,0x6,0x0,B,OASIS-32I,draft,branch if ra == rb
+BNE,0x6,0x1,B,OASIS-32I,draft,branch if ra != rb
+BLT,0x6,0x2,B,OASIS-32I,draft,signed branch if ra < rb
+BLE,0x6,0x3,B,OASIS-32I,draft,signed branch if ra <= rb
+BGT,0x6,0x4,B,OASIS-32I,draft,signed branch if ra > rb
+BGE,0x6,0x5,B,OASIS-32I,draft,signed branch if ra >= rb
+BLTU,0x6,0x6,B,OASIS-32I,draft,unsigned branch if ra < rb
+BLEU,0x6,0x7,B,OASIS-32I,draft,unsigned branch if ra <= rb
+BGTU,0x6,0x8,B,OASIS-32I,draft,unsigned branch if ra > rb
+BGEU,0x6,0x9,B,OASIS-32I,draft,unsigned branch if ra >= rb
+JMP,0x7,0x0,J,OASIS-32I,draft,pc-relative jump
+CALL,0x7,0x1,J,OASIS-32T,draft,call pc-relative target and write ra
+RET,0x7,0x2,J,OASIS-32T,draft,return to ra
+JMR,0x7,0x3,J,OASIS-32I,draft,jump to register plus offset
+JALR,0x7,0x4,J,OASIS-32T,draft,jump to register plus offset and link
+SLT,0x8,0x0,R,OASIS-32I,draft,rd = signed ra < rb
+SLTU,0x8,0x1,R,OASIS-32I,draft,rd = unsigned ra < rb
+SEQ,0x8,0x2,R,OASIS-32I,draft,rd = ra == rb
+SNE,0x8,0x3,R,OASIS-32I,draft,rd = ra != rb
+MVV,0x9,0x0,R,OASIS-32I,draft,rd = ra
+MVI,0x9,0x1,U,OASIS-32I,draft,rd = imm32
+MUL,0xA,0x0,R,OASIS-32M,draft,rd = low32 signed multiply
+DIV,0xA,0x1,R,OASIS-32M,draft,signed division
+DIVU,0xA,0x2,R,OASIS-32M,draft,unsigned division
+MOD,0xA,0x3,R,OASIS-32M,draft,signed remainder
+MODU,0xA,0x4,R,OASIS-32M,draft,unsigned remainder

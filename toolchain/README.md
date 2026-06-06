@@ -54,7 +54,7 @@ Run:
 make generate
 ```
 
-This creates `toolchain/generated/oasis-base16t-v0.2-draft.json` from the source
+This creates `toolchain/generated/oasis-base16t-v0.1-draft.json` from the source
 tables in `tables/`. Compiler backends, assemblers, emulators, and compliance
 harnesses should prefer generated metadata over hand-copying opcode constants.
 The metadata also includes the recommended programming access-port register map.
@@ -68,7 +68,47 @@ The metadata also includes the recommended programming access-port register map.
 4. Add more compiler-generated compliance and torture-style smoke tests.
 5. Keep release artifacts reproducible across Linux and Darwin hosts.
 
+OASIS-32 toolchain work is draft planning only for now. The future Base-32T
+target is documented in [spec/oasis32/abi.md](../spec/oasis32/abi.md) and
+[toolchain/abi/base32-baremetal-abi.md](abi/base32-baremetal-abi.md), with
+initial machine-readable opcode and encoding tables under `tables/oasis32/`.
+The active build scripts still target `oasis16-unknown-elf`.
+
 ## GCC 14 Build Scripts
+
+## Fetching Upstream Source Trees
+
+The OASIS backend files are staged into normal upstream GCC and binutils source
+trees. The CI build currently uses GCC `14.3.0` and binutils `2.46.0`.
+
+Fetch and unpack both source archives into a local build area:
+
+```sh
+mkdir -p .build/sources
+
+curl --fail --location --show-error \
+  https://ftp.gnu.org/gnu/gcc/gcc-14.3.0/gcc-14.3.0.tar.xz \
+  -o .build/sources/gcc-14.3.0.tar.xz
+
+curl --fail --location --show-error \
+  https://ftp.gnu.org/gnu/binutils/binutils-2.46.0.tar.xz \
+  -o .build/sources/binutils-2.46.0.tar.xz
+
+tar -C .build/sources -xf .build/sources/gcc-14.3.0.tar.xz
+tar -C .build/sources -xf .build/sources/binutils-2.46.0.tar.xz
+```
+
+The build scripts can then use:
+
+```sh
+--gcc-src "$PWD/.build/sources/gcc-14.3.0" \
+--binutils-src "$PWD/.build/sources/binutils-2.46.0"
+```
+
+For release or CI work, keep the exact versions pinned so generated artifacts
+remain reproducible. For bring-up against a newer binutils release, start by
+running `toolchain/scripts/apply-gcc14-backend.py --integrate-config` against
+the new source tree and expect small config or documentation patch differences.
 
 Darwin/macOS:
 

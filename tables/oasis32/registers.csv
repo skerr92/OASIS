@@ -1,0 +1,65 @@
+id,name,alias,role,volatility,status
+0,r0,zero,constant zero,immutable,draft
+1,r1,ra,return address,caller-saved,draft
+2,r2,sp,stack pointer,callee-saved,draft
+3,r3,fp,frame pointer,callee-saved,draft
+4,r4,rv0,primary return value,caller-saved,draft
+5,r5,rv1,secondary return value,caller-saved,draft
+6,r6,a0,argument 0,caller-saved,draft
+7,r7,a1,argument 1,caller-saved,draft
+8,r8,a2,argument 2,caller-saved,draft
+9,r9,a3,argument 3,caller-saved,draft
+10,r10,a4,argument 4,caller-saved,draft
+11,r11,a5,argument 5,caller-saved,draft
+12,r12,a6,argument 6,caller-saved,draft
+13,r13,a7,argument 7,caller-saved,draft
+14,r14,a8,argument 8,caller-saved,draft
+15,r15,a9,argument 9,caller-saved,draft
+16,r16,t0,temporary 0,caller-saved,draft
+17,r17,t1,temporary 1,caller-saved,draft
+18,r18,t2,temporary 2,caller-saved,draft
+19,r19,t3,temporary 3,caller-saved,draft
+20,r20,t4,temporary 4,caller-saved,draft
+21,r21,t5,temporary 5,caller-saved,draft
+22,r22,t6,temporary 6,caller-saved,draft
+23,r23,t7,temporary 7,caller-saved,draft
+24,r24,t8,temporary 8,caller-saved,draft
+25,r25,t9,temporary 9,caller-saved,draft
+26,r26,t10,temporary 10,caller-saved,draft
+27,r27,t11,temporary 11,caller-saved,draft
+28,r28,t12,temporary 12,caller-saved,draft
+29,r29,t13,temporary 13,caller-saved,draft
+30,r30,t14,temporary 14,caller-saved,draft
+31,r31,t15,temporary 15,caller-saved,draft
+32,r32,s0,saved register 0,callee-saved,draft
+33,r33,s1,saved register 1,callee-saved,draft
+34,r34,s2,saved register 2,callee-saved,draft
+35,r35,s3,saved register 3,callee-saved,draft
+36,r36,s4,saved register 4,callee-saved,draft
+37,r37,s5,saved register 5,callee-saved,draft
+38,r38,s6,saved register 6,callee-saved,draft
+39,r39,s7,saved register 7,callee-saved,draft
+40,r40,s8,saved register 8,callee-saved,draft
+41,r41,s9,saved register 9,callee-saved,draft
+42,r42,s10,saved register 10,callee-saved,draft
+43,r43,s11,saved register 11,callee-saved,draft
+44,r44,s12,saved register 12,callee-saved,draft
+45,r45,s13,saved register 13,callee-saved,draft
+46,r46,s14,saved register 14,callee-saved,draft
+47,r47,s15,saved register 15,callee-saved,draft
+48,r48,platform0,platform reserved,reserved,draft
+49,r49,platform1,platform reserved,reserved,draft
+50,r50,platform2,platform reserved,reserved,draft
+51,r51,platform3,platform reserved,reserved,draft
+52,r52,platform4,platform reserved,reserved,draft
+53,r53,platform5,platform reserved,reserved,draft
+54,r54,platform6,platform reserved,reserved,draft
+55,r55,platform7,platform reserved,reserved,draft
+56,r56,reserved56,reserved,reserved,draft
+57,r57,reserved57,reserved,reserved,draft
+58,r58,reserved58,reserved,reserved,draft
+59,r59,reserved59,reserved,reserved,draft
+60,r60,reserved60,reserved,reserved,draft
+61,r61,reserved61,reserved,reserved,draft
+62,r62,reserved62,reserved,reserved,draft
+63,r63,reserved63,reserved,reserved,draft
