@@ -47,6 +47,21 @@ OASIS-16 v1.0.0-rc.1 release preparation is tracked in
 Candidate notes are in
 [docs/oasis16-v1.0-rc1-release-notes.md](docs/oasis16-v1.0-rc1-release-notes.md).
 
+## Implementations
+
+[DungV](https://github.com/skerr92/DungV) is the FPGA-oriented OASIS-16
+implementation. Its
+[v1.0 MMIO milestone](https://github.com/skerr92/DungV/commit/3425421a3b113d3e13b53f84e32a649007d5a94c)
+implements the explicit `{mmio, addr11}` boundary and a stalling
+request/completion/error bus. GPIO, RGB PWM, 115200-baud UART, and I2C were
+exercised on an iCE5LP4K RPGA board; the I2C test read BMA530 CHIP_ID `0xC2`
+from address `0x18`.
+
+This is a verified implementation of the v1.0 MMIO transaction boundary, not
+yet a full Base-16T or OASIS-16P conformance claim. Current profile status and
+limitations remain authoritative in DungV's
+[compatibility report](https://github.com/skerr92/DungV/blob/main/docs/oasis-compatibility.md).
+
 ## Repository Layout
 
 | Path | Purpose |

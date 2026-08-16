@@ -28,3 +28,14 @@ be rebuilt. Implementations without OASIS-16P remain conforming Base-16 or
 Base-16T implementations when they report the extension as unsupported.
 
 OASIS-32 and DungV-32 remain planned profiles, not release-candidate RTL.
+
+## Downstream Implementation Validation
+
+After the candidate was tagged, DungV pinned commit `251f2a3` and implemented
+the Base-16 direct memory/MMIO boundary. DungV
+[`3425421`](https://github.com/skerr92/DungV/commit/3425421a3b113d3e13b53f84e32a649007d5a94c)
+hardware-verified non-aliasing MMIO dispatch and variable-latency completion
+with GPIO, RGB PWM, UART, and I2C peripherals on an iCE5LP4K RPGA board.
+
+This validation covers the direct MMIO architectural boundary; it is not a
+claim that DungV has completed Base-16T or OASIS-16P.

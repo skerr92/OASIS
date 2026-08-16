@@ -260,6 +260,18 @@ Implementations may bridge this contract to Wishbone, APB, AXI-Lite, a custom
 fabric, or discrete peripheral selects. These bridges are implementation
 details and do not change architectural instruction semantics.
 
+### Verified implementation
+
+[DungV commit `3425421`](https://github.com/skerr92/DungV/commit/3425421a3b113d3e13b53f84e32a649007d5a94c)
+implements this minimum contract as `valid`, `write`, word address, write/read
+data, `ready`, and `error` signals. The core holds requests and stalls
+retirement until `ready`. Its iCE5LP4K hardware tests exercised GPIO, RGB PWM,
+blocking UART, and open-drain I2C; a BMA530 at address `0x18` returned its
+documented CHIP_ID `0xC2`.
+
+DungV's verified custom fabric is an implementation example, not a required
+OASIS on-chip bus protocol.
+
 ## Baseline Decisions
 
 - `mem:[addr11]` and `io:[addr11]` are the normative direct assembly forms.
