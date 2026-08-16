@@ -25,6 +25,7 @@ VALID_PROFILES = {
     "oasis-base16t-v0.2-draft",
     "oasis-base16-v1.0",
     "oasis-base16t-v1.0",
+    "oasis-base16p-v1.0",
 }
 
 

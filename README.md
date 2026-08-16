@@ -42,10 +42,10 @@ v0.x encoding compatibility at the explicit memory/MMIO boundary.
 OASIS-32 remains experimental architecture groundwork. Its roadmap carries the
 v1.0 address-space contract forward with full 32-bit addresses in each space.
 
-OASIS-16 v0.2 release planning is tracked in
-[docs/oasis16-v0.2-release-plan.md](docs/oasis16-v0.2-release-plan.md).
-Draft release notes are tracked in
-[docs/oasis16-v0.2-release-notes.md](docs/oasis16-v0.2-release-notes.md).
+OASIS-16 v1.0.0-rc.1 release preparation is tracked in
+[docs/oasis16-v1.0-rc1-release-plan.md](docs/oasis16-v1.0-rc1-release-plan.md).
+Candidate notes are in
+[docs/oasis16-v1.0-rc1-release-notes.md](docs/oasis16-v1.0-rc1-release-notes.md).
 
 ## Repository Layout
 

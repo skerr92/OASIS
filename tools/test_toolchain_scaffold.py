@@ -65,17 +65,17 @@ def main() -> int:
     require_contains(package_toolchain.stdout, "package-toolchain-installer.sh")
     require_contains(
         (ROOT / "toolchain" / "scripts" / "package-toolchain-installer.sh").read_text(),
-        "Base-16T v0.2",
+        "Base-16T v1.0.0-rc.1",
     )
 
     package_source = run(["toolchain/scripts/package-source-release.sh", "--help"])
     if package_source.returncode != 0:
         raise AssertionError("source packaging help should succeed")
     require_contains(package_source.stdout, "package-source-release.sh")
-    require_contains(package_source.stdout, "default: oasis-v0.2")
+    require_contains(package_source.stdout, "default: oasis-v1.0.0-rc.1")
     require_contains(
         (ROOT / "toolchain" / "scripts" / "package-source-release.sh").read_text(),
-        "OASIS v0.2 Source Package",
+        "OASIS v1.0.0-rc.1 Source Package",
     )
 
     build_common = (ROOT / "toolchain" / "scripts" / "build-gcc14-common.sh").read_text()

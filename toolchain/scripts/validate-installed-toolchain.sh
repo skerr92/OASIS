@@ -13,6 +13,8 @@ Options:
   --tests DIR    C smoke-test directory, default: toolchain/tests/c
   --cxx-tests DIR
                  C++ smoke-test directory, default: toolchain/tests/cxx
+  --asm-tests DIR
+                 assembly fixture directory, default: toolchain/tests/asm
   --dry-run      print commands without executing them
   -h, --help     show this help
 EOF
@@ -22,6 +24,7 @@ ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/../.." && pwd)
 PREFIX=
 TEST_DIR="$ROOT/toolchain/tests/c"
 CXX_TEST_DIR="$ROOT/toolchain/tests/cxx"
+ASM_TEST_DIR="$ROOT/toolchain/tests/asm"
 DRY_RUN=0
 
 quote() {
@@ -55,6 +58,10 @@ while [ "$#" -gt 0 ]; do
       CXX_TEST_DIR=$2
       shift 2
       ;;
+    --asm-tests)
+      ASM_TEST_DIR=$2
+      shift 2
+      ;;
     --dry-run)
       DRY_RUN=1
       shift
@@ -86,16 +93,22 @@ if [ ! -d "$CXX_TEST_DIR" ]; then
   exit 1
 fi
 
+if [ ! -d "$ASM_TEST_DIR" ]; then
+  echo "error: assembly test directory not found: $ASM_TEST_DIR" >&2
+  exit 1
+fi
+
 CC="$PREFIX/bin/$TARGET_ALIAS-gcc"
 CXX="$PREFIX/bin/$TARGET_ALIAS-g++"
 AS="$PREFIX/bin/$TARGET_ALIAS-as"
 LD="$PREFIX/bin/$TARGET_ALIAS-ld"
 OBJDUMP="$PREFIX/bin/$TARGET_ALIAS-objdump"
+OBJCOPY="$PREFIX/bin/$TARGET_ALIAS-objcopy"
 ELF2IMG="$PREFIX/bin/oasis-elf2img"
 OUT_DIR="$ROOT/.build/toolchain-tests"
 
 if [ "$DRY_RUN" -eq 0 ]; then
-  for tool in "$CC" "$CXX" "$AS" "$LD" "$OBJDUMP" "$ELF2IMG"; do
+  for tool in "$CC" "$CXX" "$AS" "$LD" "$OBJDUMP" "$OBJCOPY" "$ELF2IMG"; do
     if [ ! -x "$tool" ]; then
       echo "error: missing executable tool: $tool" >&2
       exit 1
@@ -134,6 +147,29 @@ run "$CC" -ffreestanding -nostdlib -S "$ROOT/toolchain/runtime/cxxabi.c" -o "$OU
 run "$AS" "$OUT_DIR/cxxabi.s" -o "$OUT_DIR/cxxabi.o"
 run "$CXX" -ffreestanding -nostdlib -fno-exceptions -fno-rtti -S "$ROOT/toolchain/runtime/cxxnew.cpp" -o "$OUT_DIR/cxxnew.s"
 run "$AS" "$OUT_DIR/cxxnew.s" -o "$OUT_DIR/cxxnew.o"
+
+for source in "$ASM_TEST_DIR"/*.s; do
+  name=$(basename "$source" .s)
+  obj="$OUT_DIR/$name.o"
+  binary="$OUT_DIR/$name.bin"
+  dump="$OUT_DIR/$name.dump"
+  actual_hex="$OUT_DIR/$name.hex"
+  expected_hex="$ASM_TEST_DIR/$name.expected.hex"
+  expected_dump="$ASM_TEST_DIR/$name.expected.dump"
+
+  run "$AS" "$source" -o "$obj"
+  run "$OBJDUMP" -d "$obj"
+  run "$OBJCOPY" -O binary -j .text "$obj" "$binary"
+  if [ "$DRY_RUN" -eq 0 ]; then
+    "$OBJDUMP" -d "$obj" > "$dump"
+    od -An -v -tx1 "$binary" | tr -d ' \n' > "$actual_hex"
+    printf '\n' >> "$actual_hex"
+    diff -u "$expected_hex" "$actual_hex"
+    while IFS= read -r expected; do
+      grep -F "$expected" "$dump" >/dev/null
+    done < "$expected_dump"
+  fi
+done
 
 for source in "$TEST_DIR"/*.c; do
   name=$(basename "$source" .c)

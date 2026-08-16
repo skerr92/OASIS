@@ -14,6 +14,7 @@ for the first `oasis16-unknown-elf` binutils build:
 - BFD architecture definition
 - ELF header constants
 - Opcode table, encoder, decoder, and disassembler entry point
+- OASIS-16P grouped-suboperation assembly and reserved-bit-aware disassembly
 - GAS parser/encoder for the OASIS assembly syntax
 - LD emulation parameters and linker script template
 - Initial relocation names and BFD howto entries

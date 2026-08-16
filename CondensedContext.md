@@ -2,8 +2,8 @@
 
 ## Context Freshness
 Context ID: FRESH-001
-Last Verified Commit: 32aa67a930fcf7ef255ee1ef0bb0eea0a4440c8f
-Current HEAD: 32aa67a930fcf7ef255ee1ef0bb0eea0a4440c8f
+Last Verified Commit: 975030bc262c34e9babedf264e9e2c43b0fbd276
+Current HEAD: 975030bc262c34e9babedf264e9e2c43b0fbd276
 Generated: 2026-08-16
 Status:
 - Partial: v1.0 MMIO baseline is pushed to `origin/v1.0_source`; optional
@@ -19,17 +19,18 @@ current, and useful for future agents.
 Context ID: ACTIVE-001
 Confidence: High; verified against the instruction tables and assembler.
 - The accepted OASIS v1.0 memory/MMIO boundary is implemented. Current work
-  defines optional OASIS-16P/OASIS-32P and hardens the native toolchain rebuild.
+  prepares `1.0.0-rc.1` with native OASIS-16P tooling and behavioral modeling.
 
 ## Handoff
 Context ID: HANDOFF-001
 Confidence: High.
 - Last known state: v1.0 baseline uses explicit address spaces, uniform direct
   operands, full indirect pointers, the scratch ABI, and `MCP` opcode `00:1100`.
-- Next useful step: review/commit the P-profile contract, then integrate DungV
-  after v1.0 merges to the OASIS default branch.
+- Next useful step: review and commit/tag `v1.0.0-rc.1`, rebuild final artifacts
+  from that commit, then pin it in DungV for RPGA Feather implementation.
 - Validation: `make check`, `git diff --check`, and a clean native GCC 14.3.0 /
-  binutils 2.46 build with `--run-tests` passed on 2026-08-16.
+  binutils 2.46 build with `--run-tests` passed on 2026-08-16; native P-profile
+  GAS/objdump exact-byte fixtures also pass.
 
 ## Stable Facts
 Context ID: FACTS-001
@@ -68,6 +69,12 @@ Confidence: High; user direction recorded 2026-08-16.
   uses class `0xE` except for class `0x0` `TRAP`.
 - `TRAP imm8` saves the following PC and places its zero-extended immediate in
   `TVAL`; the system save bank is architecturally one level deep.
+- Native binutils recognizes the seven P mnemonics as suboperations of system
+  group `00:1110`; reserved-field violations and unknown subops disassemble as
+  raw `.word` values.
+- `tools/oasis16p_model.py` executes the system-state contract independently of
+  a core pipeline; its tests cover traps, return, CSR, IRQ, WFI, privilege, and
+  MMIO-fault behavior.
 
 ## Known Constraints
 Context ID: CONSTRAINTS-001
@@ -93,6 +100,8 @@ Confidence: High.
 - `spec/exceptions.md`: shared OASIS-16P/OASIS-32P system-state contract.
 - `tables/system-registers.csv`, `tables/trap-causes.csv`: canonical system IDs.
 - `docs/dungv-v1-integration.md`: downstream DungV and DungV-32 sequence.
+- `VERSION` and `docs/oasis16-v1.0-rc1-release-*.md`: candidate identity,
+  release gates, compatibility notes, and FPGA handoff boundary.
 
 ## Validation Memory
 Context ID: VALIDATION-001
@@ -103,6 +112,8 @@ Confidence: Medium.
 - `git diff --check` passed on 2026-08-16.
 - Fresh native prefix `.toolchain/oasis16-v1-darwin-arm64` built and passed the
   full toolchain validation suite on 2026-08-16.
+- Installed-toolchain validation extracts the P fixture `.text`, checks exact
+  little-endian bytes, and checks positive and malformed-word disassembly.
 
 ## Coverage
 Context ID: COVERAGE-001
@@ -117,6 +128,8 @@ Confidence: Medium.
 | 2026-08-16 | `[v1.0]` `[baseline]` `[toolchain]` `[oasis32]` | Solidified explicit memory/MMIO encodings, MCP, scratch ABI, code generation, compliance, and OASIS-32 mapping. | ISA/spec, tables, tools, toolchain, tests, docs | `32aa67a` | `origin/v1.0_source` |
 | 2026-08-16 | `[v1.0]` `[toolchain]` `[native]` | Fixed stale generated relocation-name migration and completed a clean GCC/binutils rebuild. | `toolchain/scripts/apply-gcc14-backend.py` | Uncommitted | Not confirmed |
 | 2026-08-16 | `[OASIS-16P]` `[OASIS-32P]` `[DungV]` | Defined the shared system block, canonical IDs/encodings, validation, and downstream integration order. | `spec/exceptions.md`, system tables, OASIS-32 tables/docs, DungV integration note | Uncommitted | Not confirmed |
+| 2026-08-16 | `[OASIS-16P]` `[binutils]` `[compliance]` | Added grouped-subop GAS/objdump support and executable exact-byte/reserved-encoding fixtures. | binutils opcode/GAS backend, installed validator, toolchain fixture, compliance YAML | Uncommitted | Not confirmed |
+| 2026-08-16 | `[v1.0.0-rc.1]` `[model]` `[release]` | Added executable P system-state tests, candidate packaging metadata, release gates, and DungV/RPGA handoff. | P model/tests, VERSION, release docs, package scripts | Uncommitted | Not confirmed |
 
 ## Archived History
 - None yet.
@@ -127,6 +140,5 @@ Confidence: High.
 - Downstream implementations must update RTL/simulator decode and expose MMIO
   request/completion/error behavior in their conformance reports.
 - A future revision may standardize more detailed fault/timeout behavior.
-- Native binutils support for OASIS-16P grouped subops and executable P-profile
-  compliance fixtures are the next toolchain layer; current native rebuild
-  validates the v1 base/MMIO contract.
+- P-profile architectural state is covered by a reference model; full pipeline,
+  MMIO handshake, and FPGA execution remain downstream DungV work.

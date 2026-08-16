@@ -376,6 +376,22 @@ md_assemble(char *str)
         as_bad(_("MCP scratch source must be absolute"));
       operands.address = (unsigned int) value;
       break;
+
+    case OASIS16_OPERANDS_TRAP_IMM8:
+      input = parse_absolute(input, &tmp_expr);
+      if (!expression_is_constant(&tmp_expr, &value))
+        as_bad(_("TRAP immediate must be absolute"));
+      operands.immediate = value;
+      break;
+
+    case OASIS16_OPERANDS_RA_CSR8:
+      input = parse_register(input, &operands.ra);
+      input = skip_comma(input);
+      input = parse_absolute(input, &tmp_expr);
+      if (!expression_is_constant(&tmp_expr, &value))
+        as_bad(_("system-register ID must be absolute"));
+      operands.csr = (unsigned int) value;
+      break;
     }
 
   input = skip_space(input);

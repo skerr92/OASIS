@@ -24,6 +24,9 @@
 #define OASIS16_MCP_SCRATCH11_SHIFT 9
 #define OASIS16_MVF_MVT_MMIO_SHIFT 21
 #define OASIS16_MSI_MMIO_SHIFT 27
+#define OASIS16_SYSTEM_SUBOP_SHIFT 22
+#define OASIS16_SYSTEM_RA_SHIFT 16
+#define OASIS16_SYSTEM_ARG8_SHIFT 8
 #define OASIS16_OFF6_SHIFT 8
 #define OASIS16_CLASS_MASK 0x3u
 #define OASIS16_OPCODE4_MASK 0xfu
@@ -33,6 +36,8 @@
 #define OASIS16_IMM16_MASK 0xffffu
 #define OASIS16_TARGET8_MASK 0xffu
 #define OASIS16_ADDR11_MASK 0x7ffu
+#define OASIS16_SYSTEM_SUBOP_MASK 0xfu
+#define OASIS16_SYSTEM_ARG8_MASK 0xffu
 
 enum oasis16_opcode_class
 {
@@ -55,7 +60,9 @@ enum oasis16_operand_kind
   OASIS16_OPERANDS_RA_SPACE_ADDR11,
   OASIS16_OPERANDS_SPACE_ADDR11_IMM16,
   OASIS16_OPERANDS_RA_MEM_RB_OFF6,
-  OASIS16_OPERANDS_RB_SCRATCH11
+  OASIS16_OPERANDS_RB_SCRATCH11,
+  OASIS16_OPERANDS_TRAP_IMM8,
+  OASIS16_OPERANDS_RA_CSR8
 };
 
 enum oasis16_reloc_field
@@ -74,6 +81,7 @@ struct oasis16_opcode
   unsigned int opcode;
   enum oasis16_operand_kind operands;
   const char *format;
+  unsigned int subopcode;
 };
 
 struct oasis16_insn
@@ -85,6 +93,7 @@ struct oasis16_insn
   int target;
   unsigned int address;
   unsigned int mmio;
+  unsigned int csr;
 };
 
 extern const struct oasis16_opcode oasis16_opcodes[];

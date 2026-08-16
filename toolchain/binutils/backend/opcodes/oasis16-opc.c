@@ -25,6 +25,13 @@ const struct oasis16_opcode oasis16_opcodes[] =
   { "JLTU", 0, 0xa, OASIS16_OPERANDS_RA_RB_TARGET8, "ra,rb,target8" },
   { "JGEU", 0, 0xb, OASIS16_OPERANDS_RA_RB_TARGET8, "ra,rb,target8" },
   { "MCP", 0, 0xc, OASIS16_OPERANDS_RB_SCRATCH11, "[rb],mem:[scratch11]" },
+  { "TRAP", 0, 0xe, OASIS16_OPERANDS_TRAP_IMM8, "imm8", 0x0 },
+  { "ERET", 0, 0xe, OASIS16_OPERANDS_NONE, "", 0x1 },
+  { "WFI", 0, 0xe, OASIS16_OPERANDS_NONE, "", 0x2 },
+  { "CSRR", 0, 0xe, OASIS16_OPERANDS_RA_CSR8, "ra,csr8", 0x3 },
+  { "CSRW", 0, 0xe, OASIS16_OPERANDS_RA_CSR8, "ra,csr8", 0x4 },
+  { "CSRS", 0, 0xe, OASIS16_OPERANDS_RA_CSR8, "ra,csr8", 0x5 },
+  { "CSRC", 0, 0xe, OASIS16_OPERANDS_RA_CSR8, "ra,csr8", 0x6 },
   { "ADD", 1, 0x1, OASIS16_OPERANDS_RA_RB, "ra,rb" },
   { "SUB", 1, 0x2, OASIS16_OPERANDS_RA_RB, "ra,rb" },
   { "AND", 1, 0x3, OASIS16_OPERANDS_RA_RB, "ra,rb" },
@@ -88,6 +95,9 @@ oasis16_encode_instruction(const struct oasis16_opcode *opcode,
     encoded |= opcode->opcode << OASIS16_REG_OPCODE_SHIFT;
   else
     encoded |= opcode->opcode << OASIS16_ALU_OPCODE_SHIFT;
+
+  if (opcode->insn_class == OASIS16_CLASS_TOOL && opcode->opcode == 0xe)
+    encoded |= opcode->subopcode << OASIS16_SYSTEM_SUBOP_SHIFT;
 
   switch (opcode->operands)
     {
@@ -183,6 +193,20 @@ oasis16_encode_instruction(const struct oasis16_opcode *opcode,
       encoded |= (operands->rb << OASIS16_RA_TOOL_SHIFT)
                  | (operands->address << OASIS16_MCP_SCRATCH11_SHIFT);
       break;
+
+    case OASIS16_OPERANDS_TRAP_IMM8:
+      if (!oasis16_unsigned_range((unsigned int) operands->immediate, 8))
+        return false;
+      encoded |= (unsigned int) operands->immediate << OASIS16_SYSTEM_ARG8_SHIFT;
+      break;
+
+    case OASIS16_OPERANDS_RA_CSR8:
+      if (!oasis16_unsigned_range(operands->ra, 6)
+          || !oasis16_unsigned_range(operands->csr, 8))
+        return false;
+      encoded |= (operands->ra << OASIS16_SYSTEM_RA_SHIFT)
+                 | (operands->csr << OASIS16_SYSTEM_ARG8_SHIFT);
+      break;
     }
 
   *word = encoded;
@@ -205,7 +229,11 @@ oasis16_decode_instruction(unsigned int word,
 
   for (i = 0; i < oasis16_num_opcodes; i++)
     if (oasis16_opcodes[i].insn_class == insn_class
-        && oasis16_opcodes[i].opcode == opcode_bits)
+        && oasis16_opcodes[i].opcode == opcode_bits
+        && (opcode_bits != 0xe || insn_class != OASIS16_CLASS_TOOL
+            || oasis16_opcodes[i].subopcode
+               == ((word >> OASIS16_SYSTEM_SUBOP_SHIFT)
+                   & OASIS16_SYSTEM_SUBOP_MASK)))
       {
         const struct oasis16_opcode *op = &oasis16_opcodes[i];
 
@@ -285,7 +313,27 @@ oasis16_decode_instruction(unsigned int word,
             operands->address = (word >> OASIS16_MCP_SCRATCH11_SHIFT)
                                 & OASIS16_ADDR11_MASK;
             break;
+
+          case OASIS16_OPERANDS_TRAP_IMM8:
+            if ((word & 0x003f00ffu) != 0)
+              continue;
+            operands->immediate = (word >> OASIS16_SYSTEM_ARG8_SHIFT)
+                                  & OASIS16_SYSTEM_ARG8_MASK;
+            break;
+
+          case OASIS16_OPERANDS_RA_CSR8:
+            if ((word & 0xffu) != 0)
+              continue;
+            operands->ra = (word >> OASIS16_SYSTEM_RA_SHIFT) & OASIS16_REG_MASK;
+            operands->csr = (word >> OASIS16_SYSTEM_ARG8_SHIFT)
+                            & OASIS16_SYSTEM_ARG8_MASK;
+            break;
           }
+
+        if (op->operands == OASIS16_OPERANDS_NONE
+            && op->insn_class == OASIS16_CLASS_TOOL && op->opcode == 0xe
+            && (word & 0x003fffffu) != 0)
+          continue;
 
         return true;
       }
@@ -343,6 +391,12 @@ oasis16_print_instruction(const struct oasis16_opcode *opcode,
                    operands->ra, operands->rb,
                    operands->offset < 0 ? '-' : '+',
                    operands->offset < 0 ? -operands->offset : operands->offset);
+      break;
+    case OASIS16_OPERANDS_TRAP_IMM8:
+      fprintf_func(stream, " 0x%02x", operands->immediate & 0xff);
+      break;
+    case OASIS16_OPERANDS_RA_CSR8:
+      fprintf_func(stream, " r%u, 0x%02x", operands->ra, operands->csr);
       break;
     }
 }

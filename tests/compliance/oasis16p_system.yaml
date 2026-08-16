@@ -1,0 +1,19 @@
+name: oasis16p-system-encoding
+profile: oasis-base16p-v1.0
+program:
+  - "TRAP 0x12"
+  - "ERET"
+  - "WFI"
+  - "CSRR r4, 0x01"
+  - "CSRW r5, 0x02"
+  - "CSRS r6, 0x03"
+  - "CSRC r7, 0x04"
+expect:
+  words:
+    - 0x38001200
+    - 0x38400000
+    - 0x38800000
+    - 0x38c40100
+    - 0x39050200
+    - 0x39460300
+    - 0x39870400

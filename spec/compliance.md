@@ -91,6 +91,17 @@ toolchain validation flow for actual ELF/linker availability. Valid symbol
 kinds are `runtime` for startup symbols and `linker` for symbols exported by the
 default linker script.
 
+## OASIS-16P Behavioral Model
+
+`tools/oasis16p_model.py` is the executable reference for the optional system
+block. `tools/test_oasis16p_model.py` checks reset privilege, software-trap
+entry, `TVAL`, `ERET`, interrupt masking and priority, `WFI` wake behavior, CSR
+operations, privilege violations, illegal encodings, and MMIO fault capture.
+
+The model owns only architectural system state. A conforming core or RTL harness
+still owns general registers, instruction retirement, memory/MMIO completion,
+and the precise faulting/next-PC inputs described in `exceptions.md`.
+
 ## Harness Requirements
 
 The harness should support:

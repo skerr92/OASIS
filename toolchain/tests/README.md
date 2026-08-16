@@ -1,10 +1,12 @@
 # OASIS Toolchain Validation Tests
 
-This directory contains freestanding C and C++ smoke tests for the first
+This directory contains assembly fixtures plus freestanding C and C++ smoke tests for the first
 `oasis16-unknown-elf` GCC/binutils toolchain.
 
 The suite is intentionally small and layered:
 
+- `asm/oasis16p.s` verifies exact native GAS bytes, all seven P-profile
+  disassemblies, and rejection of malformed reserved encodings by objdump.
 - `return_constant.c`, `add.c`, and `sub.c` exercise basic HImode codegen.
 - `if_else.c`, `while_loop.c`, and `for_loop.c` exercise branches.
 - `call.c` exercises the `CALL`/`RET` ABI.

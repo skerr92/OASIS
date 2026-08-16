@@ -10,6 +10,7 @@ check:
 	python3 tools/validate_binutils_backend.py
 	python3 tools/validate_oasis32_tables.py
 	python3 tools/validate_system_tables.py
+	python3 tools/test_oasis16p_model.py
 
 generate:
 	python3 tools/generate_instruction_docs.py
