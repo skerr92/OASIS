@@ -10,7 +10,7 @@ against a pinned OASIS version.
 
 ## Current Profile
 
-OASIS v0.1 defines two profiles:
+OASIS v1.0 defines two profiles:
 
 - Base-16: compact ISA foundation
 - Base-16T: Base-16 plus toolchain operations for C/C++ compiler targets
@@ -21,21 +21,25 @@ Base-16 provides:
 - 32-bit instructions
 - 64 general purpose registers
 - Word-addressed data memory
+- Separate ordinary-memory and MMIO spaces
 - Basic ALU, move/immediate, load/store, and jump/branch operations
 - No privilege modes, interrupts, exceptions, or status flags
 
-Base-16T adds immediate arithmetic, register-indirect memory access, call/return,
-jump-register, and signed/unsigned comparison branches.
+Base-16T adds immediate arithmetic, register-indirect memory/MMIO access,
+scratch-to-far `MCP`, call/return, jump-register, and signed/unsigned comparison
+branches.
 
-Start with [spec/oasis-v0.1.md](spec/oasis-v0.1.md).
+Start with the topic specifications under [spec/](spec/).
 
-OASIS v0.1 is the first functional architecture and toolchain baseline. The
-v0.2 work stream is now focused on a more capable core profile, deeper compiler
-lowering, richer runtime support, and stronger release/compliance packaging.
+The v1.0 compatibility boundary replaces the v0.x direct-memory contract.
+`MVF`, `MVT`, and `MSI` now encode `{mmio, addr11}` and require explicit
+`mem:`/`io:` assembly operands.
 
-OASIS v0.2-draft also starts the OASIS-32 planning scaffold. OASIS-32 is
-experimental architecture groundwork for future 32-bit profiles and does not
-modify OASIS v0.1 Base-16/Base-16T compatibility.
+OASIS v0.1 and v0.2 remain historical baselines. OASIS v1.0 deliberately ends
+v0.x encoding compatibility at the explicit memory/MMIO boundary.
+
+OASIS-32 remains experimental architecture groundwork. Its roadmap carries the
+v1.0 address-space contract forward with full 32-bit addresses in each space.
 
 OASIS-16 v0.2 release planning is tracked in
 [docs/oasis16-v0.2-release-plan.md](docs/oasis16-v0.2-release-plan.md).
@@ -95,11 +99,12 @@ manual workflow runs:
 
 ## Development Rule
 
-OASIS v0.1 requires:
+OASIS v1.0 requires:
 
 - Complete generated instruction docs for every opcode
 - Machine-readable opcode, encoding, register, target, and programming tables
 - Compliance coverage for every mnemonic in the opcode table
 
-OASIS v0.2 proposals should keep v0.1 compatibility explicit and include
-matching table, documentation, assembler, compliance, and toolchain updates.
+Post-v1.0 proposals must keep the v1.0 compatibility boundary explicit and
+include matching table, documentation, assembler, compliance, and toolchain
+updates.

@@ -1,0 +1,14 @@
+name: memory_space_addr11
+profile: oasis-base16-v1.0
+description: Direct operations select memory or MMIO explicitly at the top addr11 word.
+program:
+  - MSI mem:[0x7ff], 0x55aa
+  - MVF r1, mem:[0x7ff]
+  - MVT r1, io:[0x7fe]
+expect:
+  registers:
+    r1: 0x55aa
+  memory:
+    0x7ff: 0x55aa
+  mmio:
+    0x7fe: 0x55aa

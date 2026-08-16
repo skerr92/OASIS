@@ -30,6 +30,9 @@ expect:
     __oasis_extmem_start: linker
     __oasis_extmem_end: linker
     __oasis_stack_top: linker
+    __oasis_scratch_start: linker
+    __oasis_scratch_end: linker
+    __oasis_scratch_words: linker
   exit:
     kind: normal
     symbol: __oasis_exit

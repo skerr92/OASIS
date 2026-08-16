@@ -2,7 +2,7 @@
 
 ## Summary
 
-Loads a data-memory word using a base register and signed word offset.
+Loads a memory or MMIO word using a `{mmio, addr15}` pointer and signed word offset.
 
 ## Syntax
 
@@ -28,20 +28,20 @@ Opcode: `0011`
 ## Operation
 
 ```text
-ra = memory[rb + sign_extend(off6)]
+ra = space[rb[15]][rb[14:0] + sign_extend(off6)]
 ```
 
 ## Effects
 
 - Writes ra
-- reads memory
+- reads memory or MMIO
 - does not branch
 - flags: none.
 
 ## Edge Cases
 
 - Offset is signed 6-bit word offset -32..31
-- effective address wraps modulo 2^16 before implementation address truncation.
+- address wraps modulo 2^15 without changing the space bit.
 
 ## Example
 

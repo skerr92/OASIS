@@ -1,6 +1,6 @@
 # Encoding
 
-OASIS v0.1 instructions are 32 bits wide. Multi-bit fields are encoded
+OASIS v1.0 Base-16 instructions are 32 bits wide. Multi-bit fields are encoded
 most-significant bit first.
 
 ## Common Fields
@@ -31,3 +31,10 @@ call/return, register jump, and signed/unsigned comparison branches.
 
 See [../tables/encoding-fields.csv](../tables/encoding-fields.csv) for the
 machine-readable field table.
+
+## Direct Address Spaces
+
+`MVF`, `MVT`, and `MSI` use the same logical 12-bit direct-address operand:
+`{mmio, addr11}`. `mmio = 0` selects ordinary data memory and `mmio = 1`
+selects MMIO. The spaces do not alias. Assembly must spell the space explicitly
+as `mem:[addr11]` or `io:[addr11]`.

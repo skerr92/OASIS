@@ -1,0 +1,5 @@
+MVF r1, mem:[0x7ff]
+MVT r1, io:[0x7ff]
+MSI mem:[0x000], 0x1234
+MVI sap, io:0x0100
+MCP [sap], mem:[0x000]

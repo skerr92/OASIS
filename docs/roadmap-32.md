@@ -274,7 +274,7 @@ Memory operations.
 59:56 op
 55:48 rd_or_rs
 47:40 base
-39:32 mode / size / flags
+39:32 space / size / flags
 31:0  signed_offset
 ```
 
@@ -284,6 +284,10 @@ Example:
 LDW r3, [r1 + 16]
 STW r3, [r1 - 8]
 ```
+
+The M-format space flag explicitly selects ordinary memory or MMIO. Both spaces
+retain full 32-bit byte addresses and do not alias. Assembly should expose the
+selection as `mem:` or `io:` rather than infer it from a platform address map.
 
 ## B-Type
 
@@ -887,5 +891,19 @@ Implemented in the first OASIS-32 planning pass:
 - `tables/oasis32/extensions.csv`
 - `tools/validate_oasis32_tables.py`
 
-The validator is wired into `make check`. This keeps OASIS-32 draft table work
-visible while preserving OASIS v0.1 Base-16/Base-16T compatibility.
+The validator is wired into `make check`.
+
+## v1.0 Architectural Boundary
+
+OASIS-32 carries forward the OASIS-16 v1.0 memory/MMIO contract:
+
+- ordinary memory and MMIO are separate, non-aliasing architectural spaces;
+- every load/store explicitly selects a space in its M-format flags;
+- assembly, compiler IR, relocations, and disassembly preserve that selection;
+- full 32-bit byte addresses remain available in each space;
+- no mandatory Base-16-style scratch block is required;
+- a future `MCP` must name its source and destination spaces explicitly and may
+  not depend on hidden state from a preceding instruction.
+
+This is a deliberate semantic continuation of v1.0, not binary compatibility
+with the Base-16 `{mmio, addr11}` encoding.

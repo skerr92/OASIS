@@ -18,7 +18,8 @@ import sys
 
 XLEN = 16
 REG_COUNT = 64
-DATA_ADDR_MAX = 0xFFF
+DIRECT_ADDR_MAX = 0x7FF
+FAR_ADDR_MAX = 0x7FFF
 PC_MAX = 0xFF
 IMM16_MAX = 0xFFFF
 IMM6_MAX = 0x3F
@@ -42,6 +43,7 @@ TOOL_OPS = {
     "JGE": 0b1001,
     "JLTU": 0b1010,
     "JGEU": 0b1011,
+    "MCP": 0b1100,
 }
 
 ALU_OPS = {
@@ -85,6 +87,12 @@ class AssemblerError(Exception):
     pass
 
 
+REGISTER_ALIASES = {
+    "sap": 59,
+    "sdata": 60,
+}
+
+
 def strip_comment(line: str) -> str:
     return line.split(";", 1)[0].strip()
 
@@ -97,6 +105,11 @@ def split_operands(text: str) -> list[str]:
 
 def parse_int(token: str, labels: dict[str, int], line: SourceLine) -> int:
     token = token.strip()
+    pointer_match = re.fullmatch(r"(mem|io):(.+)", token, re.IGNORECASE)
+    if pointer_match:
+        address = parse_int(pointer_match.group(2), labels, line)
+        require_range(address, 0, FAR_ADDR_MAX, "far address", line)
+        return address | (0x8000 if pointer_match.group(1).lower() == "io" else 0)
     if token in labels:
         return labels[token]
     try:
@@ -114,23 +127,39 @@ def require_range(value: int, low: int, high: int, what: str, line: SourceLine) 
 
 
 def parse_register(token: str, line: SourceLine) -> int:
+    alias = REGISTER_ALIASES.get(token.strip().lower())
+    if alias is not None:
+        return alias
     match = re.fullmatch(r"[rR]([0-9]+)", token.strip())
     if not match:
         raise AssemblerError(f"{line.path}:{line.line_no}: expected register, got {token!r}")
     return require_range(int(match.group(1)), 0, REG_COUNT - 1, "register", line)
 
 
-def parse_mem_addr(token: str, labels: dict[str, int], line: SourceLine) -> int:
-    match = re.fullmatch(r"\[(.+)\]", token.strip())
+def parse_direct_addr(token: str, labels: dict[str, int], line: SourceLine) -> tuple[int, int]:
+    match = re.fullmatch(r"(mem|io):\[(.+)\]", token.strip(), re.IGNORECASE)
     if not match:
-        raise AssemblerError(f"{line.path}:{line.line_no}: expected memory address, got {token!r}")
-    value = parse_int(match.group(1).strip(), labels, line)
-    return require_range(value, 0, DATA_ADDR_MAX, "memory address", line)
+        raise AssemblerError(
+            f"{line.path}:{line.line_no}: expected explicit mem:[addr11] or "
+            f"io:[addr11], got {token!r}"
+        )
+    value = parse_int(match.group(2).strip(), labels, line)
+    address = require_range(value, 0, DIRECT_ADDR_MAX, "direct address", line)
+    return (1 if match.group(1).lower() == "io" else 0), address
+
+
+def parse_pointer_ref(token: str, line: SourceLine) -> int:
+    match = re.fullmatch(r"\[\s*([A-Za-z][A-Za-z0-9]*)\s*\]", token.strip())
+    if not match:
+        raise AssemblerError(
+            f"{line.path}:{line.line_no}: expected pointer register reference, got {token!r}"
+        )
+    return parse_register(match.group(1), line)
 
 
 def parse_mem_ref(token: str, labels: dict[str, int], line: SourceLine) -> tuple[int, int]:
     match = re.fullmatch(
-        r"\[\s*([rR][0-9]+)(?:\s*([+-])\s*([A-Za-z_][A-Za-z0-9_]*|0x[0-9A-Fa-f]+|0b[01]+|[0-9]+))?\s*\]",
+        r"\[\s*([A-Za-z][A-Za-z0-9]*)(?:\s*([+-])\s*([A-Za-z_][A-Za-z0-9_]*|0x[0-9A-Fa-f]+|0b[01]+|[0-9]+))?\s*\]",
         token.strip(),
     )
     if not match:
@@ -165,15 +194,15 @@ def collect_labels(lines: list[SourceLine]) -> tuple[dict[str, int], list[Source
 
     for line in lines:
         text = line.text
-        while ":" in text:
-            label, rest = text.split(":", 1)
-            label = label.strip()
-            if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", label):
-                raise AssemblerError(f"{line.path}:{line.line_no}: invalid label {label!r}")
+        while True:
+            label_match = re.match(r"^([A-Za-z_][A-Za-z0-9_]*):(?:\s*|$)", text)
+            if not label_match:
+                break
+            label = label_match.group(1)
             if label in labels:
                 raise AssemblerError(f"{line.path}:{line.line_no}: duplicate label {label!r}")
             labels[label] = pc
-            text = rest.strip()
+            text = text[label_match.end():].strip()
             if not text:
                 break
         if text:
@@ -257,6 +286,16 @@ def encode_tool(mnemonic: str, operands: list[str], labels: dict[str, int], line
         rb, off6 = parse_mem_ref(operands[1], labels, line)
         return (CLASS_TOOL << 30) | (opcode << 26) | (ra << 20) | (rb << 14) | (off6 << 8)
 
+    if mnemonic == "MCP":
+        expect_count(operands, 2, mnemonic, line)
+        rb = parse_pointer_ref(operands[0], line)
+        mmio, address = parse_direct_addr(operands[1], labels, line)
+        if mmio:
+            raise AssemblerError(
+                f"{line.path}:{line.line_no}: MCP source must be ordinary memory scratch"
+            )
+        return (CLASS_TOOL << 30) | (opcode << 26) | (rb << 20) | (address << 9)
+
     if mnemonic == "CALL":
         expect_count(operands, 1, mnemonic, line)
         target = require_range(parse_int(operands[0], labels, line), 0, PC_MAX, "target8", line)
@@ -315,14 +354,14 @@ def encode_memory(
     if mnemonic in {"MVF", "MVT"}:
         expect_count(operands, 2, mnemonic, line)
         ra = parse_register(operands[0], line)
-        addr = parse_mem_addr(operands[1], labels, line)
-        return (CLASS_MEM << 30) | (opcode << 28) | (ra << 22) | (addr << 10)
+        mmio, addr = parse_direct_addr(operands[1], labels, line)
+        return (CLASS_MEM << 30) | (opcode << 28) | (ra << 22) | (mmio << 21) | (addr << 10)
 
     if mnemonic == "MSI":
         expect_count(operands, 2, mnemonic, line)
-        addr = parse_mem_addr(operands[0], labels, line)
+        mmio, addr = parse_direct_addr(operands[0], labels, line)
         imm16 = require_range(parse_int(operands[1], labels, line), 0, IMM16_MAX, "imm16", line)
-        return (CLASS_MEM << 30) | (opcode << 28) | (addr << 16) | imm16
+        return (CLASS_MEM << 30) | (opcode << 28) | (mmio << 27) | (addr << 16) | imm16
 
     raise AssemblerError(f"{line.path}:{line.line_no}: unsupported memory op {mnemonic}")
 

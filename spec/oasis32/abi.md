@@ -3,7 +3,7 @@
 Status: experimental planning draft.
 
 This ABI records early decisions needed for future C and C++ toolchain work on
-OASIS-32. It is not implemented by the current OASIS v0.1 toolchain.
+OASIS-32. It is not implemented by the current OASIS v1.0 toolchain.
 
 The companion toolchain-facing ABI note is
 [../../toolchain/abi/base32-baremetal-abi.md](../../toolchain/abi/base32-baremetal-abi.md).

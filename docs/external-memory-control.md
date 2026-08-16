@@ -1,9 +1,10 @@
 # External Memory Control
 
-Status: v0.2 design note.
+Status: updated for the v1.0 address-space boundary.
 
-OASIS Base-16T is a word-addressed 16-bit profile. The base architectural data
-memory is 4096 words in the current v0.2 draft tables, but implementations may
+OASIS Base-16T is a word-addressed 16-bit profile. Direct instructions reach
+2048 words in each of the ordinary-memory and MMIO spaces, while register-
+indirect pointers reach 32768 words per space. Implementations may
 attach larger or slower storage through an external memory controller.
 
 This document describes the expected contract for such controllers without

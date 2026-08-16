@@ -64,8 +64,8 @@ def main() -> int:
     for reloc in [
         "R_OASIS16_16",
         "R_OASIS16_ABS16",
-        "R_OASIS16_ADDR12",
-        "R_OASIS16_MSI_ADDR12",
+        "R_OASIS16_ADDR11",
+        "R_OASIS16_MSI_ADDR11",
         "R_OASIS16_TARGET8",
         "R_OASIS16_PCREL8",
         "R_OASIS16_CALL8",
@@ -77,8 +77,8 @@ def main() -> int:
     elf_bfd = (BINUTILS / "bfd" / "elf32-oasis16.c").read_text()
     for reloc in [
         "R_OASIS16_16",
-        "R_OASIS16_ADDR12",
-        "R_OASIS16_MSI_ADDR12",
+        "R_OASIS16_ADDR11",
+        "R_OASIS16_MSI_ADDR11",
         "R_OASIS16_TARGET8",
         "R_OASIS16_CALL8",
     ]:

@@ -213,9 +213,9 @@ def main() -> int:
             "ENUM\n"
             "  BFD_RELOC_OASIS16_16\n"
             "ENUMX\n"
-            "  BFD_RELOC_OASIS16_ADDR12\n"
+            "  BFD_RELOC_OASIS16_ADDR11\n"
             "ENUMX\n"
-            "  BFD_RELOC_OASIS16_MSI_ADDR12",
+            "  BFD_RELOC_OASIS16_MSI_ADDR11",
         )
         require_contains((binutils_src / "bfd" / "targets.c").read_text(), "&oasis16_elf32_vec")
         require_contains((binutils_src / "include" / "elf" / "common.h").read_text(), "EM_OASIS16")

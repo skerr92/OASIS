@@ -11,7 +11,7 @@ it from release notes or hardware documentation.
 | Implementation name | |
 | Repository or source package | |
 | Hardware target or simulator | |
-| OASIS version | v0.2 |
+| OASIS version | v1.0 |
 | Profile | Base-16 / Base-16T |
 | Report date | |
 | Commit, tag, or artifact ID | |
@@ -24,7 +24,9 @@ it from release notes or hardware documentation.
 | 32-bit instruction words | | |
 | 64 writable general purpose registers | | |
 | Word-addressed data memory | | |
-| `addr12` absolute data-memory operands | | |
+| Explicit `{mmio, addr11}` direct operands | | |
+| `{mmio, addr15}` Base-16T indirect pointers | | |
+| `MCP` scratch-to-far transfer, if Base-16T | | |
 | Base-16 instruction set | | |
 | Base-16T instruction set, if claimed | | |
 | Reset behavior | | |
@@ -36,6 +38,7 @@ it from release notes or hardware documentation.
 | ------ | ---- | ----- | ----- |
 | Instruction memory | | | |
 | Data memory | | | |
+| Scratch reservation | | | |
 | Stack | | | |
 | Heap, if provided | | | |
 | Memory-mapped IO | | | |
@@ -49,6 +52,7 @@ it from release notes or hardware documentation.
 | Programming image generation works | | |
 | GCC/binutils build or installed-toolchain smoke tests pass | | |
 | Base-16T ABI register roles followed, if claimed | | |
+| Scratch linker symbols and exclusion verified | | |
 | Stack frame and call/return behavior verified | | |
 | Runtime exit/debug observation convention documented | | |
 | C++ init-array and guard hooks available, if claimed | | |

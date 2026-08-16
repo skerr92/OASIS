@@ -24,9 +24,10 @@ Output formats:
 - One instruction per line
 - Comments start with `;`
 - Labels end with `:`
-- Registers are `r0` through `r63`
+- Registers are `r0` through `r63`; `sap` aliases `r59` and `sdata` aliases `r60`
 - Immediates may be decimal, `0b` binary, or `0x` hexadecimal
-- Absolute memory operands use brackets, such as `[0x001]`
+- Direct operands require an explicit space: `mem:[addr11]` or `io:[addr11]`
+- Far pointer immediates use `mem:addr15` or `io:addr15`
 - Base-16T register-relative memory operands use `[rN]`, `[rN + off6]`, or `[rN - off6]`
 
 Example:
@@ -36,8 +37,17 @@ start:
 MVI r1, 10
 MVI r2, 20
 ADD r1, r2
-MVT r1, [0x001]
+MVT r1, mem:[0x001]
 JMP start
+```
+
+The assembler rejects unqualified direct operands and addresses above
+`0x07ff`. A staged far write uses:
+
+```asm
+MVI sap, io:0x0100
+MSI mem:[0x0000], 0x1234
+MCP [sap], mem:[0x0000]
 ```
 
 ## Submodule Consumption

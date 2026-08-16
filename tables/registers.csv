@@ -58,8 +58,8 @@ r55,55,16,general
 r56,56,16,general
 r57,57,16,general
 r58,58,16,general
-r59,59,16,general
-r60,60,16,general
+r59,59,16,scratch/far-address pointer (sap) in Base-16T ABI
+r60,60,16,scratch transfer data (sdata) in Base-16T ABI
 r61,61,16,general
 r62,62,16,general
 r63,63,16,general

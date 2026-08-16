@@ -1,4 +1,4 @@
-# OASIS v0.1 Instruction Reference
+# OASIS v1.0 Instruction Reference
 
 These pages are generated from `tables/opcode-map.csv`.
 
@@ -15,6 +15,7 @@ These pages are generated from `tables/opcode-map.csv`.
 | `JGE` | [JGE.md](JGE.md) |
 | `JLTU` | [JLTU.md](JLTU.md) |
 | `JGEU` | [JGEU.md](JGEU.md) |
+| `MCP` | [MCP.md](MCP.md) |
 | `ADD` | [ADD.md](ADD.md) |
 | `SUB` | [SUB.md](SUB.md) |
 | `AND` | [AND.md](AND.md) |

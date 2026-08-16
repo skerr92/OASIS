@@ -9,7 +9,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-OUT = ROOT / "toolchain" / "generated" / "oasis-base16t-v0.2-draft.json"
+OUT = ROOT / "toolchain" / "generated" / "oasis-base16t-v1.0.json"
 
 
 def read_csv(path: Path) -> list[dict[str, str]]:
@@ -25,8 +25,8 @@ def main() -> int:
     toolchain_targets = read_csv(ROOT / "tables" / "toolchain-targets.csv")
 
     metadata = {
-        "profile": "oasis-base16t-v0.2-draft",
-        "base_profile": "oasis-base16-v0.2-draft",
+        "profile": "oasis-base16t-v1.0",
+        "base_profile": "oasis-base16-v1.0",
         "target_triple": "oasis16-unknown-none",
         "gcc_target_triple": "oasis16-unknown-elf",
         "tool_alias": "oasis16-elf",
@@ -34,8 +34,10 @@ def main() -> int:
         "instruction_width": 32,
         "program_counter_width": 8,
         "register_count": 64,
-        "data_address_width": 12,
-        "status": "experimental-draft",
+        "direct_address_width": 11,
+        "pointer_address_width": 15,
+        "address_space_bit": 1,
+        "status": "baseline",
         "opcodes": opcodes,
         "registers": registers,
         "encoding_fields": encoding_fields,

@@ -1,0 +1,14 @@
+name: base16t_mcp
+profile: oasis-base16t-v1.0
+description: MCP copies an ordinary scratch word to a full-pointer MMIO destination.
+program:
+  - MVI sap, io:0x0100
+  - MSI mem:[0x0000], 0x1234
+  - MCP [sap], mem:[0x0000]
+expect:
+  registers:
+    r59: 0x8100
+  memory:
+    0x0000: 0x1234
+  mmio:
+    0x0100: 0x1234

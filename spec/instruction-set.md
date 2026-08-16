@@ -1,25 +1,25 @@
 # Instruction Set
 
-The OASIS v0.1 instruction set is intentionally small. It should be frozen and
-tested before new operations are added.
+The OASIS v1.0 instruction set is intentionally small and forms the new
+compatibility baseline.
 
 ## Groups
 
 | Group | Instructions |
 | ----- | ------------ |
-| Toolchain | `ADI`, `SBI`, `LDR`, `STR`, `CALL`, `RET`, `JMR`, `JLT`, `JGE`, `JLTU`, `JGEU` |
+| Toolchain | `ADI`, `SBI`, `LDR`, `STR`, `CALL`, `RET`, `JMR`, `JLT`, `JGE`, `JLTU`, `JGEU`, `MCP` |
 | ALU | `ADD`, `SUB`, `AND`, `OOR`, `XOR`, `SHR`, `SHL`, `RTR`, `RTL`, `NOT`, `MLT` |
 | Branch | `JEQ`, `JNE`, `JMP`, `NOP` |
 | Register | `MVV`, `MVI` |
-| Memory | `MVF`, `MVT`, `MSI` |
+| Memory | `MVF`, `MVT`, `MSI` with explicit `mem:` or `io:` space |
 
 The toolchain group belongs to the Base-16T profile. Base-16T is Base-16 plus
 the instructions required for freestanding C and C++ compiler support.
 
 OASIS-32 draft instructions are planned separately under
-[oasis-v0.2-draft.md](oasis-v0.2-draft.md) and `tables/oasis32/`. They are
-experimental and do not change OASIS v0.1 Base-16/Base-16T instruction
-semantics.
+[oasis-v0.2-draft.md](oasis-v0.2-draft.md) and `tables/oasis32/`. They carry
+forward v1.0's explicit memory/MMIO distinction without sharing Base-16 binary
+encodings.
 
 See [../docs/instruction-expansion.md](../docs/instruction-expansion.md) for
 v0.2 notes on optional peripheral and implementation extension templates.

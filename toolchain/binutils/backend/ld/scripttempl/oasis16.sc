@@ -46,5 +46,8 @@ SECTIONS
   } > dmem
 
   PROVIDE(__stack_top = ORIGIN(dmem) + LENGTH(dmem) - 1);
+  PROVIDE(__oasis_scratch_start = 0x0000);
+  PROVIDE(__oasis_scratch_end = 0x0020);
+  PROVIDE(__oasis_scratch_words = 0x0020);
 }
 EOF

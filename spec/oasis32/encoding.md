@@ -24,7 +24,7 @@ Field meanings should remain as stable as possible across instruction formats:
 | `op` | `59:56` | Primary operation within the class |
 | `rd` | `55:48` | Destination register or source register for stores |
 | `ra` | `47:40` | First source or base register |
-| `rb` | `39:32` | Second source, mode, size, condition, or flags |
+| `rb` | `39:32` | Second source, address-space/size mode, condition, or flags |
 | `imm32` | `31:0` | Immediate, offset, function bits, or extension payload |
 
 ## Canonical Formats
@@ -51,3 +51,11 @@ immediates may use zero-extension or full 32-bit literal interpretation as
 defined by each instruction.
 
 `MVI rd, imm32` should directly materialize any 32-bit constant in Base-32T.
+
+## Memory Space Bit
+
+M-format instructions reserve a `space` bit in `space_size_flags`: `0` selects
+ordinary memory and `1` selects MMIO. This selector is independent of the full
+32-bit base and signed-offset calculation. The exact subfield position will be
+frozen with the Base-32 opcode table; implementations must not infer the space
+from the numeric address.

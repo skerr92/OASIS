@@ -16,6 +16,8 @@ Base-16T draft has assigned the first version of each item:
 - Stack pointer register: `r56`
 - Frame pointer register: `r57`
 - Return address register: `r58`
+- Scratch/far-address pointer register: `r59` (`sap`)
+- Scratch transfer register: `r60` (`sdata`)
 - Function call sequence: `CALL target8`
 - Function return sequence: `RET`
 - Argument registers: `r4` through `r11`
@@ -36,6 +38,7 @@ The v0.2 ABI work also defines:
 - stack-frame conventions for leaf and non-leaf functions
 - the first C++ ABI/runtime hook expectations
 - linker symbols for optional external memory, heap, and stack placement
+- linker symbols for the configurable ordinary-memory scratch block
 
 For v0.2, init/fini array range symbols are required for toolchain
 compatibility, but automatic constructor/destructor execution is an optional

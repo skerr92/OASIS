@@ -38,5 +38,6 @@ OASIS-32 should provide:
 
 - No RTL implementation is defined here.
 - No assembler or emulator implementation is required yet.
-- No OASIS v0.1 Base-16/Base-16T semantics are changed.
+- OASIS-32 preserves the OASIS v1.0 explicit memory/MMIO contract but defines
+  independent encodings and full-width addresses.
 - No privileged exception model is finalized.

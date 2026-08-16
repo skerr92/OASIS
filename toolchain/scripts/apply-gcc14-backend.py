@@ -111,8 +111,8 @@ def insert_reloc_docs(path: Path) -> bool:
     bad_addition = (
         "\n/* OASIS Base-16T relocations. */\n"
         "  BFD_RELOC_OASIS16_16,\n"
-        "  BFD_RELOC_OASIS16_ADDR12,\n"
-        "  BFD_RELOC_OASIS16_MSI_ADDR12,\n"
+        "  BFD_RELOC_OASIS16_ADDR11,\n"
+        "  BFD_RELOC_OASIS16_MSI_ADDR11,\n"
         "  BFD_RELOC_OASIS16_TARGET8,\n"
         "  BFD_RELOC_OASIS16_CALL8,\n"
     )
@@ -120,9 +120,9 @@ def insert_reloc_docs(path: Path) -> bool:
         "ENUMX\n"
         "  BFD_RELOC_OASIS16_16\n"
         "ENUMX\n"
-        "  BFD_RELOC_OASIS16_ADDR12\n"
+        "  BFD_RELOC_OASIS16_ADDR11\n"
         "ENUMX\n"
-        "  BFD_RELOC_OASIS16_MSI_ADDR12\n"
+        "  BFD_RELOC_OASIS16_MSI_ADDR11\n"
         "ENUMX\n"
         "  BFD_RELOC_OASIS16_TARGET8\n"
         "ENUMX\n"
@@ -135,9 +135,9 @@ def insert_reloc_docs(path: Path) -> bool:
         "ENUM\n"
         "  BFD_RELOC_OASIS16_16\n"
         "ENUMX\n"
-        "  BFD_RELOC_OASIS16_ADDR12\n"
+        "  BFD_RELOC_OASIS16_ADDR11\n"
         "ENUMX\n"
-        "  BFD_RELOC_OASIS16_MSI_ADDR12\n"
+        "  BFD_RELOC_OASIS16_MSI_ADDR11\n"
         "ENUMX\n"
         "  BFD_RELOC_OASIS16_TARGET8\n"
         "ENUMX\n"
@@ -428,8 +428,8 @@ def integrate_binutils(binutils_src: Path) -> list[str]:
             "  BFD_RELOC_UNUSED",
             (
                 "  BFD_RELOC_OASIS16_16,\n"
-                "  BFD_RELOC_OASIS16_ADDR12,\n"
-                "  BFD_RELOC_OASIS16_MSI_ADDR12,\n"
+                "  BFD_RELOC_OASIS16_ADDR11,\n"
+                "  BFD_RELOC_OASIS16_MSI_ADDR11,\n"
                 "  BFD_RELOC_OASIS16_TARGET8,\n"
                 "  BFD_RELOC_OASIS16_CALL8,\n"
             ),

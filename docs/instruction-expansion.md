@@ -1,12 +1,11 @@
 # Instruction Expansion
 
-This note records early v0.2 guidance for extending OASIS Base-16T without
-fragmenting implementation behavior. It is intentionally a template, not a final
-opcode allocation.
+This note records extension guidance for OASIS Base-16T without fragmenting
+implementation behavior. OASIS v1.0 has consumed one former exploration opcode.
 
 ## Goals
 
-- Keep v0.1 Base-16T compiler behavior stable.
+- Respect the v1.0 compatibility boundary.
 - Give implementation authors a repeatable pattern for peripheral instructions.
 - Preserve memory-mapped IO as the portable baseline.
 - Make optional extension profiles easy to advertise, test, and ignore.
@@ -14,7 +13,7 @@ opcode allocation.
 ## Class `00` Expansion Space
 
 Class `00` is reserved by Base-16 and defined by Base-16T for toolchain-facing
-instructions. v0.1 Base-16T currently uses these class `00` opcodes:
+instructions. v1.0 Base-16T uses these class `00` opcodes:
 
 | Opcode | Instruction |
 | ------ | ----------- |
@@ -29,18 +28,18 @@ instructions. v0.1 Base-16T currently uses these class `00` opcodes:
 | `1001` | `JGE` |
 | `1010` | `JLTU` |
 | `1011` | `JGEU` |
+| `1100` | `MCP` |
 
-The v0.2 exploration space is therefore:
+The remaining exploration space is therefore:
 
 | Opcode | Suggested Use |
 | ------ | ------------- |
 | `0000` | Escape, system, or extension-discovery prefix |
-| `1100` | Peripheral register access template |
 | `1101` | Peripheral block transfer or external-memory template |
 | `1110` | Interrupt/debug/control template |
 | `1111` | Vendor or implementation-defined escape template |
 
-These assignments are provisional. They should become architectural only after
+The remaining assignments are provisional. They should become architectural only after
 tables, assembler support, binutils support, and compliance tests exist.
 
 ## Peripheral Template

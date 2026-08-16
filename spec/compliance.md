@@ -9,6 +9,8 @@ Tests name the profile they target:
 - `oasis-base16t-v0.1-draft`
 - `oasis-base16-v0.2-draft`
 - `oasis-base16t-v0.2-draft`
+- `oasis-base16-v1.0`
+- `oasis-base16t-v1.0`
 
 Each instruction should have at least one basic test and one edge-case test where
 applicable.
@@ -35,9 +37,10 @@ applicable.
 | `NOP` | No architectural state change besides `pc` |
 | `MVV` | Copy source register to destination register |
 | `MVI` | Load immediate into register |
-| `MVF` | Load data memory into register |
-| `MVT` | Store register into data memory |
-| `MSI` | Store immediate into data memory |
+| `MVF` | Load explicitly selected memory or MMIO into register |
+| `MVT` | Store register into explicitly selected memory or MMIO |
+| `MSI` | Store immediate into explicitly selected memory or MMIO |
+| `MCP` | Copy ordinary scratch memory to a register-addressed memory/MMIO destination |
 
 ## YAML Format
 

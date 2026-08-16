@@ -51,6 +51,9 @@ SECTIONS
   __oasis_heap_end = ORIGIN(dmem) + LENGTH(dmem) - 1;
   PROVIDE(__oasis_extmem_start = 0);
   PROVIDE(__oasis_extmem_end = 0);
+  PROVIDE(__oasis_scratch_start = 0x0000);
+  PROVIDE(__oasis_scratch_end = 0x0020);
+  PROVIDE(__oasis_scratch_words = 0x0020);
   PROVIDE(__oasis_stack_top = ORIGIN(dmem) + LENGTH(dmem) - 1);
   PROVIDE(__stack_top = __oasis_stack_top);
 }

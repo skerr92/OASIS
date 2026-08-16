@@ -81,3 +81,12 @@ The C++ front end is available for freestanding experiments. The runtime now
 documents and installs initial init-array, guard-variable, pure-virtual, and
 heapless allocation hooks. Exceptions, RTTI, hosted libstdc++, threads, and OS
 syscalls remain outside the OASIS-16 v0.2 baseline.
+
+## v1.0 Memory And MMIO Pointers
+
+Base-16T v1.0 pointers encode `{mmio, addr15}`. The GCC backend continues to
+lower register-indirect accesses through `LDR` and `STR`; the pointer's high bit
+selects MMIO. Runtime headers provide `OASIS16_MEM_PTR(type, word)` and
+`OASIS16_MMIO_PTR(type, word)` so C/C++ source preserves the address-space
+choice explicitly. `r59`/`sap` and `r60`/`sdata` remain fixed compiler registers
+for far/staged transfer sequences.
