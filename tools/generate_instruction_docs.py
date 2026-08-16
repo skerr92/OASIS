@@ -28,6 +28,13 @@ ENCODING_BY_GROUP = {
         ("13:8", "off6", "signed word offset"),
         ("7:0", "reserved", "must be zero"),
     ],
+    "mem_copy": [
+        ("31:30", "class", "`00` toolchain class"),
+        ("29:26", "opcode", "instruction opcode"),
+        ("25:20", "rb", "destination `{mmio, addr15}` pointer register"),
+        ("19:9", "scratch11", "ordinary-memory scratch source"),
+        ("8:0", "reserved", "must be zero"),
+    ],
     "call": [
         ("31:30", "class", "`00` toolchain class"),
         ("29:26", "opcode", "instruction opcode"),
@@ -73,12 +80,19 @@ ENCODING_BY_GROUP = {
         ("21:16", "rb", "source register for MVV"),
         ("15:0", "imm16", "immediate value for MVI"),
     ],
-    "memory": [
+    "memory_reg": [
         ("31:30", "class", "`11` memory class"),
         ("29:28", "opcode", "instruction opcode"),
         ("27:22", "ra", "register for MVF/MVT"),
-        ("21:10", "addr12", "data-memory word address for MVF/MVT"),
-        ("27:16", "addr12", "data-memory word address for MSI"),
+        ("21", "mmio", "space selector for MVF/MVT"),
+        ("20:10", "addr11", "word address for MVF/MVT"),
+        ("9:0", "reserved", "must be zero"),
+    ],
+    "memory_immediate": [
+        ("31:30", "class", "`11` memory class"),
+        ("29:28", "opcode", "instruction opcode"),
+        ("27", "mmio", "space selector for MSI"),
+        ("26:16", "addr11", "word address for MSI"),
         ("15:0", "imm16", "immediate value for MSI"),
     ],
 }
@@ -147,7 +161,7 @@ Opcode: `{row['opcode']}`
         for row in rows
     )
     (INSTRUCTION_DIR / "README.md").write_text(
-        "# OASIS v0.1 Instruction Reference\n\n"
+        "# OASIS v1.0 Instruction Reference\n\n"
         "These pages are generated from `tables/opcode-map.csv`.\n\n"
         "| Instruction | Page |\n"
         "| ----------- | ---- |\n"

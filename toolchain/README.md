@@ -6,7 +6,7 @@ The first compiler target is a freestanding GCC 14 cross toolchain for
 
 ## Current Status
 
-The Base-16 assembler is implemented in `tools/oasis_asm.py`, and OASIS v0.1
+The Base-16 assembler is implemented in `tools/oasis_asm.py`, and OASIS v1.0
 now has a working initial GCC 14/binutils toolchain path for
 `oasis16-unknown-elf`.
 
@@ -59,7 +59,7 @@ Run:
 make generate
 ```
 
-This creates `toolchain/generated/oasis-base16t-v0.2-draft.json` from the source
+This creates `toolchain/generated/oasis-base16t-v1.0.json` from the source
 tables in `tables/`. Compiler backends, assemblers, emulators, and compliance
 harnesses should prefer generated metadata over hand-copying opcode constants.
 The metadata also includes the recommended programming access-port register map.

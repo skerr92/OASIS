@@ -9,6 +9,8 @@ Tests name the profile they target:
 - `oasis-base16t-v0.1-draft`
 - `oasis-base16-v0.2-draft`
 - `oasis-base16t-v0.2-draft`
+- `oasis-base16-v1.0`
+- `oasis-base16t-v1.0`
 
 Each instruction should have at least one basic test and one edge-case test where
 applicable.
@@ -35,9 +37,10 @@ applicable.
 | `NOP` | No architectural state change besides `pc` |
 | `MVV` | Copy source register to destination register |
 | `MVI` | Load immediate into register |
-| `MVF` | Load data memory into register |
-| `MVT` | Store register into data memory |
-| `MSI` | Store immediate into data memory |
+| `MVF` | Load explicitly selected memory or MMIO into register |
+| `MVT` | Store register into explicitly selected memory or MMIO |
+| `MSI` | Store immediate into explicitly selected memory or MMIO |
+| `MCP` | Copy ordinary scratch memory to a register-addressed memory/MMIO destination |
 
 ## YAML Format
 
@@ -87,6 +90,17 @@ expectations are checked by compliance tooling for shape and by the installed
 toolchain validation flow for actual ELF/linker availability. Valid symbol
 kinds are `runtime` for startup symbols and `linker` for symbols exported by the
 default linker script.
+
+## OASIS-16P Behavioral Model
+
+`tools/oasis16p_model.py` is the executable reference for the optional system
+block. `tools/test_oasis16p_model.py` checks reset privilege, software-trap
+entry, `TVAL`, `ERET`, interrupt masking and priority, `WFI` wake behavior, CSR
+operations, privilege violations, illegal encodings, and MMIO fault capture.
+
+The model owns only architectural system state. A conforming core or RTL harness
+still owns general registers, instruction retirement, memory/MMIO completion,
+and the precise faulting/next-PC inputs described in `exceptions.md`.
 
 ## Harness Requirements
 

@@ -9,7 +9,7 @@ the Base-16T toolchain profile.
 
 | Purpose | Name |
 | ------- | ---- |
-| ISA profile | `oasis-base16t-v0.2-draft` |
+| ISA profile | `oasis-base16t-v1.0` |
 | Generic bare-metal target | `oasis16-unknown-elf` |
 | GCC/binutils target alias | `oasis16-elf` |
 
@@ -25,7 +25,9 @@ the Base-16T toolchain profile.
 | `r56` | Stack pointer `sp` | Callee-saved |
 | `r57` | Frame pointer `fp` | Callee-saved |
 | `r58` | Return address `ra` | Caller-saved |
-| `r59` - `r63` | Reserved for toolchain, debug, or platform | Reserved |
+| `r59` / `sap` | Scratch/far-address pointer | Caller-saved |
+| `r60` / `sdata` | Scratch transfer value | Caller-saved |
+| `r61` - `r63` | Reserved for toolchain, debug, or platform | Reserved |
 
 ## Calling Convention
 
@@ -41,7 +43,9 @@ the Base-16T toolchain profile.
   return.
 - Callees that need nested calls must save `r58` before issuing another `CALL`.
 - Callees must preserve `r32` through `r57` if they modify them.
-- `r59` through `r63` must not be used by portable application code.
+- `r59` and `r60` are caller-saved ABI temporaries used by far-address and
+  staged-transfer expansions.
+- `r61` through `r63` must not be used by portable application code.
 
 ## C Data Model
 
@@ -54,7 +58,7 @@ The Base-16T C data model is intentionally small and freestanding:
 | `int` | 16 bits | 1 word | Natural scalar type |
 | `long` | 16 bits | 1 word | Initial GCC target model |
 | `long long` | 64 bits | 1 word | Compiler/libgcc helper backed |
-| pointer | 16 bits | 1 word | Data-memory word address unless qualified by a profile |
+| pointer | 16 bits | 1 word | `{mmio, addr15}` word address |
 
 Base-16T data memory is word-addressed, so byte addressing is not
 architecturally visible. `char` is therefore a 16-bit storage unit in the first
@@ -180,9 +184,15 @@ roles stable.
 
 ## External Memory And MMIO ABI Hooks
 
-Base-16T keeps the architectural data-memory address type at 16 bits. A core or
-SoC may attach external memory behind part of the 16-bit word-address space, but
-portable software must discover or be linked for that memory map explicitly.
+Base-16T keeps the architectural address type at 16 bits. Bit 15 selects
+ordinary memory (`0`) or MMIO (`1`); bits 14:0 select a word within that space.
+A core or SoC may attach external memory behind part of the ordinary-memory
+space, but portable software must discover or be linked for that map explicitly.
+
+The default ABI reserves ordinary-memory words `0x0000` through `0x001f` as a
+32-word scratch block. A platform may override the reservation, including its
+size and location, through its linker script. The corresponding MMIO addresses
+are not reserved.
 
 Expected linker symbols for implementations with external memory:
 
@@ -193,6 +203,9 @@ Expected linker symbols for implementations with external memory:
 | `__oasis_heap_start` | first heap word, if heap is available |
 | `__oasis_heap_end` | one past the last heap word |
 | `__oasis_stack_top` | initial stack pointer value |
+| `__oasis_scratch_start` | first reserved ordinary-memory scratch word |
+| `__oasis_scratch_end` | one past the final scratch word |
+| `__oasis_scratch_words` | number of reserved scratch words |
 
 An external-memory implementation may use memory-mapped control registers or an
 optional extension instruction profile. The C/C++ ABI should interact with it

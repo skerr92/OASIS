@@ -64,3 +64,17 @@ The active release checklist lives in
 
 Defer hosted libc, threads, operating-system ABIs, dynamic linking, and full
 libstdc++ until the v0.2 freestanding core/toolchain path is stable.
+
+## v1.0: Explicit MMIO Boundary
+
+- Split direct address operands into `{mmio, addr11}` for `MVF`, `MVT`, and
+  `MSI`.
+- Require explicit `mem:` or `io:` assembly syntax.
+- Define Base-16T `{mmio, addr15}` register-indirect pointers.
+- Reserve ordinary memory `0x0000`-`0x001f` as the default configurable scratch
+  block and publish its linker symbols.
+- Assign `r59`/`sap` and `r60`/`sdata` to far-transfer expansion.
+- Add `MCP` at Base-16T class/opcode `00:1100` for explicit scratch-to-far
+  memory or MMIO transfer.
+- End v0.x compatibility at this encoding boundary and carry the space-selection
+  contract into OASIS-32 without inheriting Base-16's address-width compromise.

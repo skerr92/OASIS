@@ -2,9 +2,9 @@ name: memory_basic
 profile: oasis-base16-v0.1-draft
 description: Immediate store, load, and register store behavior.
 program:
-  - MSI [0x001], 0x1234
-  - MVF r1, [0x001]
-  - MVT r1, [0x002]
+  - MSI mem:[0x001], 0x1234
+  - MVF r1, mem:[0x001]
+  - MVT r1, mem:[0x002]
 expect:
   registers:
     r1: 0x1234

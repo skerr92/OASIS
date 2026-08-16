@@ -26,6 +26,9 @@ Future OASIS-32 compliance should be generated from:
 | Calls | `CALL`, `RET`, indirect jumps |
 | ABI | argument passing, return values, stack alignment |
 | Illegal instructions | reserved class/op decode behavior |
+| Privilege | User/Machine access checks and system-register protection |
+| Traps | precise `EPC`, `CAUSE`, `TVAL`, direct vector entry, and `ERET` |
+| Interrupts | masking, pending state, deterministic priority, and `WFI` wake |
 
 ## Emulator First
 

@@ -96,12 +96,14 @@ def main() -> int:
         "hex",
     )
     assert_file(
-        ROOT / "tests" / "assembler" / "memory_addr12.oas",
-        ROOT / "tests" / "assembler" / "memory_addr12.expected.hex",
+        ROOT / "tests" / "assembler" / "memory_space_addr11.oas",
+        ROOT / "tests" / "assembler" / "memory_space_addr11.expected.hex",
         "hex",
     )
     assert_error("MVI r64, 1\n", "register 64 out of range")
-    assert_error("MVT r1, [0x1000]\n", "memory address 4096 out of range")
+    assert_error("MVT r1, [0x001]\n", "expected explicit mem:[addr11] or io:[addr11]")
+    assert_error("MVT r1, mem:[0x800]\n", "direct address 2048 out of range")
+    assert_error("MCP [sap], io:[0]\n", "MCP source must be ordinary memory scratch")
     assert_error("LDR r1, [r56 + 32]\n", "off6 32 out of range")
     assert_program_image(
         ROOT / "examples" / "base16" / "add_store.oas",

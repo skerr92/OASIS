@@ -1,6 +1,6 @@
 # OASIS Toolchain Plan
 
-The v0.1 toolchain baseline is in place. The assembler, ELF conversion,
+The v1.0 toolchain baseline is in place. The assembler, ELF conversion,
 GCC/binutils backend files, runtime pieces, build scripts, validation scripts,
 and release packaging scripts are now part of the repository.
 
@@ -13,7 +13,7 @@ Available now:
 - ELF-to-program-image converter: `bin/oasis-elf2img`
 - Darwin and Linux GCC 14 build wrappers
 - Installed-toolchain C/C++ smoke-test runner
-- Machine-readable ISA metadata: `toolchain/generated/oasis-base16t-v0.2-draft.json`
+- Machine-readable ISA metadata: `toolchain/generated/oasis-base16t-v1.0.json`
 - Opcode, register, encoding, and programming tables in `tables/`
 
 Not available yet:
@@ -29,6 +29,7 @@ class `00` for ABI-friendly operations:
 
 - `ADI` and `SBI` for stack adjustment and immediate arithmetic
 - `LDR` and `STR` for register-indirect memory access
+- `MCP` for explicit scratch-to-far memory/MMIO transfer
 - `CALL`, `RET`, and `JMR` for function control flow
 - `JLT`, `JGE`, `JLTU`, and `JGEU` for signed and unsigned C comparisons
 
@@ -47,7 +48,7 @@ Status: implemented.
 
 ### 2. ABI Draft
 
-Status: Base-16T v0.2 baseline defined.
+Status: Base-16T v1.0 baseline defined.
 
 Defined:
 
@@ -62,6 +63,7 @@ Defined:
 - C data model
 - C++ freestanding hooks
 - External-memory linker symbols
+- Explicit memory/MMIO pointer convention and scratch linker symbols
 
 See `toolchain/abi/base16-baremetal-abi.md`.
 
@@ -103,7 +105,7 @@ are the ELF path for normal GCC workflows.
 
 ### 6. GCC 14 Backend
 
-Status: implemented for the v0.1 freestanding baseline and covered by the
+Status: implemented for the v1.0 freestanding baseline and covered by the
 release build workflow.
 
 Initial goal:

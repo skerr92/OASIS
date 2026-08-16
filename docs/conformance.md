@@ -10,6 +10,8 @@ An implementation should claim the highest profile it fully implements and tests
 | Base-16T v0.1 | Implements Base-16 plus every v0.1 class `00` toolchain instruction |
 | Base-16 v0.2 | Implements Base-16 with `addr12` data-memory operands |
 | Base-16T v0.2 | Implements Base-16 v0.2 plus the Base-16T ABI/toolchain instruction set |
+| Base-16 v1.0 | Implements explicit `{mmio, addr11}` direct memory/MMIO operations |
+| Base-16T v1.0 | Implements Base-16 v1.0 plus `{mmio, addr15}` indirect pointers, `MCP`, and the scratch ABI |
 
 ## Status Labels
 
@@ -46,6 +48,8 @@ Suggested badge text:
 - `OASIS Base-16T v0.1: Tested`
 - `OASIS Base-16 v0.2: Tested`
 - `OASIS Base-16T v0.2: Tested`
+- `OASIS Base-16 v1.0: Tested`
+- `OASIS Base-16T v1.0: Tested`
 
 Do not claim a profile until every instruction in that profile is implemented
 and covered by passing compliance tests.

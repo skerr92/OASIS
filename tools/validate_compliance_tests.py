@@ -23,6 +23,9 @@ VALID_PROFILES = {
     "oasis-base16t-v0.1-draft",
     "oasis-base16-v0.2-draft",
     "oasis-base16t-v0.2-draft",
+    "oasis-base16-v1.0",
+    "oasis-base16t-v1.0",
+    "oasis-base16p-v1.0",
 }
 
 
@@ -195,6 +198,9 @@ def validate_symbol_expectation(path: Path, text: str, errors: list[str]) -> Non
         "__oasis_extmem_start": "linker",
         "__oasis_extmem_end": "linker",
         "__oasis_stack_top": "linker",
+        "__oasis_scratch_start": "linker",
+        "__oasis_scratch_end": "linker",
+        "__oasis_scratch_words": "linker",
     }
 
     keys = mapping_keys(symbol_block, 4)

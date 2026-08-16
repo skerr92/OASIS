@@ -1,0 +1,8 @@
+mnemonic,class,opcode,subop,syntax,privilege,operation
+TRAP,00,1110,0000,TRAP imm8,U,enter Machine mode with software-trap cause and resume at following instruction
+ERET,00,1110,0001,ERET,M,restore saved privilege interrupt enable and program counter
+WFI,00,1110,0010,WFI,M,wait until an interrupt or permitted resume event
+CSRR,00,1110,0011,"CSRR ra, csr8",per-register,read system register into ra
+CSRW,00,1110,0100,"CSRW ra, csr8",per-register,write ra to system register
+CSRS,00,1110,0101,"CSRS ra, csr8",per-register,atomically set system-register bits selected by ra
+CSRC,00,1110,0110,"CSRC ra, csr8",per-register,atomically clear system-register bits selected by ra

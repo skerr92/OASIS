@@ -1,0 +1,26 @@
+kind,id,name,tval,description
+exception,0x01,ILLEGAL_INSTRUCTION,instruction,invalid reserved or unsupported instruction encoding
+exception,0x02,PRIVILEGE_VIOLATION,instruction,operation or system register is not allowed in current mode
+exception,0x03,INSTRUCTION_ACCESS_FAULT,address,instruction fetch failed
+exception,0x04,LOAD_ACCESS_FAULT,address,ordinary-memory load failed
+exception,0x05,STORE_ACCESS_FAULT,address,ordinary-memory store failed
+exception,0x06,MMIO_ACCESS_FAULT,address,MMIO read or write failed
+exception,0x07,BREAKPOINT,zero,debug breakpoint trap
+exception,0x08,SOFTWARE_TRAP,immediate,TRAP instruction executed with zero-extended imm8 in TVAL
+exception,0x09,ALIGNMENT_FAULT,address,access or instruction address violates profile alignment
+interrupt,0x00,SOFTWARE_INTERRUPT,zero,standard software interrupt source
+interrupt,0x01,TIMER_INTERRUPT,zero,standard timer interrupt source
+interrupt,0x02,EXTERNAL_INTERRUPT_0,zero,platform external interrupt source 0
+interrupt,0x03,EXTERNAL_INTERRUPT_1,zero,platform external interrupt source 1
+interrupt,0x04,EXTERNAL_INTERRUPT_2,zero,platform external interrupt source 2
+interrupt,0x05,EXTERNAL_INTERRUPT_3,zero,platform external interrupt source 3
+interrupt,0x06,EXTERNAL_INTERRUPT_4,zero,platform external interrupt source 4
+interrupt,0x07,EXTERNAL_INTERRUPT_5,zero,platform external interrupt source 5
+interrupt,0x08,EXTERNAL_INTERRUPT_6,zero,platform external interrupt source 6
+interrupt,0x09,EXTERNAL_INTERRUPT_7,zero,platform external interrupt source 7
+interrupt,0x0a,EXTERNAL_INTERRUPT_8,zero,platform external interrupt source 8
+interrupt,0x0b,EXTERNAL_INTERRUPT_9,zero,platform external interrupt source 9
+interrupt,0x0c,EXTERNAL_INTERRUPT_10,zero,platform external interrupt source 10
+interrupt,0x0d,EXTERNAL_INTERRUPT_11,zero,platform external interrupt source 11
+interrupt,0x0e,EXTERNAL_INTERRUPT_12,zero,platform external interrupt source 12
+interrupt,0x0f,EXTERNAL_INTERRUPT_13,zero,platform external interrupt source 13

@@ -1,7 +1,7 @@
 format,description,bits_63_60,bits_59_56,bits_55_48,bits_47_40,bits_39_32,bits_31_0
 R,register-register operation,class,op,rd,ra,rb,func_or_flags
 I,register-immediate operation,class,op,rd,ra,subop_or_flags,imm32
-M,memory base-plus-offset operation,class,op,rd_or_rs,base,mode_size_flags,signed_offset32
+M,memory base-plus-offset operation,class,op,rd_or_rs,base,space_size_flags,signed_offset32
 B,conditional branch,class,condition,ra,rb,flags,signed_pc_relative_offset32
 J,jump call and indirect control flow,class,op,rd_or_link,base,flags,signed_offset_or_target32
 U,constant and immediate construction,class,op,rd,flags_hi,flags_lo,imm32

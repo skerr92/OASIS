@@ -47,6 +47,9 @@ def main() -> int:
         "OASIS16_STACK_POINTER_REGNUM 56",
         "OASIS16_FRAME_POINTER_REGNUM 57",
         "OASIS16_RETURN_ADDRESS_REGNUM 58",
+        "OASIS16_SCRATCH_ADDRESS_REGNUM 59",
+        "OASIS16_SCRATCH_DATA_REGNUM 60",
+        '"r59", "r60"',
         "CALL_USED_REGISTERS",
         "REGNO_OK_FOR_BASE_P",
         "INITIAL_ELIMINATION_OFFSET",
@@ -117,6 +120,8 @@ def main() -> int:
     for token in [
         "__oasis_init_array_start",
         "__oasis_extmem_start",
+        "__oasis_scratch_start",
+        "OASIS16_MMIO_PTR",
         "__cxa_guard_acquire",
         "__cxa_pure_virtual",
     ]:

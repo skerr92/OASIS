@@ -1,6 +1,6 @@
 # OASIS Base-16T
 
-Base-16T is the OASIS v0.1 toolchain profile. It extends Base-16 with the
+Base-16T is the OASIS v1.0 toolchain profile. It extends Base-16 with the
 minimum ISA mechanisms needed for freestanding C and C++ compiler targets.
 
 ## Relationship To Base-16
@@ -23,6 +23,7 @@ reserved by Base-16.
 | Indirect control flow | `JMR` |
 | Signed comparisons | `JLT`, `JGE` |
 | Unsigned comparisons | `JLTU`, `JGEU` |
+| Scratch-to-far transfer | `MCP` |
 
 ## Encoding Formats
 
@@ -46,6 +47,19 @@ Register-indirect memory:
 | `[19:14]` | base register `rb` |
 | `[13:8]` | signed word offset `off6` |
 | `[7:0]` | reserved |
+
+Register-indirect memory interprets `rb` as `{mmio, addr15}`. The signed offset
+applies to `addr15` without changing `mmio`.
+
+Scratch-to-far memory copy:
+
+| Bits | Field |
+| ---- | ----- |
+| `[31:30]` | `00` class |
+| `[29:26]` | `1100` MCP opcode |
+| `[25:20]` | destination pointer `rb` |
+| `[19:9]` | ordinary-memory `scratch11` source |
+| `[8:0]` | reserved |
 
 Toolchain branch:
 

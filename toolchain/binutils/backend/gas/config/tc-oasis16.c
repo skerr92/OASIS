@@ -68,6 +68,16 @@ parse_register(char *input, unsigned int *regno)
   long value;
 
   input = skip_space(input);
+  if (strncasecmp(input, "sap", 3) == 0 && !ISALNUM(input[3]) && input[3] != '_')
+    {
+      *regno = 59;
+      return skip_space(input + 3);
+    }
+  if (strncasecmp(input, "sdata", 5) == 0 && !ISALNUM(input[5]) && input[5] != '_')
+    {
+      *regno = 60;
+      return skip_space(input + 5);
+    }
   if (*input != 'r' && *input != 'R')
     {
       as_bad(_("expected register"));
@@ -107,8 +117,24 @@ expression_is_constant(expressionS *expression_p, int *value)
 }
 
 static char *
-parse_addr12(char *input, expressionS *expression_p)
+parse_space_addr11(char *input, expressionS *expression_p, unsigned int *mmio)
 {
+  input = skip_space(input);
+  if (strncasecmp(input, "mem:", 4) == 0)
+    {
+      *mmio = 0;
+      input += 4;
+    }
+  else if (strncasecmp(input, "io:", 3) == 0)
+    {
+      *mmio = 1;
+      input += 3;
+    }
+  else
+    {
+      as_bad(_("expected explicit mem: or io: address space"));
+      return input;
+    }
   input = skip_space(input);
   if (*input != '[')
     {
@@ -163,13 +189,13 @@ reloc_for_operand(const struct oasis16_opcode *opcode)
     {
     case OASIS16_OPERANDS_RA_IMM16:
       return BFD_RELOC_OASIS16_16;
-    case OASIS16_OPERANDS_ADDR12_IMM16:
-      return BFD_RELOC_OASIS16_MSI_ADDR12;
+    case OASIS16_OPERANDS_SPACE_ADDR11_IMM16:
+      return BFD_RELOC_OASIS16_MSI_ADDR11;
     case OASIS16_OPERANDS_TARGET8:
     case OASIS16_OPERANDS_RA_RB_TARGET8:
       return BFD_RELOC_OASIS16_CALL8;
-    case OASIS16_OPERANDS_RA_ADDR12:
-      return BFD_RELOC_OASIS16_ADDR12;
+    case OASIS16_OPERANDS_RA_SPACE_ADDR11:
+      return BFD_RELOC_OASIS16_ADDR11;
     default:
       return BFD_RELOC_NONE;
     }
@@ -249,14 +275,34 @@ md_assemble(char *str)
       break;
 
     case OASIS16_OPERANDS_RA_IMM16:
+      {
+        int pointer_space = -1;
+
       input = parse_register(input, &operands.ra);
       input = skip_comma(input);
+      if (strncasecmp(input, "mem:", 4) == 0)
+        {
+          pointer_space = 0;
+          input = skip_space(input + 4);
+        }
+      else if (strncasecmp(input, "io:", 3) == 0)
+        {
+          pointer_space = 1;
+          input = skip_space(input + 3);
+        }
       input = parse_absolute(input, &reloc_expr);
       if (expression_is_constant(&reloc_expr, &value))
-        operands.immediate = value;
+        {
+          if (pointer_space >= 0 && (value < 0 || value > 0x7fff))
+            as_bad(_("far pointer address must fit in 15 bits"));
+          operands.immediate = value | (pointer_space == 1 ? 0x8000 : 0);
+        }
+      else if (pointer_space >= 0)
+        as_bad(_("explicit far pointer must be absolute"));
       else
         reloc_ptr = &reloc_expr;
       break;
+      }
 
     case OASIS16_OPERANDS_RA_RB_TARGET8:
       input = parse_register(input, &operands.ra);
@@ -282,18 +328,18 @@ md_assemble(char *str)
       input = parse_register(input, &operands.rb);
       break;
 
-    case OASIS16_OPERANDS_RA_ADDR12:
+    case OASIS16_OPERANDS_RA_SPACE_ADDR11:
       input = parse_register(input, &operands.ra);
       input = skip_comma(input);
-      input = parse_addr12(input, &reloc_expr);
+      input = parse_space_addr11(input, &reloc_expr, &operands.mmio);
       if (expression_is_constant(&reloc_expr, &value))
         operands.address = (unsigned int) value;
       else
         reloc_ptr = &reloc_expr;
       break;
 
-    case OASIS16_OPERANDS_ADDR12_IMM16:
-      input = parse_addr12(input, &reloc_expr);
+    case OASIS16_OPERANDS_SPACE_ADDR11_IMM16:
+      input = parse_space_addr11(input, &reloc_expr, &operands.mmio);
       if (expression_is_constant(&reloc_expr, &value))
         operands.address = (unsigned int) value;
       else
@@ -309,6 +355,42 @@ md_assemble(char *str)
       input = parse_register(input, &operands.ra);
       input = skip_comma(input);
       input = parse_reg_offset_mem(input, &operands.rb, &operands.offset);
+      break;
+
+    case OASIS16_OPERANDS_RB_SCRATCH11:
+      input = skip_space(input);
+      if (*input != '[')
+        as_bad(_("expected '[' before MCP destination register"));
+      else
+        input++;
+      input = parse_register(input, &operands.rb);
+      if (*input != ']')
+        as_bad(_("expected ']' after MCP destination register"));
+      else
+        input++;
+      input = skip_comma(input);
+      input = parse_space_addr11(input, &tmp_expr, &operands.mmio);
+      if (operands.mmio != 0)
+        as_bad(_("MCP source must be ordinary memory scratch"));
+      if (!expression_is_constant(&tmp_expr, &value))
+        as_bad(_("MCP scratch source must be absolute"));
+      operands.address = (unsigned int) value;
+      break;
+
+    case OASIS16_OPERANDS_TRAP_IMM8:
+      input = parse_absolute(input, &tmp_expr);
+      if (!expression_is_constant(&tmp_expr, &value))
+        as_bad(_("TRAP immediate must be absolute"));
+      operands.immediate = value;
+      break;
+
+    case OASIS16_OPERANDS_RA_CSR8:
+      input = parse_register(input, &operands.ra);
+      input = skip_comma(input);
+      input = parse_absolute(input, &tmp_expr);
+      if (!expression_is_constant(&tmp_expr, &value))
+        as_bad(_("system-register ID must be absolute"));
+      operands.csr = (unsigned int) value;
       break;
     }
 
@@ -344,11 +426,11 @@ md_apply_fix(fixS *fixP, valueT *valP, segT seg ATTRIBUTE_UNUSED)
     case BFD_RELOC_OASIS16_16:
       instruction |= value & 0xffff;
       break;
-    case BFD_RELOC_OASIS16_ADDR12:
-      instruction |= (value & 0xfff) << 10;
+    case BFD_RELOC_OASIS16_ADDR11:
+      instruction |= (value & 0x7ff) << 10;
       break;
-    case BFD_RELOC_OASIS16_MSI_ADDR12:
-      instruction |= (value & 0xfff) << 16;
+    case BFD_RELOC_OASIS16_MSI_ADDR11:
+      instruction |= (value & 0x7ff) << 16;
       break;
     case BFD_RELOC_OASIS16_CALL8:
       instruction |= (value & 0xff) << 6;

@@ -14,5 +14,5 @@ OASIS-32M,0xA,MULDIV,draft,multiply divide and remainder operations
 OASIS-32A,0xB,ATOMIC,reserved,atomics and memory ordering
 OASIS-32C,0xC,CUSTOM,reserved,custom and vendor extension namespace
 OASIS-32V,0xD,VECTOR,reserved,vector and SIMD operations
-OASIS-32P,0xE,PRIVILEGED,reserved,privileged and system operations
+OASIS-32P,0xE,PRIVILEGED,draft,interrupt trap privilege return wait and system-register operations
 OASIS-32X,0xF,EXTENDED,reserved,escape and future extended encodings

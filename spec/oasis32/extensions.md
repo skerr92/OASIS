@@ -25,9 +25,16 @@ keeps the base profile small while giving future profiles stable places to grow.
 - Implementations must document every non-base extension they advertise.
 - Standard extensions must include compliance tests before being marked stable.
 
+## OASIS-32P Baseline
+
+OASIS-32P uses the common interrupt, trap, privilege, system-register, and cause
+contract in [../exceptions.md](../exceptions.md). It defines User and Machine
+modes, precise direct-vector trap entry, 16 standard interrupt inputs, `TRAP`,
+`ERET`, `WFI`, and CSR read/modify/write operations.
+
 ## Illegal Instruction Behavior
 
 Base-32 implementations without a privileged trap model may halt or enter an
 implementation-defined error state on illegal instruction decode.
 
-Future privileged profiles should raise an illegal-instruction exception.
+OASIS-32P implementations raise an illegal-instruction exception.

@@ -11,6 +11,7 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 OPCODE_TABLE = ROOT / "tables" / "opcode-map.csv"
+P_OPCODE_TABLE = ROOT / "tables" / "oasis16p-opcode-map.csv"
 BINUTILS = ROOT / "toolchain" / "binutils" / "backend"
 
 
@@ -19,6 +20,9 @@ def main() -> int:
 
     with OPCODE_TABLE.open(newline="") as table:
         isa_mnemonics = {row["mnemonic"].upper() for row in csv.DictReader(table)}
+    with P_OPCODE_TABLE.open(newline="") as table:
+        p_mnemonics = {row["mnemonic"].upper() for row in csv.DictReader(table)}
+    expected_mnemonics = isa_mnemonics | p_mnemonics
 
     opcode_c = (BINUTILS / "opcodes" / "oasis16-opc.c").read_text()
     backend_mnemonics = {
@@ -26,8 +30,8 @@ def main() -> int:
         for match in re.finditer(r'\{\s*"([A-Za-z0-9]+)"\s*,', opcode_c)
     }
 
-    missing = isa_mnemonics - backend_mnemonics
-    extra = backend_mnemonics - isa_mnemonics
+    missing = expected_mnemonics - backend_mnemonics
+    extra = backend_mnemonics - expected_mnemonics
     if missing:
         errors.append("binutils opcode table missing: " + ", ".join(sorted(missing)))
     if extra:
@@ -64,8 +68,8 @@ def main() -> int:
     for reloc in [
         "R_OASIS16_16",
         "R_OASIS16_ABS16",
-        "R_OASIS16_ADDR12",
-        "R_OASIS16_MSI_ADDR12",
+        "R_OASIS16_ADDR11",
+        "R_OASIS16_MSI_ADDR11",
         "R_OASIS16_TARGET8",
         "R_OASIS16_PCREL8",
         "R_OASIS16_CALL8",
@@ -77,8 +81,8 @@ def main() -> int:
     elf_bfd = (BINUTILS / "bfd" / "elf32-oasis16.c").read_text()
     for reloc in [
         "R_OASIS16_16",
-        "R_OASIS16_ADDR12",
-        "R_OASIS16_MSI_ADDR12",
+        "R_OASIS16_ADDR11",
+        "R_OASIS16_MSI_ADDR11",
         "R_OASIS16_TARGET8",
         "R_OASIS16_CALL8",
     ]:
@@ -100,7 +104,10 @@ def main() -> int:
             print(error, file=sys.stderr)
         return 1
 
-    print(f"validated binutils backend for {len(isa_mnemonics)} mnemonics")
+    print(
+        f"validated binutils backend for {len(isa_mnemonics)} base and "
+        f"{len(p_mnemonics)} OASIS-16P mnemonics"
+    )
     return 0
 
 

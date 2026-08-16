@@ -2,13 +2,24 @@
 
 OASIS Base-16 defines separate instruction and data memory spaces.
 
-| Memory | Addressing | Width | v0.2 size |
+| Memory | Addressing | Width | v1.0 direct reach |
 | ------ | ---------- | ----- | --------- |
 | Instruction memory | Instruction index | 32-bit instruction | 256 instructions |
-| Data memory | Word index | 16-bit word | 4096 words |
+| Data memory | Word index | 16-bit word | 2048 words |
+| MMIO | Word index | 16-bit word/register | 2048 words |
 
 Data memory is word-addressed in Base-16. Byte ordering is not architecturally
 visible because the base profile only defines whole-word accesses.
+
+Ordinary data memory and MMIO are distinct architectural spaces. Direct memory
+instructions encode `{mmio, addr11}`. Register-indirect Base-16T pointers encode
+`mmio` in bit 15 and a 15-bit word address in bits 14:0. Signed `LDR`/`STR`
+offsets apply within the selected space and wrap modulo 32768 without changing
+the space bit.
+
+The default Base-16T ABI reserves ordinary-memory words `0x0000` through
+`0x001f` for scratch transfers. This is a linker/platform convention rather
+than hardwired CPU memory; implementations may publish an overridden range.
 
 The program counter stores an 8-bit instruction index. Jump targets are absolute
 8-bit instruction indexes.

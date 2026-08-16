@@ -2,12 +2,12 @@
 
 ## Summary
 
-Loads a data-memory word into ra.
+Loads a word from explicit ordinary memory or MMIO.
 
 ## Syntax
 
 ```asm
-MVF ra, [addr12]
+MVF ra, space:[addr11]
 ```
 
 ## Encoding
@@ -21,30 +21,31 @@ Opcode: `01`
 | `31:30` | `class` | `11` memory class |
 | `29:28` | `opcode` | instruction opcode |
 | `27:22` | `ra` | register for MVF/MVT |
-| `21:10` | `addr12` | data-memory word address for MVF/MVT |
-| `27:16` | `addr12` | data-memory word address for MSI |
-| `15:0` | `imm16` | immediate value for MSI |
+| `21` | `mmio` | space selector for MVF/MVT |
+| `20:10` | `addr11` | word address for MVF/MVT |
+| `9:0` | `reserved` | must be zero |
 
 ## Operation
 
 ```text
-ra = memory[addr12]
+ra = space[mmio][addr11]
 ```
 
 ## Effects
 
 - Writes ra
-- reads memory
+- reads memory or MMIO
 - does not branch
 - flags: none.
 
 ## Edge Cases
 
-- Address is a 12-bit word index
+- Space must be mem or io
+- address is an 11-bit word index
 - reserved bits must be zero.
 
 ## Example
 
 ```asm
-MVF r1, [0x001]
+MVF r1, mem:[0x001]
 ```
