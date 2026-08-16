@@ -1,0 +1,10 @@
+id,name,access,min_privilege,reset,description
+0x00,STATUS,RW,M,0x0004,interrupt enable saved state current and previous privilege and WFI state
+0x01,TVEC,RW,M,0x0000,direct trap handler instruction address
+0x02,EPC,RW,M,0x0000,saved trap return instruction address
+0x03,CAUSE,RO,M,0x0000,synchronous cause or interrupt flag plus source ID
+0x04,TVAL,RO,M,0x0000,cause-specific instruction or address value
+0x05,IENABLE,RW,M,0x0000,per-source mask for 16 standard interrupt inputs
+0x06,IPENDING,RO,M,0x0000,synchronized pending state for 16 standard interrupt inputs
+0x07,SCRATCH,RW,M,0x0000,machine handler temporary with no hardware side effects
+0x08,SYSINFO,RO,U,0x0001,system block version and implemented capability flags

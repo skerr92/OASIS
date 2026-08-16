@@ -23,7 +23,8 @@ Base-16 provides:
 - Word-addressed data memory
 - Separate ordinary-memory and MMIO spaces
 - Basic ALU, move/immediate, load/store, and jump/branch operations
-- No privilege modes, interrupts, exceptions, or status flags
+- No required privilege modes, interrupts, exceptions, or status flags in the
+  base profile; OASIS-16P defines the optional shared system block
 
 Base-16T adds immediate arithmetic, register-indirect memory/MMIO access,
 scratch-to-far `MCP`, call/return, jump-register, and signed/unsigned comparison

@@ -40,4 +40,5 @@ OASIS-32 should provide:
 - No assembler or emulator implementation is required yet.
 - OASIS-32 preserves the OASIS v1.0 explicit memory/MMIO contract but defines
   independent encodings and full-width addresses.
-- No privileged exception model is finalized.
+- The draft OASIS-32P privileged model is shared with OASIS-16P through
+  [../exceptions.md](../exceptions.md).

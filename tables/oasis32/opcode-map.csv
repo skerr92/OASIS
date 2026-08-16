@@ -1,7 +1,7 @@
 mnemonic,class,op,format,extension,status,description
 NOP,0x0,0x0,S,OASIS-32I,draft,no operation
 HALT,0x0,0x1,S,OASIS-32I,draft,halt or enter implementation-defined stopped state
-TRAP,0x0,0x2,S,OASIS-32P,reserved,software trap for privileged profiles
+TRAP,0x0,0x2,S,OASIS-32P,draft,software trap carrying an implementation-independent immediate
 ADD,0x1,0x0,R,OASIS-32I,draft,rd = ra + rb
 SUB,0x1,0x1,R,OASIS-32I,draft,rd = ra - rb
 AND,0x1,0x2,R,OASIS-32I,draft,rd = ra & rb
@@ -56,3 +56,9 @@ DIV,0xA,0x1,R,OASIS-32M,draft,signed division
 DIVU,0xA,0x2,R,OASIS-32M,draft,unsigned division
 MOD,0xA,0x3,R,OASIS-32M,draft,signed remainder
 MODU,0xA,0x4,R,OASIS-32M,draft,unsigned remainder
+ERET,0xE,0x0,S,OASIS-32P,draft,return from a Machine-mode trap
+WFI,0xE,0x1,S,OASIS-32P,draft,wait for an interrupt or permitted resume event
+CSRR,0xE,0x2,S,OASIS-32P,draft,read an architectural system register
+CSRW,0xE,0x3,S,OASIS-32P,draft,write an architectural system register
+CSRS,0xE,0x4,S,OASIS-32P,draft,atomically set selected system-register bits
+CSRC,0xE,0x5,S,OASIS-32P,draft,atomically clear selected system-register bits

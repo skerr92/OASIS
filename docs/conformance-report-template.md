@@ -94,7 +94,7 @@ assumption, or extension required to reproduce the report.
 | External memory control | | |
 | Peripheral instructions | | |
 | Debug/halt interface | | |
-| Interrupts or exceptions | | |
+| OASIS-16P interrupts, traps, and privilege | | |
 
 ## Claim
 

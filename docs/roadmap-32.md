@@ -15,6 +15,18 @@ OASIS-32 should introduce:
 - Cleaner immediate handling
 - Extension space for future privileged, memory, SIMD, DSP, or system features
 
+The first privileged/system target is now `OASIS-32P`. It shares the two-mode,
+precise-trap state machine, system-register IDs, cause IDs, and 16-input
+interrupt model defined in [`spec/exceptions.md`](../spec/exceptions.md) with
+OASIS-16P. Its 64-bit instruction encodings remain profile-specific.
+
+Implementation should proceed in this order:
+
+1. build the shared interrupt/trap/privilege state block and executable model;
+2. integrate it with OASIS-16 retirement, redirect, and MMIO fault signals;
+3. reuse that verified block behind the OASIS-32 pipeline interface;
+4. bring up DungV-32 against OASIS-32I, OASIS-32T, and OASIS-32P compliance.
+
 The goal is not to replace OASIS-16, but to define a larger profile:
 
 ```text

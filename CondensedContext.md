@@ -2,14 +2,14 @@
 
 ## Context Freshness
 Context ID: FRESH-001
-Last Verified Commit: 68f3e7a415ae191e3ae44c922c290d0258dd7f7f
-Current HEAD: 68f3e7a415ae191e3ae44c922c290d0258dd7f7f
+Last Verified Commit: 32aa67a930fcf7ef255ee1ef0bb0eea0a4440c8f
+Current HEAD: 32aa67a930fcf7ef255ee1ef0bb0eea0a4440c8f
 Generated: 2026-08-16
 Status:
-- Partial: verified against `HEAD`, with uncommitted v1.0 MMIO baseline work.
+- Partial: v1.0 MMIO baseline is pushed to `origin/v1.0_source`; optional
+  OASIS-16P/OASIS-32P and native-rebuild updates are uncommitted.
 Files requiring verification:
-- v1.0 ISA/spec, assembler, toolchain, ABI/linker, compliance, and OASIS-32
-  roadmap changes listed by `git status`.
+- Interrupt/trap/privilege architecture and downstream DungV integration notes.
 
 ## Purpose
 Durable, compact memory for agent work in this repository. Keep this file short,
@@ -18,23 +18,22 @@ current, and useful for future agents.
 ## Current Focus
 Context ID: ACTIVE-001
 Confidence: High; verified against the instruction tables and assembler.
-- The accepted OASIS v1.0 memory/MMIO boundary is implemented across canonical
-  tables, specifications, assemblers, compiler/runtime ABI, tests, and OASIS-32
-  planning.
+- The accepted OASIS v1.0 memory/MMIO boundary is implemented. Current work
+  defines optional OASIS-16P/OASIS-32P and hardens the native toolchain rebuild.
 
 ## Handoff
 Context ID: HANDOFF-001
 Confidence: High.
 - Last known state: v1.0 baseline uses explicit address spaces, uniform direct
   operands, full indirect pointers, the scratch ABI, and `MCP` opcode `00:1100`.
-- Next useful step: Implement the v1.0 decode/data-path contract in downstream
-  RTL or simulators and test against the updated compliance fixtures.
-- Validation: `make generate`, `make check`, and `git diff --check` passed on
-  2026-08-16; 32 opcodes and 17 compliance fixtures validated.
+- Next useful step: review/commit the P-profile contract, then integrate DungV
+  after v1.0 merges to the OASIS default branch.
+- Validation: `make check`, `git diff --check`, and a clean native GCC 14.3.0 /
+  binutils 2.46 build with `--run-tests` passed on 2026-08-16.
 
 ## Stable Facts
 Context ID: FACTS-001
-Confidence: High; verified against commit `68f3e7a`.
+Confidence: High; verified against commit `32aa67a`.
 - Base-16 instructions are 32 bits; data words are 16 bits and word-addressed.
 - v1.0 direct memory operands are `{mmio, addr11}` and address 2048 words in
   each of two non-aliasing spaces.
@@ -63,6 +62,12 @@ Confidence: High; user direction recorded 2026-08-16.
   ordinary-memory scratch word to a register-addressed memory/MMIO destination.
 - OASIS-32 preserves separate memory/MMIO spaces through an M-format space bit
   while retaining full 32-bit addresses and requiring no baseline scratch area.
+- OASIS-16P and OASIS-32P share User/Machine modes, nine system registers,
+  precise direct-vector traps, 16 interrupt inputs, cause IDs, and return rules.
+- OASIS-16P is an optional class `00`, opcode `1110` system group; OASIS-32P
+  uses class `0xE` except for class `0x0` `TRAP`.
+- `TRAP imm8` saves the following PC and places its zero-extended immediate in
+  `TVAL`; the system save bank is architecturally one level deep.
 
 ## Known Constraints
 Context ID: CONSTRAINTS-001
@@ -72,6 +77,8 @@ Confidence: High.
 - Preserve the unrelated untracked `.DS_Store`.
 - OASIS-32 remains a separate draft and need not inherit Base-16 scratch-space
   constraints without analysis.
+- DungV currently remains outside this change set; advance its OASIS submodule
+  and implement v1 only after v1.0 merges to the default branch.
 
 ## File Map
 Context ID: FILEMAP-001
@@ -83,6 +90,9 @@ Confidence: High.
 - `spec/memory-model.md`: normative Base-16 memory model.
 - `docs/mmio-peripheral-bus-v1.0.md`: accepted v1.0 architecture rationale.
 - `spec/oasis32/memory.md`: OASIS-32 mapping of the explicit space contract.
+- `spec/exceptions.md`: shared OASIS-16P/OASIS-32P system-state contract.
+- `tables/system-registers.csv`, `tables/trap-causes.csv`: canonical system IDs.
+- `docs/dungv-v1-integration.md`: downstream DungV and DungV-32 sequence.
 
 ## Validation Memory
 Context ID: VALIDATION-001
@@ -91,6 +101,8 @@ Confidence: Medium.
 - `make generate` generated 32 instruction pages and v1.0 toolchain metadata.
 - `make check` passed all repository validators and tests on 2026-08-16.
 - `git diff --check` passed on 2026-08-16.
+- Fresh native prefix `.toolchain/oasis16-v1-darwin-arm64` built and passed the
+  full toolchain validation suite on 2026-08-16.
 
 ## Coverage
 Context ID: COVERAGE-001
@@ -102,10 +114,9 @@ Confidence: Medium.
 ## Changes
 | Date | Tags | Change | Files | Commit | Remote |
 | --- | --- | --- | --- | --- | --- |
-| 2026-08-16 | `[v1.0]` `[baseline]` `[toolchain]` `[oasis32]` | Solidified explicit memory/MMIO encodings, MCP, scratch ABI, code generation, compliance, and OASIS-32 mapping. | ISA/spec, tables, tools, toolchain, tests, docs | Uncommitted | Not confirmed |
-| 2026-08-16 | `[v1.0]` `[mmio]` `[abi]` | Drafted uniform direct operands, a 32-word configurable scratch block, and `r59`/`r60` far-transfer convention. | `docs/mmio-peripheral-bus-v1.0.md`, `CondensedContext.md` | Uncommitted | Not confirmed |
-| 2026-08-16 | `[v1.0]` `[mmio]` `[msi]` | Selected single-word MSI encoding with `mmio` plus an 11-bit per-space address. | `docs/mmio-peripheral-bus-v1.0.md`, `CondensedContext.md` | Uncommitted | Not confirmed |
-| 2026-08-16 | `[v1.0]` `[mmio]` `[isa]` | Began MMIO/peripheral-bus design and recorded the MSI encoding constraint. | `docs/mmio-peripheral-bus-v1.0.md`, `CondensedContext.md` | Uncommitted | Not confirmed |
+| 2026-08-16 | `[v1.0]` `[baseline]` `[toolchain]` `[oasis32]` | Solidified explicit memory/MMIO encodings, MCP, scratch ABI, code generation, compliance, and OASIS-32 mapping. | ISA/spec, tables, tools, toolchain, tests, docs | `32aa67a` | `origin/v1.0_source` |
+| 2026-08-16 | `[v1.0]` `[toolchain]` `[native]` | Fixed stale generated relocation-name migration and completed a clean GCC/binutils rebuild. | `toolchain/scripts/apply-gcc14-backend.py` | Uncommitted | Not confirmed |
+| 2026-08-16 | `[OASIS-16P]` `[OASIS-32P]` `[DungV]` | Defined the shared system block, canonical IDs/encodings, validation, and downstream integration order. | `spec/exceptions.md`, system tables, OASIS-32 tables/docs, DungV integration note | Uncommitted | Not confirmed |
 
 ## Archived History
 - None yet.
@@ -116,3 +127,6 @@ Confidence: High.
 - Downstream implementations must update RTL/simulator decode and expose MMIO
   request/completion/error behavior in their conformance reports.
 - A future revision may standardize more detailed fault/timeout behavior.
+- Native binutils support for OASIS-16P grouped subops and executable P-profile
+  compliance fixtures are the next toolchain layer; current native rebuild
+  validates the v1 base/MMIO contract.

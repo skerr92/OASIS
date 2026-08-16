@@ -147,6 +147,10 @@ def insert_reloc_docs(path: Path) -> bool:
         "\n"
     )
     text = read_text(path).replace(bad_addition, "")
+    text = text.replace("BFD_RELOC_OASIS16_ADDR12", "BFD_RELOC_OASIS16_ADDR11")
+    text = text.replace(
+        "BFD_RELOC_OASIS16_MSI_ADDR12", "BFD_RELOC_OASIS16_MSI_ADDR11"
+    )
     if bad_enumx_addition in text:
         write_text(path, text.replace(bad_enumx_addition, addition, 1))
         return True
@@ -156,6 +160,18 @@ def insert_reloc_docs(path: Path) -> bool:
     if marker not in text:
         return False
     write_text(path, text.replace(marker, addition + marker, 1))
+    return True
+
+
+def migrate_reloc_names(path: Path) -> bool:
+    text = read_text(path)
+    updated = text.replace("BFD_RELOC_OASIS16_ADDR12", "BFD_RELOC_OASIS16_ADDR11")
+    updated = updated.replace(
+        "BFD_RELOC_OASIS16_MSI_ADDR12", "BFD_RELOC_OASIS16_MSI_ADDR11"
+    )
+    if updated == text:
+        return False
+    write_text(path, updated)
     return True
 
 
@@ -406,10 +422,14 @@ def integrate_binutils(binutils_src: Path) -> list[str]:
         changes.append("bfd/elf-bfd.h")
 
     reloc_c = binutils_src / "bfd" / "reloc.c"
+    if patch_if_exists(reloc_c, migrate_reloc_names):
+        changes.append("bfd/reloc.c:reloc-migration")
     if patch_if_exists(reloc_c, insert_reloc_docs):
         changes.append("bfd/reloc.c")
 
     bfd_in2_h = binutils_src / "bfd" / "bfd-in2.h"
+    if patch_if_exists(bfd_in2_h, migrate_reloc_names):
+        changes.append("bfd/bfd-in2.h:reloc-migration")
     if patch_if_exists(
         bfd_in2_h,
         lambda path: insert_before_marker(

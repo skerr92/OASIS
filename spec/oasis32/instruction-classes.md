@@ -21,7 +21,7 @@ decoder.
 | `0xB` | `ATOMIC` | Atomics and memory ordering |
 | `0xC` | `CUSTOM` | Vendor/custom extension namespace |
 | `0xD` | `VECTOR` | Reserved vector/SIMD namespace |
-| `0xE` | `PRIVILEGED` | Reserved privileged/system namespace |
+| `0xE` | `PRIVILEGED` | OASIS-32P return, wait, and system-register operations |
 | `0xF` | `EXTENDED` | Escape and future expansion namespace |
 
 Reserved classes and opcodes must decode as illegal instructions unless an
